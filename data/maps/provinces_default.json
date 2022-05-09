@@ -1,0 +1,29 @@
+[
+	{
+		"Colour" : "ff00ff"
+		,"Name" : "Inaccessible province"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "00ff00"
+		,"Name" : "Green province"
+		,"Owner" : "00ff00"
+	}
+	,{
+		"Colour" : "ff0000"
+		,"Name" : "Red province"
+		,"Owner" : "ff0000"
+	}
+	,{
+		"Colour" : "0000ff"
+		,"Name" : "Blue province"
+		,"Owner" : "ff0000"
+	}
+	,{
+		"Colour" : "00ffff"
+		,"Name" : "Teal province"
+		,"Owner" : "ff0000"
+	}
+
+	
+]

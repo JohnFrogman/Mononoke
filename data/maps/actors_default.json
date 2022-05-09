@@ -1,0 +1,10 @@
+[
+	{
+		"Colour" : "ff0000"
+		,"Name" : "player"
+	}
+	,{
+		"Colour" : "00ff00"
+		,"Name" : "Green player"
+	}
+]
