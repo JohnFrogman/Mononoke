@@ -2,21 +2,41 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Mononoke
 {
     class ProvinceResource
     {
-        const float SecondsToExpire = 10f;
-        public float CurrentSecond = 0f;
-        public int Amount;
-        public ProvinceResource()
+        float CurrentSecond = 0;
+        float SecondsToSpawn = 10f;
+
+        //int Min = 0;
+        int Max = 5;
+        int Current = 0;
+        //int Increment = 1;
+        Vector2 Position;
+        Province Province;
+        eProvinceResourceType Type;
+        public ProvinceResource( eProvinceResourceType type, Province p, Vector2 pos )
         {
-            Amount = 1;
+            Type = type;
+            Province = p;
+            Position = pos;
         }
-        public void Update( GameTime gameTime )
+        public void Update( GameTime gameTime  )
         {
-            CurrentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            CurrentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;    
+            if ( CurrentSecond > SecondsToSpawn )
+            {
+                if ( Current < Max )
+                    ++Current;
+                CurrentSecond = 0;
+            }
+        }
+        public void Draw( SpriteBatch spriteBatch )
+        {
+            spriteBatch.DrawString( Mononoke.Font, Current.ToString(), Position, Color.White );
         }
     }
 }

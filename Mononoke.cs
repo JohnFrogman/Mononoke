@@ -1,17 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
+
 namespace Mononoke
 {
     public class Mononoke : Game
     {
+        public const int DRAW_DISTANCE = 2;
         //public static Mononoke Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         
         private Controller Controller;
         private MapHolder Maps;
+        private ProvinceHolder Provinces;
+        private ActorHolder Actors;
         Camera2D Camera;
+        public static SpriteFont Font { get; private set;}
         public Mononoke()
         {
             //if ( Game != null )
@@ -29,18 +35,19 @@ namespace Mononoke
             // TODO: Add your initialization logic here
             base.Initialize();  
 
-_graphics.PreferredBackBufferWidth = 1920;  // set this value to the desired width of your window
-_graphics.PreferredBackBufferHeight = 1080;   // set this value to the desired height of your window
-_graphics.ApplyChanges();
+            _graphics.PreferredBackBufferWidth = 1920;  // set this value to the desired width of your window
+            _graphics.PreferredBackBufferHeight = 1080;   // set this value to the desired height of your window
+            _graphics.ApplyChanges();
 
+            Font = Content.Load<SpriteFont>("vampire_wars");
             Maps = new MapHolder( _graphics );
             Camera = new Camera2D( );
             Controller = new Controller( Camera, this );
 
             //Camera.Zoom = 1f;
-            //Actors = new ActorHolder();
+            Actors = new ActorHolder();
             //Actors.New( );
-            //Provinces = new ProvinceHolder();
+            Provinces = new ProvinceHolder( Actors );
             //EconomyModel.SetProvinceHolder( Provinces );
             //Provinces.New( Maps, EconomyModel );
             //Player.Load("");
@@ -58,6 +65,7 @@ _graphics.ApplyChanges();
         protected override void Update(GameTime gameTime)
         {
             Controller.Update( gameTime );
+            Provinces.Update( gameTime );
             base.Update(gameTime);
         }
 
@@ -71,8 +79,12 @@ _graphics.ApplyChanges();
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
                            SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));
 
-            Maps.Draw( _spriteBatch );
+        MouseState mstate = Mouse.GetState();
+            Vector2 result = ( mstate.Position.ToVector2() - Camera.Position );
 
+            Maps.Draw( _spriteBatch, _graphics, result /*-Camera.Position*/ );
+            Provinces.Draw ( _spriteBatch, _graphics, result );        
+    
             _spriteBatch.End();
 
             base.Draw(gameTime);

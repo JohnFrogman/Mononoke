@@ -25,3 +25,10 @@
 /processorParam:TextureFormat=Color
 /build:terrain.png
 
+#begin vampire_wars.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:vampire_wars.spritefont
+

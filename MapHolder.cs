@@ -8,18 +8,18 @@ namespace Mononoke
 {
     class MapHolder
     {
-        public const int PIXELS_PER_TILE = 1;
+        public const int PIXELS_PER_TILE = 32;
         MapPainter TerrainPainter;
-        MapPainter ProvincePainter;
+        //MapPainter ProvincePainter;
         public MapHolder( GraphicsDeviceManager graphics )        
         {
-            TerrainPainter = new MapPainter( "data/maps/test.png", graphics );
+            TerrainPainter = new MapPainter( "data/maps/test_terrain.png", graphics );
             //ProvincePainter = new MapPainter("data/maps/provinces_default.png", graphics ); 
             
         }
-        public void Draw( SpriteBatch spriteBatch)
+        public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
-            TerrainPainter.Draw( spriteBatch );
+            TerrainPainter.Draw( spriteBatch, graphics, pos );
         }
         public void GetTerrainColourAt(Vector2 pos )
         {

@@ -33,8 +33,16 @@ namespace Mononoke
                 }
             }
         }
-        public void Draw( SpriteBatch spriteBatch)
+        public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
+            //for (int i = 0; i < Mononoke.DRAW_DISTANCE; i++)
+            //{
+                //Texture2D tex = new Texture2D( graphics.GraphicsDevice, 1,1 /*MapHolder.PIXELS_PER_TILE, MapHolder.PIXELS_PER_TILE*/ );
+                //Color[] pixels = new Color[1];
+            //    pixels[0] = Color.Magenta;
+            //    tex.SetData(pixels);
+            //    spriteBatch.Draw( tex, pos, null, Color.White, 0, new Vector2 (0,0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f );
+            //}
             spriteBatch.Draw( texture, new Vector2(0,0), null, Color.White, 0, new Vector2 (0,0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f );
         }
         public Color GetColourAt( Vector2 pos )

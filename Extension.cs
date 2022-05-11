@@ -22,7 +22,7 @@ namespace Mononoke
         public static Color GetColor( this JsonElement e)
         {   
             string str = e.ToString();
-            Color col = new Color();
+            //Color col = new Color();
             byte r = byte.Parse( str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber );
             byte g = byte.Parse( str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber );
             byte b = byte.Parse( str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber );

@@ -4,23 +4,25 @@ using System.Text;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 namespace Mononoke
 {
     class ProvinceHolder
     {
         List<Province> Provinces;
         Dictionary<Color, Province> ProvinceMap;
-        public ProvinceHolder()
+        public ProvinceHolder( ActorHolder actorHolder )
         {
             ProvinceMap = new Dictionary<Color, Province>();
             Provinces = new List<Province>();
-            New();
+            New( actorHolder );
         }
-        public void New()
+        public void New( ActorHolder actorHolder )
         {
-            Load(  "/data/maps/provinces_default.json" );
+            Load(  "data/json/provinces_default.json", actorHolder );
         }
-        public void Load( string path )
+        public void Load( string path, ActorHolder actorHolder )
         {
             if ( !File.Exists( path ) )
             {
@@ -32,16 +34,23 @@ namespace Mononoke
             
             foreach ( JsonElement i in itr )
             {
-                Province p = Province.FromJson(i);
+                Province p = Province.FromJson(i, actorHolder );
                 Provinces.Add( p );
                 ProvinceMap.Add( p.Colour, p);
             }
         }
-            public void Update( GameTime gameTime )
+        public void Update( GameTime gameTime )
         {
             foreach ( Province p in Provinces )
             {
                 p.Update ( gameTime );
+            }
+        }
+        public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
+        {
+            foreach ( Province p in Provinces )
+            {
+                p.Draw ( spriteBatch );
             }
         }
         

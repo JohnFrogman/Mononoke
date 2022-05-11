@@ -1,0 +1,42 @@
+[
+	{
+		"Colour" : "00c897"
+		,"Name" : "Province 1"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "008dc8"
+		,"Name" : "Province 2"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "c8007a"
+		,"Name" : "Province 3"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "c80000"
+		,"Name" : "Province 4"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "a900c8"
+		,"Name" : "Province 5"
+		,"Owner" : "00ff00"
+	}
+	,{
+		"Colour" : "6c00c8"
+		,"Name" : "Province 6"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "2f00c8"
+		,"Name" : "Province 7"
+		,"Owner" : ""
+	}
+	,{
+		"Colour" : "00ffff"
+		,"Name" : "Province 8"
+		,"Owner" : ""
+	}
+]

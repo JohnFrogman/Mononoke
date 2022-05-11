@@ -13,32 +13,40 @@ namespace Mononoke
         public const string COLOUR_PROPERTY_STR = "Colour";
         string Name;
         public Color Colour;
-        Color Owner;
-        List<ProvinceResourceSpawn> ResourceSpawns;
-        List<ProvinceResource> Resources
-        Province( string name, Color color, Color owner )
+        Actor Owner;
+        List<ProvinceResource> Resources;
+        Province( string name, Color color )
         {
             Name = name;
             Colour = color;
-            Owner = owner;
+            Resources = new List<ProvinceResource>();
+            Resources.Add( new ProvinceResource(eProvinceResourceType.Food, this, new Vector2(0,0)));
         }
-        public static Province FromJson( JsonElement json )
+        public static Province FromJson( JsonElement json, ActorHolder actorHolder )
         {
-            return new Province ( 
+            Province p = new Province ( 
                 json.GetProperty( NAME_PROPERTY_STR ).GetString()
                 ,json.GetProperty( COLOUR_PROPERTY_STR ).GetColor() 
-                ,json.GetProperty( OWNER_PROPERTY_STR ).GetColor()
             );
+            if ( json.GetProperty( OWNER_PROPERTY_STR ).GetString() != "" )
+            {
+                p.SetOwner( actorHolder.GetActor ( json.GetProperty( OWNER_PROPERTY_STR ).GetColor() )  );
+            }
+            return p;
         }
-        public void SpawnSupply( eProvinceResourceType type, Vector2 pos )
+        void SetOwner ( Actor actor )
         {
-        }
-        public void SpawnDemand()
-        {
+            Owner = actor;
         }
         public void Update( GameTime gameTime )
         {
-            
+            foreach ( ProvinceResource r in Resources )
+                r.Update( gameTime );
+        }
+        public void Draw( SpriteBatch spriteBatch )
+        {
+            foreach ( ProvinceResource r in Resources )
+                r.Draw( spriteBatch );
         }
     }
 }
