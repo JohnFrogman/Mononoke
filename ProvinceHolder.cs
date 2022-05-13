@@ -12,17 +12,17 @@ namespace Mononoke
     {
         List<Province> Provinces;
         Dictionary<Color, Province> ProvinceMap;
-        public ProvinceHolder( ActorHolder actorHolder )
+        public ProvinceHolder( ActorHolder actorHolder, MapHolder maps )
         {
             ProvinceMap = new Dictionary<Color, Province>();
             Provinces = new List<Province>();
-            New( actorHolder );
+            New( actorHolder, maps );
         }
-        public void New( ActorHolder actorHolder )
+        public void New( ActorHolder actorHolder, MapHolder maps )
         {
-            Load(  "data/json/provinces_default.json", actorHolder );
+            Load(  "data/json/provinces_default.json", actorHolder, maps );
         }
-        public void Load( string path, ActorHolder actorHolder )
+        public void Load( string path, ActorHolder actorHolder, MapHolder maps )
         {
             if ( !File.Exists( path ) )
             {
@@ -32,9 +32,17 @@ namespace Mononoke
             JsonElement e = doc.RootElement;
             JsonElement.ArrayEnumerator itr = e.EnumerateArray();
             
+            Dictionary<Color, List<Tuple<eProvinceResourceType, Vector2>>> resources = maps.GetProvinceResources();
             foreach ( JsonElement i in itr )
             {
                 Province p = Province.FromJson(i, actorHolder );
+                if ( resources.ContainsKey(p.Colour))
+                {
+                    foreach ( Tuple<eProvinceResourceType, Vector2> r in resources[p.Colour] )
+                    {
+                        p.AddResourceAt( r.Item1, r.Item2 );
+                    }
+                }
                 Provinces.Add( p );
                 ProvinceMap.Add( p.Colour, p);
             }

@@ -20,7 +20,7 @@ namespace Mononoke
             Name = name;
             Colour = color;
             Resources = new List<ProvinceResource>();
-            Resources.Add( new ProvinceResource(eProvinceResourceType.Food, this, new Vector2(0,0)));
+            //Resources.Add( new ProvinceResource(eProvinceResourceType.Food, this, new Vector2(0,0)));
         }
         public static Province FromJson( JsonElement json, ActorHolder actorHolder )
         {
@@ -47,6 +47,10 @@ namespace Mononoke
         {
             foreach ( ProvinceResource r in Resources )
                 r.Draw( spriteBatch );
+        }
+        public void AddResourceAt( eProvinceResourceType res, Vector2 pos )
+        {
+            Resources.Add( new ProvinceResource( res, this, pos ) );
         }
     }
 }

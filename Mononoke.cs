@@ -40,18 +40,13 @@ namespace Mononoke
             _graphics.ApplyChanges();
 
             Font = Content.Load<SpriteFont>("vampire_wars");
-            Maps = new MapHolder( _graphics );
-            Camera = new Camera2D( );
+            Camera = new Camera2D( _graphics );
             Controller = new Controller( Camera, this );
 
             //Camera.Zoom = 1f;
+            Maps = new MapHolder( _graphics );
             Actors = new ActorHolder();
-            //Actors.New( );
-            Provinces = new ProvinceHolder( Actors );
-            //EconomyModel.SetProvinceHolder( Provinces );
-            //Provinces.New( Maps, EconomyModel );
-            //Player.Load("");
-
+            Provinces = new ProvinceHolder( Actors, Maps );
         }
 
         protected override void LoadContent()
@@ -79,10 +74,8 @@ namespace Mononoke
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
                            SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));
 
-        MouseState mstate = Mouse.GetState();
-            Vector2 result = ( mstate.Position.ToVector2() - Camera.Position );
-
-            Maps.Draw( _spriteBatch, _graphics, result /*-Camera.Position*/ );
+            Vector2 result = Vector2.Floor( -Camera.Position / MapHolder.PIXELS_PER_TILE );
+            Maps.Draw( _spriteBatch, _graphics, result );
             Provinces.Draw ( _spriteBatch, _graphics, result );        
     
             _spriteBatch.End();

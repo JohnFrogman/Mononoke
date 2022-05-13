@@ -55,7 +55,7 @@ namespace Mononoke
             {
                 mousedown = false;
             }
-            Camera.Move( sprint * 100f * camTranslate );
+            Camera.Move( sprint /** 100f*/ * camTranslate );
         }
         public Vector2 ScreenPosToMapPos()
         {

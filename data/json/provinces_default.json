@@ -1,22 +1,22 @@
 [
 	{
 		"Colour" : "00c897"
-		,"Name" : "Province 1"
-		,"Owner" : ""
+		,"Name" : "Shireen"
+		,"Owner" : "ff0000"
 	}
 	,{
 		"Colour" : "008dc8"
-		,"Name" : "Province 2"
+		,"Name" : "Matagi"
 		,"Owner" : ""
 	}
 	,{
 		"Colour" : "c8007a"
-		,"Name" : "Province 3"
+		,"Name" : "Jethro"
 		,"Owner" : ""
 	}
 	,{
 		"Colour" : "c80000"
-		,"Name" : "Province 4"
+		,"Name" : "Harran"
 		,"Owner" : ""
 	}
 	,{

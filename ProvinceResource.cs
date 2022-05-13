@@ -36,7 +36,7 @@ namespace Mononoke
         }
         public void Draw( SpriteBatch spriteBatch )
         {
-            spriteBatch.DrawString( Mononoke.Font, Current.ToString(), Position, Color.White );
+            spriteBatch.DrawString( Mononoke.Font, Current.ToString(), Position * MapHolder.PIXELS_PER_TILE, Color.Black );
         }
     }
 }
