@@ -95,7 +95,7 @@ namespace Mononoke
         public void ClickAt(Vector2 pos )
         {
             Debug.WriteLine( "click at " + pos );
-            Maps.GetTerrainColourAt( pos );
+            //Maps.TryClickAt(pos);//GetTerrainColourAt( pos );
         }
     }
 }

@@ -12,8 +12,10 @@ namespace Mononoke
     {
         List<Province> Provinces;
         Dictionary<Color, Province> ProvinceMap;
+        Dictionary<Vector2, Province> ProvinceResourcePoints;
         public ProvinceHolder( ActorHolder actorHolder, MapHolder maps )
         {
+            ProvinceResourcePoints = new Dictionary<Vector2, Province>();
             ProvinceMap = new Dictionary<Color, Province>();
             Provinces = new List<Province>();
             New( actorHolder, maps );
@@ -41,6 +43,7 @@ namespace Mononoke
                     foreach ( Tuple<eProvinceResourceType, Vector2> r in resources[p.Colour] )
                     {
                         p.AddResourceAt( r.Item1, r.Item2 );
+                        ProvinceResourcePoints.Add( r.Item2, p );
                     }
                 }
                 Provinces.Add( p );
@@ -61,6 +64,12 @@ namespace Mononoke
                 p.Draw ( spriteBatch );
             }
         }
-        
+        public void TryClickAt( Vector2 pos )
+        {
+            if ( ProvinceResourcePoints.ContainsKey( pos ) )
+            {
+                   
+            }
+        }
     }
 }
