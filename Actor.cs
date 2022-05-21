@@ -7,13 +7,13 @@ using System.Text.Json;
 
 namespace Mononoke
 {
-    class Actor
+    public class Actor
     {
         public const string NAME_PROPERTY_STR = "Name";
         public const string COLOUR_PROPERTY_STR = "Colour";
         public Color Colour;
         public string Name;
-        Actor( string name, Color colour )
+        protected Actor( string name, Color colour )
         {
             Colour = colour;
             Name = name;

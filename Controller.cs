@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 namespace Mononoke
 {
     class Controller
@@ -9,10 +10,29 @@ namespace Mononoke
         Mononoke Game;
         Camera2D Camera;
         bool mousedown = false;
-        public Controller( Camera2D camera, Mononoke game ) 
+        bool dragging = false;
+        MapHolder Maps;
+        ProvinceHolder Provinces;
+        Player Player;
+        GameEventQueue EventQueue;
+        Pathfinder pathfinder;
+
+        Vector2 HoveredPos;
+        Vector2 HoveredTile;
+        Vector2 DragOriginTile;
+        Vector2 PathPreviewTile;
+
+        List<Vector2> PathPreview;
+        public Controller( Camera2D camera, Mononoke game, MapHolder maps, ProvinceHolder provinces, Player player, GameEventQueue eventQueue, GraphicsDeviceManager graphics ) 
         {
             Game = game;
             Camera = camera;
+            Maps = maps;
+            Provinces = provinces;
+            Player = player;
+            EventQueue = eventQueue;
+            pathfinder = new Pathfinder( graphics );
+            PathPreview = new List<Vector2>();
         }
         public void Update( GameTime gameTime)
         {
@@ -46,23 +66,73 @@ namespace Mononoke
             //Vector2 mpos = ScreenPosToMapPos();
             //Debug.WriteLine("Mouse pos " +  mpos);
             MouseState mstate = Mouse.GetState();
+            HoveredPos = mstate.Position.ToVector2();
+            Vector2 tile = ScreenPosToMapPos( HoveredPos );
+            HoveredTile = tile;
             if ( !mousedown && mstate.LeftButton == ButtonState.Pressed )
             {
+                Debug.WriteLine("Mouse Down");
+                dragging = Provinces.IsDraggable( DragOriginTile );
+                Debug.WriteLine("Dragging is " + dragging);
+                DragOriginTile = HoveredTile;
                 mousedown = true;
-                Game.ClickAt( ScreenPosToMapPos() );
             }
-            else if (mstate.LeftButton == ButtonState.Released )
+            else if ( mousedown && mstate.LeftButton == ButtonState.Released )
             {
-                mousedown = false;
+                Debug.WriteLine("Mouse Release");
+                if ( DragOriginTile != HoveredTile )
+                    DragEnd();
+                else
+                    Click ( );
+                mousedown = false;    
+                dragging = false;
             }
+            
+            if ( dragging && mousedown && DragOriginTile != HoveredTile && HoveredTile != PathPreviewTile )
+            {
+                PathPreviewTile = HoveredTile;
+                SetDragPath();
+            }
+                
             Camera.Move( sprint /** 100f*/ * camTranslate );
         }
-        public Vector2 ScreenPosToMapPos()
+        public void Draw( SpriteBatch spriteBatch)
         {
-            MouseState mstate = Mouse.GetState();
-            Vector2 result = ( mstate.Position.ToVector2() - Camera.Position );
+            if ( PathPreview.Count > 0)
+                pathfinder.DrawPathPreview( PathPreview, spriteBatch );
+        }
+        void DragEnd( )
+        {   
+            PathPreview.Clear();
+            if ( Provinces.TryDragAt( DragOriginTile, HoveredTile, Player ) )
+            {
+            }
+        }
+        void Click()
+        {
+            if ( TryEventClick( HoveredPos ) )
+                return;
+            if ( TryMapClick( HoveredTile ) )
+                return;
+        }
+        bool TryEventClick( Vector2 mousePos )
+        {
+            return EventQueue.TryClickAt( mousePos );
+        }
+        bool TryMapClick( Vector2 tile)
+        {
+            Provinces.TryClickAt(tile, Player);
+            return true;
+        }
+        public Vector2 ScreenPosToMapPos( Vector2 mPos)
+        {
+            Vector2 result = mPos - Camera.Position;
             result /= MapHolder.PIXELS_PER_TILE;
             return Vector2.Floor(result);
+        }
+        void SetDragPath( )
+        {
+            PathPreview = pathfinder.GetPath( DragOriginTile, PathPreviewTile, Maps );
         }
     }
 }

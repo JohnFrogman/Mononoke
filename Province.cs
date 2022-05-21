@@ -14,12 +14,12 @@ namespace Mononoke
         string Name;
         public Color Colour;
         Actor Owner;
-        List<ProvinceResource> Resources;
+        Dictionary<Vector2, MapEvent> MapEvents;
         Province( string name, Color color )
         {
             Name = name;
             Colour = color;
-            Resources = new List<ProvinceResource>();
+            MapEvents = new Dictionary<Vector2, MapEvent>();
             //Resources.Add( new ProvinceResource(eProvinceResourceType.Food, this, new Vector2(0,0)));
         }
         public static Province FromJson( JsonElement json, ActorHolder actorHolder )
@@ -40,17 +40,26 @@ namespace Mononoke
         }
         public void Update( GameTime gameTime )
         {
-            foreach ( ProvinceResource r in Resources )
+            foreach (MapEvent r in MapEvents.Values )
                 r.Update( gameTime );
         }
         public void Draw( SpriteBatch spriteBatch )
         {
-            foreach ( ProvinceResource r in Resources )
+            foreach (MapEvent r in MapEvents.Values )
                 r.Draw( spriteBatch );
         }
-        public void AddResourceAt( eProvinceResourceType res, Vector2 pos )
+        public void AddEventAt( Vector2 pos, MapEvent ev )
         {
-            Resources.Add( new ProvinceResource( res, this, pos ) );
+            MapEvents.Add( pos , ev );
+        }
+        public void TileClick( Vector2 pos, Player clicker )
+        {
+            //ProvinceResource r = (ProvinceResource)Events[ pos ];
+            MapEvents[pos].OnClick( clicker );
+        }
+        public MapEvent GetEventAt(Vector2 pos )
+        {
+            return MapEvents[pos];
         }
     }
 }

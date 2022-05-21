@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -12,10 +13,10 @@ namespace Mononoke
     {
         List<Province> Provinces;
         Dictionary<Color, Province> ProvinceMap;
-        Dictionary<Vector2, Province> ProvinceResourcePoints;
+        Dictionary<Vector2, Province> ProvinceEventPoints;
         public ProvinceHolder( ActorHolder actorHolder, MapHolder maps )
         {
-            ProvinceResourcePoints = new Dictionary<Vector2, Province>();
+            ProvinceEventPoints = new Dictionary<Vector2, Province>();
             ProvinceMap = new Dictionary<Color, Province>();
             Provinces = new List<Province>();
             New( actorHolder, maps );
@@ -34,16 +35,16 @@ namespace Mononoke
             JsonElement e = doc.RootElement;
             JsonElement.ArrayEnumerator itr = e.EnumerateArray();
             
-            Dictionary<Color, List<Tuple<eProvinceResourceType, Vector2>>> resources = maps.GetProvinceResources();
+            Dictionary<Color, List<Tuple<Vector2, MapEvent>>> resources = maps.GetProvinceMapEvents();
             foreach ( JsonElement i in itr )
             {
                 Province p = Province.FromJson(i, actorHolder );
                 if ( resources.ContainsKey(p.Colour))
                 {
-                    foreach ( Tuple<eProvinceResourceType, Vector2> r in resources[p.Colour] )
+                    foreach ( Tuple<Vector2, MapEvent> r in resources[p.Colour] )
                     {
-                        p.AddResourceAt( r.Item1, r.Item2 );
-                        ProvinceResourcePoints.Add( r.Item2, p );
+                        p.AddEventAt( r.Item1, r.Item2 );
+                        ProvinceEventPoints.Add( r.Item1, p );
                     }
                 }
                 Provinces.Add( p );
@@ -64,12 +65,28 @@ namespace Mononoke
                 p.Draw ( spriteBatch );
             }
         }
-        public void TryClickAt( Vector2 pos )
+        public bool TryClickAt( Vector2 pos, Player clicker )
         {
-            if ( ProvinceResourcePoints.ContainsKey( pos ) )
+            if (ProvinceEventPoints.ContainsKey( pos ) )
             {
-                   
+                ProvinceEventPoints[pos].TileClick( pos, clicker);
+                return true;
             }
+            return false;
+        }
+        public bool TryDragAt(Vector2 origin, Vector2 destination, Player dragQueen )
+        {
+            if ( ProvinceEventPoints.ContainsKey(origin) && ProvinceEventPoints.ContainsKey( destination ) )
+            {
+                MapEvent ev1 = ProvinceEventPoints[origin].GetEventAt( origin );
+                MapEvent ev2 = ProvinceEventPoints[origin].GetEventAt( destination );
+                ev1.TryLink(ev2);
+            }
+            return false;
+        }
+        public bool IsDraggable( Vector2 pos )
+        {
+            return ProvinceEventPoints.ContainsKey( pos ) && ProvinceEventPoints[pos].GetEventAt(pos) is IDraggable;
         }
     }
 }

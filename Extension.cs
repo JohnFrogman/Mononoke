@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
-
+using System;
 namespace Mononoke
 {
     public static class Extension
@@ -36,6 +35,10 @@ namespace Mononoke
             stack.Clear();
             foreach (var value in values.OrderBy(x => rnd.Next() ) )
                 stack.Push(value);
+        }
+        public static int ManhattanDistance( this Vector2 v1, Vector2 v2 )
+        {
+            return (int)MathF.Floor(v1.X -v2.X + v1.Y - v2.Y);
         }
     }
 }

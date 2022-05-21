@@ -8,7 +8,7 @@ namespace Mononoke
 {
     class MapHolder
     {
-        public const int PIXELS_PER_TILE = 8;
+        public const int PIXELS_PER_TILE = 16;
         public const int MAP_TILE_WIDTH = 256;
         public const int MAP_PIXEL_WIDTH = PIXELS_PER_TILE * MAP_TILE_WIDTH;
         public const int MAP_TILE_HEIGHT = 256;
@@ -25,14 +25,10 @@ namespace Mononoke
         {
             TerrainPainter.Draw( spriteBatch, graphics, pos );
         }
-        public void GetTerrainColourAt(Vector2 pos )
-        {
-            Debug.WriteLine( TerrainPainter.GetColourAt(pos) );
-        }
         // Dictionary< Province, List<Pair( ResourceType, Location ) >>
-        public Dictionary<Color, List<Tuple<eProvinceResourceType, Vector2>>> GetProvinceResources()
+        public Dictionary<Color, List<Tuple<Vector2, MapEvent>>> GetProvinceMapEvents()
         {
-            Dictionary<Color, List<Tuple<eProvinceResourceType, Vector2>>> result = new Dictionary<Color, List<Tuple<eProvinceResourceType, Vector2>>>();
+            Dictionary<Color, List<Tuple<Vector2, MapEvent>>> result = new Dictionary<Color, List<Tuple<Vector2, MapEvent>>>();
             for (int x = 0; x < MAP_TILE_WIDTH; x++)
             {
                 for (int y = 0; y < MAP_TILE_HEIGHT; y++)
@@ -41,15 +37,40 @@ namespace Mononoke
                     if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
                     {
                         Color provinceCol = ProvincePainter.TileColourMap[pos];
-                        Tuple<eProvinceResourceType, Vector2> resourceTuple = new Tuple<eProvinceResourceType, Vector2>(eProvinceResourceType.Food, pos);
+                        MapEvent ev = new ResourceSupplyEvent( eProvinceResourceType.Food, pos);
+                        Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>( pos, ev);
                         if (!result.ContainsKey(provinceCol))
-                            result.Add(provinceCol, new List<Tuple<eProvinceResourceType, Vector2>>());
+                            result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
+                        result[provinceCol].Add(resourceTuple);
+                    }
+                    else if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Urban )
+                    {
+                        Color provinceCol = ProvincePainter.TileColourMap[pos];
+                        MapEvent ev = new ResourceDemandEvent( 1, pos );
+                        Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>(pos, ev);
+                        if (!result.ContainsKey(provinceCol))
+                            result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
                         result[provinceCol].Add(resourceTuple);
                     }
                 }
             }
             return result;
         }
-    
+        public Color GetProvinceColourAt( Vector2 pos )
+        {
+            return ProvincePainter.GetColourAt(pos);
+        }
+        public eTerrainType GetTerrainAt(Vector2 pos)
+        {
+            return TerrainTypeMap.GetColourTerrainType( TerrainPainter.GetColourAt(pos) );
+        }
+        public float GetMapCostAt( Vector2 pos )
+        {
+            eTerrainType terrainType = GetTerrainAt( pos );
+            if ( terrainType == eTerrainType.Mountain )
+                return 3;
+            else 
+                return 1;
+        }
     }
 }

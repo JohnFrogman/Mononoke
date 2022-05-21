@@ -7,7 +7,10 @@ namespace Mononoke
 {
     public class Mononoke : Game
     {
+        public const int RENDER_WIDTH = 960;
+        public const int RENDER_HEIGHT = 540;
         public const int DRAW_DISTANCE = 2;
+        
         //public static Mononoke Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -16,6 +19,8 @@ namespace Mononoke
         private MapHolder Maps;
         private ProvinceHolder Provinces;
         private ActorHolder Actors;
+        private Player Player;
+        private GameEventQueue EventQueue;
         Camera2D Camera;
         public static SpriteFont Font { get; private set;}
         public Mononoke()
@@ -35,18 +40,21 @@ namespace Mononoke
             // TODO: Add your initialization logic here
             base.Initialize();  
 
-            _graphics.PreferredBackBufferWidth = 1920;  // set this value to the desired width of your window
-            _graphics.PreferredBackBufferHeight = 1080;   // set this value to the desired height of your window
+            _graphics.PreferredBackBufferWidth = RENDER_WIDTH;
+            _graphics.PreferredBackBufferHeight = RENDER_HEIGHT;
             _graphics.ApplyChanges();
 
             Font = Content.Load<SpriteFont>("vampire_wars");
             Camera = new Camera2D( _graphics );
-            Controller = new Controller( Camera, this );
 
             //Camera.Zoom = 1f;
             Maps = new MapHolder( _graphics );
             Actors = new ActorHolder();
             Provinces = new ProvinceHolder( Actors, Maps );
+            Player = new Player( Camera);
+            EventQueue = new GameEventQueue( Player );
+            Controller = new Controller( Camera, this, Maps, Provinces, Player, EventQueue, _graphics );
+            //EventQueue.AddEvent( new GameEvent( "Food demand", 1, EventQueue ) ); 
         }
 
         protected override void LoadContent()
@@ -61,6 +69,7 @@ namespace Mononoke
         {
             Controller.Update( gameTime );
             Provinces.Update( gameTime );
+            EventQueue.Update( gameTime );
             base.Update(gameTime);
         }
 
@@ -77,7 +86,10 @@ namespace Mononoke
             Vector2 result = Vector2.Floor( -Camera.Position / MapHolder.PIXELS_PER_TILE );
             Maps.Draw( _spriteBatch, _graphics, result );
             Provinces.Draw ( _spriteBatch, _graphics, result );        
-    
+            Player.Draw( _spriteBatch, _graphics );
+            EventQueue.Draw( _spriteBatch );
+            Controller.Draw( _spriteBatch );
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -91,11 +103,6 @@ namespace Mononoke
         public void Quit()
         {
             this.Exit();
-        }
-        public void ClickAt(Vector2 pos )
-        {
-            Debug.WriteLine( "click at " + pos );
-            //Maps.TryClickAt(pos);//GetTerrainColourAt( pos );
         }
     }
 }

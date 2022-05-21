@@ -48,7 +48,6 @@ namespace Mononoke
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 origin )
         {
-            Debug.WriteLine("Drawing at " + origin);
             spriteBatch.Draw( texture, new Vector2(0,0), null, new Color(255,255,255, 122), 0, new Vector2 (0,0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f );
             for (int x = 0; x < 10; x++)
             {
@@ -57,11 +56,10 @@ namespace Mononoke
                     Vector2 pos = origin + new Vector2(x,y);
                     if (TileColourMap.ContainsKey(pos))
                     {
-                        DrawTile( spriteBatch, graphics, pos );
+                        //DrawTile( spriteBatch, graphics, pos );
                     }
                     else
                     {
-                        Debug.WriteLine("No tile at " + origin);
                     }
                 }
             }
@@ -78,11 +76,11 @@ namespace Mononoke
         public void DrawTile( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
             Texture2D tex;  
-            float scale = MapHolder.PIXELS_PER_TILE;
+            //float scale = MapHolder.PIXELS_PER_TILE;
             Color col = TileColourMap[pos];
-            if ( TerrainTypeMap.GetColourTerrainType( col ) == eTerrainType.Forest )
+            if (TerrainTypeMap.GetColourTerrainType(col) == eTerrainType.Forest)
             {
-                scale = 1f;
+                //scale = 1f;
                 tex = TestTexture;
             }
             else
@@ -103,7 +101,7 @@ namespace Mononoke
 
 
             //spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), scale , SpriteEffects.None, 0f);
+            spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1 , SpriteEffects.None, 0f);
         }
     }
 }
