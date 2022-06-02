@@ -13,8 +13,10 @@ namespace Mononoke
         public const int MAP_PIXEL_WIDTH = PIXELS_PER_TILE * MAP_TILE_WIDTH;
         public const int MAP_TILE_HEIGHT = 256;
         public const int MAP_PIXEL_HEIGHT = PIXELS_PER_TILE * MAP_TILE_HEIGHT;
+        public const int SCREEN_TILE_WIDTH = 2 + Mononoke.RENDER_WIDTH / PIXELS_PER_TILE;
+        public const int SCREEN_TILE_HEIGHT = 2 + Mononoke.RENDER_HEIGHT / PIXELS_PER_TILE; 
 
-        MapPainter TerrainPainter;
+       MapPainter TerrainPainter;
         MapPainter ProvincePainter;
         public MapHolder( GraphicsDeviceManager graphics )        
         {
@@ -23,7 +25,7 @@ namespace Mononoke
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
-            TerrainPainter.Draw( spriteBatch, graphics, pos );
+            TerrainPainter.Draw( spriteBatch, graphics, pos ); // Terrain Colours
         }
         // Dictionary< Province, List<Pair( ResourceType, Location ) >>
         public Dictionary<Color, List<Tuple<Vector2, MapEvent>>> GetProvinceMapEvents()
@@ -37,7 +39,7 @@ namespace Mononoke
                     if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
                     {
                         Color provinceCol = ProvincePainter.TileColourMap[pos];
-                        MapEvent ev = new ResourceSupplyEvent( eProvinceResourceType.Food, pos);
+                        MapEvent ev = new ResourceMapEvent( eProvinceResourceType.Food, pos);
                         Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>( pos, ev);
                         if (!result.ContainsKey(provinceCol))
                             result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());

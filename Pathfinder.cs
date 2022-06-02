@@ -9,6 +9,9 @@ namespace Mononoke
     class Pathfinder
     {
         Texture2D previewTex;
+        Texture2D straight;
+        Texture2D bend;
+
         public Pathfinder( GraphicsDeviceManager graphics )
         {
             Color[] pixels = new Color[]{ Color.Magenta };
@@ -77,7 +80,39 @@ namespace Mononoke
         }
         public void DrawPathPreview(List<Vector2> path, SpriteBatch spriteBatch)
         {
-            foreach ( Vector2 pos in path )
+            //for (int i = 0; i < path.Count; i++)
+            //{
+            //    eTileFace previous = eTileFace.Up;
+            //    eTileFace next = eTileFace.Up;
+            //    Vector2 pos = path[i];
+            //    //Vector2 previous = new Vector2();
+            //    //Vector2 next = new Vector2();
+            //    if ( i != 0 )
+            //    {
+            //        previous = pos.GetNeighbourDirection( path[i-1] ); 
+            //    }
+            //    if ( i != path.Count - 1 )
+            //    {
+            //        next = pos.GetNeighbourDirection(path[i + 1] );
+            //    }
+
+            //    if ( i == 0 )
+            //    {
+            //        float rotation = ( next == eTileFace.Up || next == eTileFace.Down ) ? 0f : 90f;
+            //        spriteBatch.Draw( straight, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, rotation, new Vector2(0, 0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f);
+            //    }
+            //    else if ( i == path.Count - 1 )
+            //    {
+            //        float rotation = ( previous == eTileFace.Up || previous == eTileFace.Down) ? 0f : 90f;
+            //        spriteBatch.Draw(straight, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, rotation, new Vector2(0, 0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f);
+            //    }
+            //    else
+            //    {
+    
+            //        if ( previous == eTileFace.Right)
+            //    }
+            //}
+            foreach (Vector2 pos in path)
             {
                 spriteBatch.Draw(previewTex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f);
             }

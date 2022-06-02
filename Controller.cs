@@ -63,8 +63,6 @@ namespace Mononoke
             }
             if (kstate.IsKeyDown(Keys.Escape))
                 Game.Quit();
-            //Vector2 mpos = ScreenPosToMapPos();
-            //Debug.WriteLine("Mouse pos " +  mpos);
             MouseState mstate = Mouse.GetState();
             HoveredPos = mstate.Position.ToVector2();
             Vector2 tile = ScreenPosToMapPos( HoveredPos );
@@ -127,7 +125,7 @@ namespace Mononoke
         public Vector2 ScreenPosToMapPos( Vector2 mPos)
         {
             Vector2 result = mPos - Camera.Position;
-            result /= MapHolder.PIXELS_PER_TILE;
+            result /= ( MapHolder.PIXELS_PER_TILE * new Vector2( Mononoke.SCALE_X, Mononoke.SCALE_Y ) ) ;
             return Vector2.Floor(result);
         }
         void SetDragPath( )

@@ -11,7 +11,7 @@ namespace Mononoke
     class MapPainter
     {
         Texture2D texture;
-        FastNoiseLite Noise;
+        protected Texture2D brokenTexture;
         public Dictionary<Vector2, Color> TileColourMap { get; private set; }
         Texture2D TestTexture;
         public MapPainter( string path, GraphicsDeviceManager graphics )
@@ -22,10 +22,9 @@ namespace Mononoke
                 throw new Exception( "Map does not exist at this path " + str );
             }
             TestTexture = Texture2D.FromFile( graphics.GraphicsDevice, str );
-
-
-            Noise = new FastNoiseLite();
-            Noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+            
+            //Noise = new FastNoiseLite();
+            //Noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 
             if ( !File.Exists( path ) )
             {
@@ -45,18 +44,22 @@ namespace Mononoke
                     ++i;
                 }
             }
+            brokenTexture = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            Color[] pixels = new Color[1];
+            pixels[0] = Color.Magenta;
+            brokenTexture.SetData(pixels);
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 origin )
         {
-            spriteBatch.Draw( texture, new Vector2(0,0), null, new Color(255,255,255, 122), 0, new Vector2 (0,0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f );
-            for (int x = 0; x < 10; x++)
+            spriteBatch.Draw( texture, new Vector2(0,0), null, new Color(255,255,255, 255), 0, new Vector2 (0,0), MapHolder.PIXELS_PER_TILE, SpriteEffects.None, 0f );
+            for (int x = 0; x < MapHolder.SCREEN_TILE_WIDTH; x++)
             {
-                for (int y = 0; y < 10; y++)
+                for (int y = 0; y < MapHolder.SCREEN_TILE_HEIGHT; y++)
                 {
                     Vector2 pos = origin + new Vector2(x,y);
                     if (TileColourMap.ContainsKey(pos))
                     {
-                        //DrawTile( spriteBatch, graphics, pos );
+                        DrawTile( spriteBatch, graphics, pos );
                     }
                     else
                     {
@@ -73,10 +76,9 @@ namespace Mononoke
             }
             return Color.Magenta;
         }
-        public void DrawTile( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
+        public virtual void DrawTile( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
             Texture2D tex;  
-            //float scale = MapHolder.PIXELS_PER_TILE;
             Color col = TileColourMap[pos];
             if (TerrainTypeMap.GetColourTerrainType(col) == eTerrainType.Forest)
             {
@@ -85,11 +87,13 @@ namespace Mononoke
             }
             else
             {
-                tex = new Texture2D(graphics.GraphicsDevice, 1, 1);
-                Color[] pixels = new Color[1];
-                pixels[0] = TileColourMap[pos];// * Noise.GetNoise(pos.X, pos.Y);
-                tex.SetData(pixels);
+                tex = brokenTexture;
+                //tex = new Texture2D(graphics.GraphicsDevice, 1, 1);
+                //Color[] pixels = new Color[1];
+                //pixels[0] = TileColourMap[pos];// * Noise.GetNoise(pos.X, pos.Y);
+                //tex.SetData(pixels);
             }
+            float scale = MapHolder.PIXELS_PER_TILE / tex.Width;
 
             //Texture2D tex = new Texture2D(graphics.GraphicsDevice, MapHolder.PIXELS_PER_TILE, MapHolder.PIXELS_PER_TILE);
             //int size = MapHolder.PIXELS_PER_TILE * MapHolder.PIXELS_PER_TILE;
@@ -101,7 +105,7 @@ namespace Mononoke
 
 
             //spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1 , SpriteEffects.None, 0f);
+            spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), scale , SpriteEffects.None, 0f);
         }
     }
 }

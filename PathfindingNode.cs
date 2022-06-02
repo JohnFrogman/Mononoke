@@ -20,28 +20,7 @@ namespace Mononoke
         }
         public List<Vector2> GetNeighbours()
         {
-            List<Vector2> result = new List<Vector2>();
-            Vector2 up = loc + new Vector2( 0, -1 );
-            if ( up.Y >= 0 ) // Up
-            {
-                result.Add(up);
-            }
-            Vector2 down = loc + new Vector2(0, 1);
-            if ( down.Y + 1 < MapHolder.MAP_TILE_HEIGHT) // Down
-            {
-                result.Add(down);
-            }
-            Vector2 left = loc + new Vector2(-1, 0); // left
-            if (left.X >= 0) // left
-            {
-                result.Add(left);
-            }
-            Vector2 right = loc + new Vector2(1, 0);
-            if (right.X < MapHolder.MAP_TILE_WIDTH) // right
-            {
-                result.Add(right);
-            }
-            return result;
+            return loc.GetNeighbours();
         }
     }
 }

@@ -6,9 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 namespace Mononoke
 {
-    class ResourceSupplyEvent : MapEvent, IDraggable
+    class ResourceMapEvent : MapEvent, IDraggable
     {
+        MapResourceType Type;
+        Vector2 Position;
         //int Min = 0;
+        //int Increment = 1;
         int Max = 5;
         int _Current = 0;
         int Current{ 
@@ -23,10 +26,7 @@ namespace Mononoke
                 return _Current;
             }
         }
-        //int Increment = 1;
-        Vector2 Position;
-        eProvinceResourceType Type;
-        public ResourceSupplyEvent( eProvinceResourceType type, Vector2 pos )
+        public ResourceMapEvent( eProvinceResourceType type, Vector2 pos )
         {
             Type = type;
             Position = pos;

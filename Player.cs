@@ -15,7 +15,8 @@ namespace Mononoke
         public int Food = 0;
         public int Materials = 0;
         public int Wealth = 0;
-
+        
+        public Dictionary<>
         private HUD hud;
 
         // Health

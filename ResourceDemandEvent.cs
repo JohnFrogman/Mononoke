@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Diagnostics;
 namespace Mononoke
 {
     class ResourceDemandEvent : MapEvent, IDraggable
@@ -35,6 +35,10 @@ namespace Mononoke
             if ( Owner != null )
                 Owner.Stability -= 1;
         }
-
+        public override bool TryLink(MapEvent partner)
+        {
+            Debug.WriteLine("trying link of demand");
+            return true;
+        }
     }
 }
