@@ -4,14 +4,12 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+
 namespace Mononoke
 {
-    class ResourceMapEvent : MapEvent, IDraggable
+    public class Farm : MapEvent, IDraggable
     {
-        MapResourceType Type;
         Vector2 Position;
-        //int Min = 0;
-        //int Increment = 1;
         int Max = 5;
         int _Current = 0;
         int Current{ 
@@ -26,9 +24,8 @@ namespace Mononoke
                 return _Current;
             }
         }
-        public ResourceMapEvent( eProvinceResourceType type, Vector2 pos )
+        public Farm( Vector2 pos )
         {
-            Type = type;
             Position = pos;
         }
         public override void Draw( SpriteBatch spriteBatch )
@@ -55,7 +52,7 @@ namespace Mononoke
         }
         public override bool TryLink(MapEvent partner)
         {
-            Debug.WriteLine("trying link of supply");
+            Debug.WriteLine("trying link of farm to " + partner );
             return true;
         }
     }

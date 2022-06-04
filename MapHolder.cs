@@ -39,7 +39,7 @@ namespace Mononoke
                     if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
                     {
                         Color provinceCol = ProvincePainter.TileColourMap[pos];
-                        MapEvent ev = new ResourceMapEvent( eProvinceResourceType.Food, pos);
+                        MapEvent ev = new Farm( pos);
                         Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>( pos, ev);
                         if (!result.ContainsKey(provinceCol))
                             result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
@@ -48,7 +48,7 @@ namespace Mononoke
                     else if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Urban )
                     {
                         Color provinceCol = ProvincePainter.TileColourMap[pos];
-                        MapEvent ev = new ResourceDemandEvent( 1, pos );
+                        MapEvent ev = new City( pos );
                         Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>(pos, ev);
                         if (!result.ContainsKey(provinceCol))
                             result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
