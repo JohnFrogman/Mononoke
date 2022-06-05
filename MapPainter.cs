@@ -76,6 +76,10 @@ namespace Mononoke
             }
             return Color.Magenta;
         }
+        public void SetColourAt( Vector2 pos, Color col )
+        {
+            TileColourMap[pos ] = col;
+        }
         public virtual void DrawTile( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
             Texture2D tex;  

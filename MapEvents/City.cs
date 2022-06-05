@@ -4,12 +4,13 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
-namespace Mononoke
+namespace Mononoke.MapEvents
 {
     class City : MapEvent, IDraggable
     {
         int Max = 5;
         int _Current = 0;
+        int FreeWorkers = 0;
         int Current
         {
             set
@@ -25,9 +26,8 @@ namespace Mononoke
             }
         }
         Player Owner;
-        public City( Vector2 pos, Player owner = null)
+        public City( Vector2 pos, Player owner = null) : base ( pos )
         {
-            Position = pos;
             Owner = owner;
         }
         public override void Draw(SpriteBatch spriteBatch)
@@ -52,10 +52,16 @@ namespace Mononoke
             }
             Current--;
         }
-        public override bool TryLink(MapEvent partner)
+        public override bool TryLink(MapEvent partner, MapHolder maps )
         {
+            IExpandable e = (IExpandable)partner;
             Debug.WriteLine("trying link of city to " + partner);
-            return true;
+            if ( e.TryExpand( mh) )
+            { 
+                FreeWorkers--;
+                return true;
+            }
+            return false;
         }
     }
 }

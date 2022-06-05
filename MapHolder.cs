@@ -4,9 +4,10 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using Mononoke.MapEvents;
 namespace Mononoke
 {
-    class MapHolder
+    public class MapHolder
     {
         public const int PIXELS_PER_TILE = 16;
         public const int MAP_TILE_WIDTH = 256;
@@ -65,6 +66,10 @@ namespace Mononoke
         public eTerrainType GetTerrainAt(Vector2 pos)
         {
             return TerrainTypeMap.GetColourTerrainType( TerrainPainter.GetColourAt(pos) );
+        }
+        public void SetTerrainAt(Vector2 pos, eTerrainType terrain)
+        {
+            TerrainPainter.SetColourAt( pos, TerrainTypeMap.GetTerrainColour( terrain ) );
         }
         public float GetMapCostAt( Vector2 pos )
         {

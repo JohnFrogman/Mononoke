@@ -4,18 +4,22 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Mononoke.MapEvents;
+using System.Linq;
 
-namespace Mononoke
+namespace Mononoke.MapEvents
 {
-    public class Farm : MapEvent, IDraggable
+    public class Farm : MapEvent, IDraggable, IExpandable
     {
-        Vector2 Position;
+        private static eTerrainType[] AllowedTerrains = new eTerrainType[] { eTerrainType.Forest };
         int Max = 5;
         int _Current = 0;
+        int Increment = 1;
+        int Level = 1;
         int Current{ 
             set {
-                if ( value > Max )
-                    _Current = Max;
+                if ( value > Max * Level )
+                    _Current = Max * Level ;
                 else
                     _Current = value;
             }
@@ -24,13 +28,12 @@ namespace Mononoke
                 return _Current;
             }
         }
-        public Farm( Vector2 pos )
+        public Farm( Vector2 pos ) : base ( pos )
         {
-            Position = pos;
         }
         public override void Draw( SpriteBatch spriteBatch )
         {
-            spriteBatch.DrawString( Mononoke.Font, Current.ToString(), Position * MapHolder.PIXELS_PER_TILE, Color.Black );
+            spriteBatch.DrawString( Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE, Color.Black );
         }   
         public override void OnClick( Player clicker )
         {
@@ -48,12 +51,32 @@ namespace Mononoke
         }
         protected override void OnExpire()
         {
-            Current++;
+            Current += Increment * Level;
         }
         public override bool TryLink(MapEvent partner)
         {
             Debug.WriteLine("trying link of farm to " + partner );
             return true;
+        }
+        // At some point make is so that potential expansion points are kept up to date automatically so dont need to search every time?
+        bool TryExpand( MapHolder mh )
+        {
+            foreach ( Vector2 v in Tiles )
+            {
+                List<Vector2> neighbours = v.GetNeighbours();
+                foreach ( Vector2 n in neighbours )
+                {
+                    eTerrainType tt = mh.GetTerrainAt( n );
+                    if ( Array.IndexOf(AllowedTerrains, tt) > -1 )
+                    { 
+                        Tiles.Add( n );
+                        Level++;
+                        mh.SetTerrainAt( n, eTerrainType.Farmland );
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
