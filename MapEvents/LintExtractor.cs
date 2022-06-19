@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using Mononoke.MapEvents;
-using System.Linq;
 
 namespace Mononoke.MapEvents
 {
-    public class Farm : ResourceExtractor
+    class LintExtractor : ResourceExtractor
     {
-        
-        public Farm( Vector2 pos ) : base ( pos )
+        public LintExtractor(Vector2 pos) : base(pos)
         {
             AllowedTerrains = new eTerrainType[] { eTerrainType.Forest };
         }
         protected override void Harvest(Player clicker, int amount)
         {
-            clicker.Food += amount;
+            clicker.Lint += amount;
         }
     }
 }

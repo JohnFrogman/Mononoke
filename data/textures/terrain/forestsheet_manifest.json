@@ -1,0 +1,74 @@
+{
+	"header" : 
+	{
+		"tilesize" : 32
+		,"filepath" : "forestsheet.png"
+	}
+	,"tiles" : 
+	[
+		{
+			"pos" : { "x" : 0 , "y" : 0 }
+			,"connectsto" : ["l", "r"]
+		},
+		{
+			"pos" : { "x" : 1 , "y" : 0 }
+			,"connectsto" : ["d", "r"]
+		},
+		{
+			"pos" : { "x" : 2 , "y" : 0 }
+			,"connectsto" : ["d", "l"]
+		},
+		{
+			"pos" : { "x" : 3 , "y" : 0 }
+			,"connectsto" : []
+		},
+		{
+			"pos" : { "x" : 0 , "y" : 1 }
+			,"connectsto" : ["u", "d"]
+		},
+		{
+			"pos" : { "x" : 1 , "y" : 1 }
+			,"connectsto" : ["u", "r"]
+		},
+		{
+			"pos" : { "x" : 2 , "y" : 1 }
+			,"connectsto" : ["l", "u"]
+		},
+		{
+			"pos" : { "x" : 3 , "y" : 1 }
+			,"connectsto" : ["u", "r", "l", "d"]
+		},
+				{
+			"pos" : { "x" : 0 , "y" : 2 }
+			,"connectsto" : ["u"]
+		},
+		{
+			"pos" : { "x" : 1 , "y" : 2 }
+			,"connectsto" : ["r"]
+		},
+		{
+			"pos" : { "x" : 2 , "y" : 2 }
+			,"connectsto" : ["l", "d", "r"]
+		},
+		{
+			"pos" : { "x" : 3 , "y" : 2 }
+			,"connectsto" : ["l", "u", "d"]
+		},
+				{
+			"pos" : { "x" : 0 , "y" : 3 }
+			,"connectsto" : ["l"]
+		},
+		{
+			"pos" : { "x" : 1 , "y" : 3 }
+			,"connectsto" : ["d"]
+		},
+		{
+			"pos" : { "x" : 2 , "y" : 3 }
+			,"connectsto" : ["u", "r", "d"]
+		},
+		{
+			"pos" : { "x" : 3 , "y" : 3 }
+			,"connectsto" : ["r", "u", "l"]
+		}
+	]
+}

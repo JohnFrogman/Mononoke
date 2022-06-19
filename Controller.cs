@@ -69,15 +69,13 @@ namespace Mononoke
             HoveredTile = tile;
             if ( !mousedown && mstate.LeftButton == ButtonState.Pressed )
             {
-                Debug.WriteLine("Mouse Down");
-                dragging = Provinces.IsDraggable( DragOriginTile );
-                Debug.WriteLine("Dragging is " + dragging);
                 DragOriginTile = HoveredTile;
+                dragging = Maps.IsDraggable( DragOriginTile );
                 mousedown = true;
             }
             else if ( mousedown && mstate.LeftButton == ButtonState.Released )
             {
-                Debug.WriteLine("Mouse Release");
+               // Debug.WriteLine("Mouse Release");
                 if ( DragOriginTile != HoveredTile )
                     DragEnd();
                 else
@@ -101,10 +99,10 @@ namespace Mononoke
         }
         void DragEnd( )
         {   
-            PathPreview.Clear();
-            if ( Provinces.TryDragAt( DragOriginTile, HoveredTile, Player ) )
+            if (PathPreview.Count > 0 && Maps.TryDragAt( DragOriginTile, HoveredTile, Player, PathPreview.GetRange(1, PathPreview.Count -1) ) )
             {
             }
+            PathPreview.Clear();
         }
         void Click()
         {
@@ -119,13 +117,12 @@ namespace Mononoke
         }
         bool TryMapClick( Vector2 tile)
         {
-            Provinces.TryClickAt(tile, Player);
-            return true;
+            return Maps.TryClickAt(tile, Player);
         }
         public Vector2 ScreenPosToMapPos( Vector2 mPos)
         {
-            Vector2 result = mPos - Camera.Position;
-            result /= ( MapHolder.PIXELS_PER_TILE * new Vector2( Mononoke.SCALE_X, Mononoke.SCALE_Y ) ) ;
+            Vector2 result = mPos - ( Camera.Position * Mononoke.ScreenScaleV2 );
+            result /= ( MapHolder.PIXELS_PER_TILE * Mononoke.ScreenScaleV2 );
             return Vector2.Floor(result);
         }
         void SetDragPath( )

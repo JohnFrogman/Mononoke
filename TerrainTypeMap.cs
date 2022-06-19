@@ -10,27 +10,27 @@ namespace Mononoke
     {
         Mountain
     
-        ,Desert
+        //,Desert
         //,RockyWasteland
-        ,Badlands
+        //,Badlands
 
         ,Grassland
-        ,GrassyHills
+        //,GrassyHills
 
-        ,Savanna 
-        ,SavannaHills
+        //,Savanna 
+        //,SavannaHills
 
-        ,Marsh
-        ,Shrubland
-        ,ShrublandHills
+        //,Marsh
+        //,Shrubland
+        //,ShrublandHills
 
-        ,Swamp
+        //,Swamp
         ,Forest
-        ,Jungle
+        //,Jungle
 
-        ,Tundra
-        ,Taiga
-        ,SnowyHills
+        //,Tundra
+        //,Taiga
+        //,SnowyHills
 
         ,Farmland
         ,Urban
@@ -69,14 +69,15 @@ namespace Mononoke
         {
             terrainMap = new Dictionary<eTerrainType, Color>
             {
-                { eTerrainType.Forest,              new Color(  28,  80,  0, 255 ) }
+                { eTerrainType.Road,                new Color(  87,  54, 52, 255 ) }
+            ,   { eTerrainType.Forest,              new Color(  28,  80,  0, 255 ) }
             //,   { eTerrainType.Hills, new Color32(1,1,1) }
-            ,   { eTerrainType.Jungle,              new Color(  19,  55,  0, 255 ) }
+            //,   { eTerrainType.Jungle,              new Color(  19,  55,  0, 255 ) }
             ,   { eTerrainType.Mountain,            new Color(  134,134,134, 255 ) }
             ,   { eTerrainType.Grassland,           new Color(  43, 123,  0, 255 ) }
-            ,   { eTerrainType.GrassyHills,         new Color(  58, 117,  26, 255 ) }
-            ,   { eTerrainType.Taiga,               new Color(  31, 128, 105, 255 ) }
-            ,   { eTerrainType.Marsh,               new Color(  50, 128, 109, 255 ) }
+            //,   { eTerrainType.GrassyHills,         new Color(  58, 117,  26, 255 ) }
+            //,   { eTerrainType.Taiga,               new Color(  31, 128, 105, 255 ) }
+            //,   { eTerrainType.Marsh,               new Color(  50, 128, 109, 255 ) }
 
             ,   { eTerrainType.Farmland,            new Color( 213, 240, 161, 255 ) }
             ,   { eTerrainType.Urban,               new Color( 166, 166, 166, 255 ) }
@@ -98,6 +99,27 @@ namespace Mononoke
                 result.Add(tt.ToString());
             }
             return result;
+        }
+        public static float GetMapCost(eTerrainType type)
+        {
+            if (type == eTerrainType.Mountain)
+                return 3;
+            else if ( type == eTerrainType.Road )
+                return 0.4f;
+            else
+                return 1;
+        }
+        public static bool Pathable( eTerrainType type)
+        {
+            return type != eTerrainType.DeepOcean && type != eTerrainType.ShallowOcean;
+
+        }
+        public static bool Buildable( eTerrainType type)
+        {
+            return type != eTerrainType.Road
+                && type != eTerrainType.Urban
+                && type != eTerrainType.Farmland
+                && Pathable( type );
         }
     }
 }

@@ -76,9 +76,9 @@ namespace Mononoke
             }
             return Color.Magenta;
         }
-        public void SetColourAt( Vector2 pos, Color col )
+        public virtual void SetColourAt( Vector2 pos, Color col )
         {
-            TileColourMap[pos ] = col;
+            TileColourMap[ pos ] = col;
         }
         public virtual void DrawTile( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
@@ -110,6 +110,37 @@ namespace Mononoke
 
             //spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), scale , SpriteEffects.None, 0f);
+        }
+        public List<Vector2> GetClumpAt( Vector2 pos )
+        {
+            Color col = TileColourMap[pos];
+            List<Vector2> result = new List<Vector2>();
+            List<Vector2> openPositions = new List<Vector2>() { pos };
+            List<Vector2> closedPositions = new List<Vector2>();
+            while ( openPositions.Count > 0 )
+            {
+                result.Add( openPositions[0] );
+                closedPositions.Add(openPositions[0] );
+
+                List<Vector2> neighbours = openPositions[0].GetNeighbours();
+                foreach( Vector2 n in neighbours )
+                {
+                    if (   TileColourMap[n] == col 
+                        && !openPositions.Contains(n)
+                        && !closedPositions.Contains(n)
+                        && !result.Contains(n)
+                    )
+                    { 
+                        openPositions.Add(n);
+                    }
+                    else
+                    { 
+                        closedPositions.Add(n);
+                    }
+                }
+                openPositions.RemoveAt(0);
+            }
+            return result;
         }
     }
 }

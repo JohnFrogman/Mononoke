@@ -13,12 +13,10 @@ namespace Mononoke
         public const int VIEWPORT_WIDTH = 1920;
         public const int VIEWPORT_HEIGHT = 1080;
 
-        public const int SCALE_X = VIEWPORT_WIDTH / RENDER_WIDTH;
-        public const int SCALE_Y = VIEWPORT_HEIGHT / RENDER_HEIGHT;
-
         //        public const int DRAW_DISTANCE = 2;
 
-        Vector3 ScreenScale; 
+        public static Vector3 ScreenScale;
+        public static Vector2 ScreenScaleV2;
         //public static Mononoke Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -35,6 +33,7 @@ namespace Mononoke
         public Mononoke()
         {
             ScreenScale = new Vector3( VIEWPORT_WIDTH / RENDER_WIDTH, VIEWPORT_HEIGHT / RENDER_HEIGHT, 1.0f);
+            ScreenScaleV2 = new Vector2(ScreenScale.X, ScreenScale.Y);
             //if ( Game != null )
             //{
             //    throw new System.Exception("You cannot have two instances of the game.");
@@ -51,8 +50,8 @@ namespace Mononoke
             // TODO: Add your initialization logic here
             base.Initialize();  
 
-            _graphics.PreferredBackBufferWidth = 1920;
-            _graphics.PreferredBackBufferHeight = 1080;
+            _graphics.PreferredBackBufferWidth = VIEWPORT_WIDTH;
+            _graphics.PreferredBackBufferHeight = VIEWPORT_HEIGHT;
             _graphics.ApplyChanges();
 
             Font = Content.Load<SpriteFont>("vampire_wars");
@@ -62,7 +61,7 @@ namespace Mononoke
             Maps = new MapHolder( _graphics );
             Actors = new ActorHolder();
             Provinces = new ProvinceHolder( Actors, Maps );
-            Player = new Player( Camera);
+            Player = new Player( Camera, _graphics);
             EventQueue = new GameEventQueue( Player );
             Controller = new Controller( Camera, this, Maps, Provinces, Player, EventQueue, _graphics );
             //EventQueue.AddEvent( new GameEvent( "Food demand", 1, EventQueue ) ); 
@@ -79,8 +78,8 @@ namespace Mononoke
         protected override void Update(GameTime gameTime)
         {
             Controller.Update( gameTime );
-            Provinces.Update( gameTime );
             EventQueue.Update( gameTime );
+            Maps.Update( gameTime );
             base.Update(gameTime);
         }
 
@@ -100,7 +99,6 @@ namespace Mononoke
        
             Vector2 result = Vector2.Floor( -Camera.Position / MapHolder.PIXELS_PER_TILE );
             Maps.Draw( _spriteBatch, _graphics, result ); 
-            Provinces.Draw ( _spriteBatch, _graphics, result );        
             Player.Draw( _spriteBatch, _graphics );
             EventQueue.Draw( _spriteBatch );
             Controller.Draw( _spriteBatch );

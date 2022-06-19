@@ -46,7 +46,7 @@ namespace Mononoke
                 List<Vector2> Neighbours = currentNode.GetNeighbours();
                 foreach ( Vector2 n in Neighbours)
                 {
-                    if ( Pathable( n, mapHolder ) && !closedLocations.Contains(n))
+                    if (mapHolder.Pathable( n ) && !closedLocations.Contains(n))
                     {
                         g = currentNode.g + mapHolder.GetMapCostAt( n );
                         h = n.ManhattanDistance(destination);
@@ -72,12 +72,7 @@ namespace Mononoke
             }
             return new List<Vector2>();
         }
-        bool Pathable( Vector2 pos, MapHolder maps )
-        {
-            eTerrainType type = maps.GetTerrainAt(pos);
-            return type  != eTerrainType.DeepOcean && type != eTerrainType.ShallowOcean;
-            
-        }
+
         public void DrawPathPreview(List<Vector2> path, SpriteBatch spriteBatch)
         {
             //for (int i = 0; i < path.Count; i++)

@@ -32,7 +32,7 @@ namespace Mononoke.MapEvents
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Position * MapHolder.PIXELS_PER_TILE, Color.Black);
+            spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE, Color.Black);
         }
         public override void OnClick(Player clicker)
         {
@@ -46,19 +46,28 @@ namespace Mononoke.MapEvents
         {
             if ( Current - 1 < 0 )
             {
-                Debug.WriteLine( "Starving city event");
+                //Debug.WriteLine( "Starving city event");
                 if ( Owner != null )
                     Owner.Stability--;
             }
             Current--;
         }
-        public override bool TryLink(MapEvent partner, MapHolder maps )
+        public override bool TryLink(MapEvent partner, MapHolder maps, List<Vector2> path )
         {
             IExpandable e = (IExpandable)partner;
             Debug.WriteLine("trying link of city to " + partner);
-            if ( e.TryExpand( mh) )
+            if ( e.TryExpand( maps ) )
             { 
                 FreeWorkers--;
+                List<Vector2> result = new List<Vector2>();
+                foreach (Vector2 p in path)
+                {
+                    if ( TerrainTypeMap.Buildable(maps.GetTerrainAt(p)) )
+                    {
+                        result.Add( p );
+                    }
+                }
+                maps.SetTerrainAt(result, eTerrainType.Road);
                 return true;
             }
             return false;

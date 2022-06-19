@@ -1,0 +1,14 @@
+{
+	header : 
+	{
+		tilesize : 16
+		filepath : 
+	}
+	,tiles : 
+	[
+		{
+			pos : { x : 0 , y : 0 }
+			,connectsto : ["l", "r"]
+		}
+	]
+}

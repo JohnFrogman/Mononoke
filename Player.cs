@@ -13,7 +13,10 @@ namespace Mononoke
         //bool Sprinting;
     
         public int Food = 0;
-        public int Materials = 0;
+        public int Eider = 0;
+        public int Lint = 0;
+        public int Alloys = 0;
+
         public int Wealth = 0;
         
         private HUD hud;
@@ -56,11 +59,11 @@ namespace Mononoke
             }
         }
         float idleTime;
-        public Player(Camera2D camera) : base( "player", Color.Magenta )
+        public Player(Camera2D camera, GraphicsDeviceManager graphics) : base( "player", Color.Magenta )
         {
             MaxStamina = 300;
             CurrentStamina = 30;
-            hud = new HUD( this, camera );
+            hud = new HUD( this, camera, graphics );
         }
 
         public void Update( GameTime gameTime )

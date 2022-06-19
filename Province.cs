@@ -4,6 +4,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
+using Mononoke.MapEvents;
+
 namespace Mononoke
 {
     class Province
@@ -14,13 +16,10 @@ namespace Mononoke
         string Name;
         public Color Colour;
         Actor Owner;
-        Dictionary<Vector2, MapEvent> MapEvents;
         Province( string name, Color color )
         {
             Name = name;
             Colour = color;
-            MapEvents = new Dictionary<Vector2, MapEvent>();
-            //Resources.Add( new ProvinceResource(eProvinceResourceType.Food, this, new Vector2(0,0)));
         }
         public static Province FromJson( JsonElement json, ActorHolder actorHolder )
         {
@@ -37,29 +36,6 @@ namespace Mononoke
         void SetOwner ( Actor actor )
         {
             Owner = actor;
-        }
-        public void Update( GameTime gameTime )
-        {
-            foreach (MapEvent r in MapEvents.Values )
-                r.Update( gameTime );
-        }
-        public void Draw( SpriteBatch spriteBatch )
-        {
-            foreach (MapEvent r in MapEvents.Values )
-                r.Draw( spriteBatch );
-        }
-        public void AddEventAt( Vector2 pos, MapEvent ev )
-        {
-            MapEvents.Add( pos , ev );
-        }
-        public void TileClick( Vector2 pos, Player clicker )
-        {
-            //ProvinceResource r = (ProvinceResource)Events[ pos ];
-            MapEvents[pos].OnClick( clicker );
-        }
-        public MapEvent GetEventAt(Vector2 pos )
-        {
-            return MapEvents[pos];
         }
     }
 }

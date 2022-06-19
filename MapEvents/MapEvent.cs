@@ -31,7 +31,7 @@ namespace Mononoke.MapEvents
         protected abstract void OnExpire();
         public abstract void OnClick( Player clicker );
         public abstract void Draw(SpriteBatch spriteBatch);
-        public virtual bool TryLink( MapEvent partner, MapHolder maps )
+        public virtual bool TryLink( MapEvent partner, MapHolder maps, List<Vector2> path )
         {
             Debug.WriteLine( "Can't link these events ");
             return false;
