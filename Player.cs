@@ -13,8 +13,8 @@ namespace Mononoke
         //bool Sprinting;
     
         public int Food = 0;
-        public int Eider = 0;
-        public int Lint = 0;
+        public int Petrichor = 0;
+        public int Linoleum = 0;
         public int Alloys = 0;
 
         public int Wealth = 0;
@@ -27,6 +27,11 @@ namespace Mononoke
             set {
                 if ( value <= MaxStability )
                     _Stability = value;
+                if ( value <= 0 )
+                { 
+                    _Stability = 0;
+                    //GameOver();
+                }
             }
             get {
                 return _Stability;
@@ -59,8 +64,12 @@ namespace Mononoke
             }
         }
         float idleTime;
+        public int Time { private set; get; }
+        float CurrentSecond = 0f;
+        float SecondsToExpire = 2000f;
         public Player(Camera2D camera, GraphicsDeviceManager graphics) : base( "player", Color.Magenta )
         {
+            Time = 680;
             MaxStamina = 300;
             CurrentStamina = 30;
             hud = new HUD( this, camera, graphics );
@@ -73,6 +82,13 @@ namespace Mononoke
             {
                 CurrentStamina++;
             }
+            CurrentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (CurrentSecond > SecondsToExpire)
+            {
+                CurrentSecond = 0;
+                Time++;
+            }
+            
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics )
         {

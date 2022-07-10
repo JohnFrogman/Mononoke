@@ -7,13 +7,11 @@ using System.Diagnostics;
 
 namespace Mononoke.MapEvents
 {
-    public abstract class ResourceExtractor : MapEvent, IExpandable
+    abstract class ResourceExtractor : ExpandableMapEvent
     {
-        protected static eTerrainType[] AllowedTerrains;
         int Max = 5;
         int _Current = 0;
         int Increment = 1;
-        int Level = 1;
         int Current
         {
             set
@@ -56,26 +54,5 @@ namespace Mononoke.MapEvents
         }
         //public abstract bool TryLink(MapEvent partner, MapHolder maps);
 
-        // At some point make is so that potential expansion points are kept up to date automatically so dont need to search every time?
-        bool IExpandable.TryExpand(MapHolder mh)
-        {
-            foreach (Vector2 v in Tiles)
-            {
-                List<Vector2> neighbours = v.GetNeighbours();
-                foreach (Vector2 n in neighbours)
-                {
-                    eTerrainType tt = mh.GetTerrainAt(n);
-                    if (Array.IndexOf(AllowedTerrains, tt) > -1)
-                    {
-                        Tiles.Add(n);
-                        Level++;
-                        Debug.WriteLine( "Expanding farm ");
-                        mh.SetTerrainAt(new List<Vector2>(){ n }, eTerrainType.Farmland);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
     }
 }

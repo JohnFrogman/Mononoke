@@ -21,12 +21,8 @@ namespace Mononoke
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         
-        private Controller Controller;
-        private MapHolder Maps;
-        private ProvinceHolder Provinces;
-        private ActorHolder Actors;
-        private Player Player;
-        private GameEventQueue EventQueue;
+        IGameState CurrentState;
+
         Camera2D Camera;
         public static SpriteFont Font { get; private set;}
         public static Effect TestEffect;
@@ -34,14 +30,8 @@ namespace Mononoke
         {
             ScreenScale = new Vector3( VIEWPORT_WIDTH / RENDER_WIDTH, VIEWPORT_HEIGHT / RENDER_HEIGHT, 1.0f);
             ScreenScaleV2 = new Vector2(ScreenScale.X, ScreenScale.Y);
-            //if ( Game != null )
-            //{
-            //    throw new System.Exception("You cannot have two instances of the game.");
-            //}
-            //Game = this;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            //TestEffect = Content.Load<Effect>("water");
             IsMouseVisible = true;
         }
 
@@ -57,13 +47,12 @@ namespace Mononoke
             Font = Content.Load<SpriteFont>("vampire_wars");
             Camera = new Camera2D( _graphics );
 
+            IconHolder.Initialise( _graphics );
+            //CurrentState = new Overworld(Camera, _graphics, this);
+            //CurrentState = new MainMenu( _graphics, this);
+            NewGame();
             //Camera.Zoom = 1f;
-            Maps = new MapHolder( _graphics );
-            Actors = new ActorHolder();
-            Provinces = new ProvinceHolder( Actors, Maps );
-            Player = new Player( Camera, _graphics);
-            EventQueue = new GameEventQueue( Player );
-            Controller = new Controller( Camera, this, Maps, Provinces, Player, EventQueue, _graphics );
+
             //EventQueue.AddEvent( new GameEvent( "Food demand", 1, EventQueue ) ); 
         }
 
@@ -77,10 +66,7 @@ namespace Mononoke
 
         protected override void Update(GameTime gameTime)
         {
-            Controller.Update( gameTime );
-            EventQueue.Update( gameTime );
-            Maps.Update( gameTime );
-            base.Update(gameTime);
+            CurrentState.Update( gameTime );
         }
 
         protected override void Draw(GameTime gameTime)
@@ -96,12 +82,8 @@ namespace Mononoke
                                 SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale( ScreenScale ));
 
             //TestEffect.CurrentTechnique.Passes[0].Apply();
-       
-            Vector2 result = Vector2.Floor( -Camera.Position / MapHolder.PIXELS_PER_TILE );
-            Maps.Draw( _spriteBatch, _graphics, result ); 
-            Player.Draw( _spriteBatch, _graphics );
-            EventQueue.Draw( _spriteBatch );
-            Controller.Draw( _spriteBatch );
+
+            CurrentState.Draw(_spriteBatch, _graphics);
 
             _spriteBatch.End();
 
@@ -110,6 +92,10 @@ namespace Mononoke
         public void Quit()
         {
             this.Exit();
+        }
+        public void NewGame()
+        {
+            CurrentState = new Overworld( Camera, _graphics, this);
         }
     }
 }

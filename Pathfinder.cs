@@ -12,13 +12,17 @@ namespace Mononoke
         Texture2D straight;
         Texture2D bend;
 
-        public Pathfinder( GraphicsDeviceManager graphics )
+        MapHolder Maps;
+        MapUnitHolder Units;
+        public Pathfinder( GraphicsDeviceManager graphics, MapHolder mapHolder, MapUnitHolder units)
         {
+            Maps = mapHolder;
+            Units = units;
             Color[] pixels = new Color[]{ Color.Magenta };
             previewTex = new Texture2D( graphics.GraphicsDevice, 1, 1);
             previewTex.SetData(pixels);
         }
-        public List<Vector2> GetPath(Vector2 origin, Vector2 destination, MapHolder mapHolder )
+        public List<Vector2> GetPath(Vector2 origin, Vector2 destination, bool unitsBlock = false )
         {
             List<PathfindingNode> openNodes = new List<PathfindingNode>();
             List<Vector2> closedLocations = new List<Vector2>();
@@ -46,9 +50,9 @@ namespace Mononoke
                 List<Vector2> Neighbours = currentNode.GetNeighbours();
                 foreach ( Vector2 n in Neighbours)
                 {
-                    if (mapHolder.Pathable( n ) && !closedLocations.Contains(n))
+                    if (Maps.Pathable( n, Units, unitsBlock ) && !closedLocations.Contains(n))
                     {
-                        g = currentNode.g + mapHolder.GetMapCostAt( n );
+                        g = currentNode.g + Maps.GetMapCostAt( n );
                         h = n.ManhattanDistance(destination);
                         f = g + h;
                         PathfindingNode neighbourNode = openNodes.Find(x => x.loc == n);

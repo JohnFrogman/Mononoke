@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Mononoke.MapEvents
 {
-    public abstract class MapEvent
+    abstract class MapEvent
     {
         protected float CurrentSecond = 0;
         protected float SecondsToExpire = 5f;
@@ -31,6 +31,12 @@ namespace Mononoke.MapEvents
         protected abstract void OnExpire();
         public abstract void OnClick( Player clicker );
         public abstract void Draw(SpriteBatch spriteBatch);
+
+        public virtual bool TryGetRadialMenu( out RadialMenu r )
+        {
+            r = null;
+            return false;
+        }
         public virtual bool TryLink( MapEvent partner, MapHolder maps, List<Vector2> path )
         {
             Debug.WriteLine( "Can't link these events ");

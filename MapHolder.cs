@@ -7,7 +7,7 @@ using System.Diagnostics;
 using Mononoke.MapEvents;
 namespace Mononoke
 {
-    public class MapHolder
+    class MapHolder
     {
         public const int PIXELS_PER_TILE = 16;
         public const int MAP_TILE_WIDTH = 256;
@@ -20,12 +20,12 @@ namespace Mononoke
         TerrainPainter TerrainPainter;
         MapPainter ProvincePainter;
         Dictionary< Vector2, MapEvent > MapEvents;
-        public MapHolder( GraphicsDeviceManager graphics )        
+        public MapHolder( GraphicsDeviceManager graphics, MapUnitHolder units )        
         {
             TerrainPainter = new TerrainPainter( "data/maps/test_terrain.png", graphics );
             ProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics );
             ProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics);
-            SetMapEvents();
+            SetMapEvents( units );
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
@@ -33,7 +33,7 @@ namespace Mononoke
             foreach (MapEvent r in MapEvents.Values)
                 r.Draw(spriteBatch);
         }
-        public void SetMapEvents()
+        public void SetMapEvents( MapUnitHolder units )
         {
             MapEvents = new Dictionary<Vector2, MapEvent>();
             for (int x = 0; x < MAP_TILE_WIDTH; x++)
@@ -50,7 +50,7 @@ namespace Mononoke
                         }
                         else if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Urban)
                         {
-                            ev = new City(pos);
+                            ev = new City(pos, this, units);
                         }
                         if ( ev != null )
                         { 
@@ -65,37 +65,7 @@ namespace Mononoke
                 }
             }
         }
-        // Dictionary< Province, List<Pair( ResourceType, Location ) >>
-        //public Dictionary<Color, List<Tuple<Vector2, MapEvent>>> GetProvinceMapEvents()
-        //{
-        //    Dictionary<Color, List<Tuple<Vector2, MapEvent>>> result = new Dictionary<Color, List<Tuple<Vector2, MapEvent>>>();
-        //    for (int x = 0; x < MAP_TILE_WIDTH; x++)
-        //    {
-        //        for (int y = 0; y < MAP_TILE_HEIGHT; y++)
-        //        {
-        //            Vector2 pos = new Vector2(x, y);
-        //            if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
-        //            {
-        //                Color provinceCol = ProvincePainter.TileColourMap[pos];
-        //                MapEvent ev = new Farm( pos);
-        //                Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>( pos, ev);
-        //                if (!result.ContainsKey(provinceCol))
-        //                    result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
-        //                result[provinceCol].Add(resourceTuple);
-        //            }
-        //            else if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Urban )
-        //            {
-        //                Color provinceCol = ProvincePainter.TileColourMap[pos];
-        //                MapEvent ev = new City( pos );
-        //                Tuple<Vector2, MapEvent> resourceTuple = new Tuple<Vector2, MapEvent>(pos, ev);
-        //                if (!result.ContainsKey(provinceCol))
-        //                    result.Add(provinceCol, new List<Tuple<Vector2, MapEvent>>());
-        //                result[provinceCol].Add(resourceTuple);
-        //            }
-        //        }
-        //    }
-        //    return result;
-        //}
+
         public Color GetProvinceColourAt( Vector2 pos )
         {
             return ProvincePainter.GetColourAt(pos);
@@ -116,10 +86,14 @@ namespace Mononoke
             else 
                 return 1;
         }
-        public bool Pathable(Vector2 pos)
+        public bool Pathable(Vector2 pos, MapUnitHolder units, bool unitsBlock)
         {
-            
-            return TerrainTypeMap.Pathable(GetTerrainAt(pos));// type != eTerrainType.DeepOcean && type != eTerrainType.ShallowOcean;
+            if ( unitsBlock && units.UnitExistsAt(pos) )
+            {
+                Debug.WriteLine("unit blockling this position " + pos );
+                return false;
+            }
+            return TerrainTypeMap.Pathable(GetTerrainAt(pos));
 
         }
         public bool TryGetMapEventAt( Vector2 pos, out MapEvent ev )
@@ -134,11 +108,11 @@ namespace Mononoke
         }
         public bool TryClickAt(Vector2 pos, Player clicker)
         {
-            Debug.WriteLine("Map clicking at " + pos );
-            TerrainPainter.LogTextureInfoAt(pos);
+            //Debug.WriteLine("Map clicking at " + pos );
+            //TerrainPainter.LogTextureInfoAt(pos);
             if (MapEvents.ContainsKey(pos))
             {
-                Debug.WriteLine("MapEvents contains " + pos);
+                //Debug.WriteLine("MapEvents contains " + pos);
                 MapEvents[pos].OnClick(clicker);
                 return true;
             }
@@ -165,6 +139,18 @@ namespace Mononoke
         {
             foreach (MapEvent r in MapEvents.Values)
                 r.Update(gameTime);
+        }
+        public bool TryGetRadialMenuAt( Vector2 pos, out RadialMenu m)
+        {
+            m = null;
+            if (MapEvents.ContainsKey(pos))
+            {
+                if ( MapEvents[pos].TryGetRadialMenu( out m ) )
+                { 
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

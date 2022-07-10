@@ -6,16 +6,24 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 namespace Mononoke.MapEvents
 {
-    class City : MapEvent, IDraggable
+    class City : ExpandableMapEvent, IDraggable
     {
-        int Max = 5;
+        int Max = 10;
         int _Current = 0;
+
+        int GrowthThreshold = 5;
+        int TurnsToGrow = 1;
+        int growthTickDown = 5;
+
         int FreeWorkers = 0;
+
+        MapHolder Maps;
+        MapUnitHolder UnitHolder;
         int Current
         {
             set
             {
-                if (value > Max)
+                if (value >= Max)
                     _Current = Max;
                 else
                     _Current = value;
@@ -26,9 +34,12 @@ namespace Mononoke.MapEvents
             }
         }
         Player Owner;
-        public City( Vector2 pos, Player owner = null) : base ( pos )
+        public City( Vector2 pos, MapHolder maps, MapUnitHolder unitHolder, Player owner = null) : base ( pos )
         {
+            AllowedTerrains = new eTerrainType[] { eTerrainType.Forest, eTerrainType.Road };
+            UnitHolder = unitHolder;
             Owner = owner;
+            Maps = maps;
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -36,7 +47,7 @@ namespace Mononoke.MapEvents
         }
         public override void OnClick(Player clicker)
         {
-            if ( Current + 1 < Max )
+            if ( Current < Max )
             {
                 clicker.Food--;
                 Current++;
@@ -46,16 +57,42 @@ namespace Mononoke.MapEvents
         {
             if ( Current - 1 < 0 )
             {
-                //Debug.WriteLine( "Starving city event");
                 if ( Owner != null )
                     Owner.Stability--;
             }
-            Current--;
+            else
+            { 
+                Current--;
+            }
+            if ( Current >= GrowthThreshold )
+            {
+                growthTickDown--;
+                if ( growthTickDown <= 0 )
+                {
+                    TryExpand( Maps );
+                    growthTickDown = TurnsToGrow;
+                }
+            }
+            else
+            {
+                growthTickDown = TurnsToGrow;
+            }
+        }
+        public override bool TryExpand(MapHolder mh)
+        {
+            if ( base.TryExpand( mh ) )
+            { 
+                FreeWorkers++;
+                return true;
+            }
+            return false;
         }
         public override bool TryLink(MapEvent partner, MapHolder maps, List<Vector2> path )
         {
-            IExpandable e = (IExpandable)partner;
-            Debug.WriteLine("trying link of city to " + partner);
+            ExpandableMapEvent e = (ExpandableMapEvent)partner;
+            Debug.WriteLine("Trying link of city");
+            //if ( FreeWorkers < 1 )
+            //    return false;
             if ( e.TryExpand( maps ) )
             { 
                 FreeWorkers--;
@@ -71,6 +108,35 @@ namespace Mononoke.MapEvents
                 return true;
             }
             return false;
+        }
+        protected override eTerrainType GetExpansionType()
+        {
+            return eTerrainType.Urban;
+        }
+        public override bool TryGetRadialMenu(out RadialMenu r)
+        {
+            r = null;
+            //if (FreeWorkers > 0)
+            //{ 
+                List<RadialMenuItem> l = new List<RadialMenuItem>();
+                l.Add( new RadialMenuItem(
+                      MapHolder.PIXELS_PER_TILE * Origin - new Vector2(0, MapHolder.PIXELS_PER_TILE)
+                    , IconHolder.GetIconByName("soldier")
+                    , () => { 
+                        this.AddSoldier();
+                       }
+                    )
+                );
+                r = new RadialMenu( l );
+                return true;
+            //}
+            //else return false;
+        }
+        void AddSoldier()
+        {
+            FreeWorkers--;
+            UnitHolder.AddUnit( Origin, new MapUnit(null, 1, "Soldier", Origin, Owner) );
+            Debug.WriteLine("Soldier Added");
         }
     }
 }

@@ -13,7 +13,11 @@ namespace Mononoke.MapEvents
         }
         protected override void Harvest( Player clicker, int amount)
         {
-            clicker.Eider += amount;
+            clicker.Petrichor += amount;
+        }
+        protected override eTerrainType GetExpansionType()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

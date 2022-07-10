@@ -50,9 +50,11 @@ namespace Mononoke
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics )
         {
-            Vector2 origin = -Camera.Position + new Vector2( 10, 10);
+            Vector2 origin = -Camera.Position + new Vector2( 0, 0);
 
             Vector2 DateboxPos = origin;
+            Vector2 DayMonthPos = origin + new Vector2 ( 2, 2);
+            Vector2 YearPos = DateboxPos + new Vector2(52, 0);
 
             Vector2 foodIconPos = DateboxPos + new Vector2( 64, 0) + spacing;
             Vector2 foodTextPos = foodIconPos + new Vector2(48, 0);
@@ -60,12 +62,21 @@ namespace Mononoke
             Vector2 wealthIconPos = foodTextPos + spacing;
             Vector2 wealthTextPos = wealthIconPos + new Vector2( 48, 0 );
 
-            Vector2 oreIconPos = wealthTextPos + spacing;
-            Vector2 oreTextPos = oreIconPos + new Vector2(48, 0);
+            Vector2 pIconPos = wealthTextPos + spacing;
+            Vector2 pTextPos = pIconPos + new Vector2(48, 0);
+
+            Vector2 lIconPos = pTextPos + spacing;
+            Vector2 lTextPos = lIconPos + new Vector2(48, 0);
+
+            Vector2 AlloyIconPos = lTextPos + spacing;
+            Vector2 AlloyTextPos = AlloyIconPos + new Vector2(48, 0);
+
+            //Vector2 WeaponsIconPos = AlloyTextPos + spacing;
+            //Vector2 WeaponsTextPos = WeaponsIconPos + new Vector2(48, 0);
 
             spriteBatch.Draw(DateBox, DateboxPos, Color.White);
-            spriteBatch.DrawString(Mononoke.Font, "22/10", DateboxPos, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(Mononoke.Font, "1114", DateboxPos + new Vector2(0, 16), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(Mononoke.Font, IntegerToDay(Player.Time) + " " + IntegerToMonth( Player.Time ) , DayMonthPos, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(Mononoke.Font, IntegerToYear( Player.Time ) , YearPos, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None, 0);
 
             spriteBatch.Draw( FoodIcon, foodIconPos, Color.White );
             spriteBatch.DrawString( Mononoke.Font, Player.Food.ToString(), foodTextPos, Color.White );
@@ -73,10 +84,19 @@ namespace Mononoke
             spriteBatch.Draw( WealthIcon, wealthIconPos, Color.White);
             spriteBatch.DrawString(Mononoke.Font, Player.Wealth.ToString(), wealthTextPos, Color.White);
 
-            spriteBatch.Draw( PetrichorIcon, oreIconPos, Color.White);
-            spriteBatch.DrawString(Mononoke.Font, Player.Food.ToString(), oreTextPos, Color.White);
+            spriteBatch.Draw( PetrichorIcon, pIconPos, Color.White);
+            spriteBatch.DrawString(Mononoke.Font, Player.Petrichor.ToString(), pTextPos, Color.White);
 
-            //spriteBatch.DrawString(Mononoke.Font, Player.Stability.ToString(), -Camera.Position + new Vector2(40, 10), Color.White);
+            spriteBatch.Draw(PetrichorIcon, lIconPos, Color.White);
+            spriteBatch.DrawString(Mononoke.Font, Player.Linoleum.ToString(), lTextPos, Color.White);
+
+            spriteBatch.Draw(PetrichorIcon, AlloyIconPos, Color.White);
+            spriteBatch.DrawString(Mononoke.Font, Player.Alloys.ToString(), AlloyTextPos, Color.White);
+
+            //spriteBatch.Draw(PetrichorIcon, lIconPos, Color.White);
+            //spriteBatch.DrawString(Mononoke.Font, Player.Weapons.ToString(), lTextPos, Color.White);
+
+            spriteBatch.DrawString(Mononoke.Font, Player.Stability.ToString(), AlloyTextPos + new Vector2(48, 0), Color.White);
         }
         private void LoadIcons( GraphicsDeviceManager graphics )
         {
@@ -104,6 +124,22 @@ namespace Mononoke
                 throw new Exception("Icon does not exist at this path " + str);
             }
             DateBox = Texture2D.FromFile(graphics.GraphicsDevice, str);
+        }
+        // 0 = 01/01/1114
+        // t = days since 01/01/1114
+        // 360 days in a year
+        // 30 days in a month
+        private string IntegerToYear(int t)
+        {
+            return ((t / 360) + 1114).ToString() ;
+        }
+        private string IntegerToMonth( int t )
+        { 
+            return (( t % 360 ) / 30 ).ToString();
+        }
+        private string IntegerToDay(int t)
+        {
+            return ((t % 360) % 30).ToString();
         }
     }
 }

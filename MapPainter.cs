@@ -16,7 +16,7 @@ namespace Mononoke
         Texture2D TestTexture;
         public MapPainter( string path, GraphicsDeviceManager graphics )
         {
-            string str = "data/textures/forest.png";
+            string str = "data/textures/gui/mainmenu/test.jpg";
             if ( !File.Exists( str ) )
             {
                 throw new Exception( "Map does not exist at this path " + str );

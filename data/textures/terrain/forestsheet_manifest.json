@@ -1,7 +1,7 @@
 {
 	"header" : 
 	{
-		"tilesize" : 32
+		"tilesize" : 16
 		,"filepath" : "forestsheet.png"
 	}
 	,"tiles" : 

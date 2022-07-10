@@ -13,7 +13,7 @@ namespace Mononoke
         public const string COLOUR_PROPERTY_STR = "Colour";
         public Color Colour;
         public string Name;
-        protected Actor( string name, Color colour )
+        public Actor( string name, Color colour )
         {
             Colour = colour;
             Name = name;

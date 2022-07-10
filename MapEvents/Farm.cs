@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Mononoke.MapEvents
 {
-    public class Farm : ResourceExtractor
+    class Farm : ResourceExtractor
     {
         
         public Farm( Vector2 pos ) : base ( pos )
@@ -19,6 +19,10 @@ namespace Mononoke.MapEvents
         protected override void Harvest(Player clicker, int amount)
         {
             clicker.Food += amount;
+        }
+        protected override eTerrainType GetExpansionType()
+        {
+            return eTerrainType.Farmland;
         }
     }
 }
