@@ -114,7 +114,7 @@ namespace Mononoke
             foreach (KeyValuePair<Vector2, MapUnit> u in Units)
             {
                 u.Value.Draw( spriteBatch, u.Key );
-                Pathfinder.DrawPathPreview( u.Value.Path, spriteBatch );
+                //Pathfinder.DrawPathPreview( u.Value.Path, spriteBatch );
             }
         }
         public bool TryGetUnitAt( Vector2 pos, out MapUnit unit )

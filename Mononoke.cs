@@ -47,7 +47,7 @@ namespace Mononoke
             Font = Content.Load<SpriteFont>("vampire_wars");
             Camera = new Camera2D( _graphics );
 
-            IconHolder.Initialise( _graphics );
+            TextureAssetManager.Initialise( _graphics );
             //CurrentState = new Overworld(Camera, _graphics, this);
             //CurrentState = new MainMenu( _graphics, this);
             NewGame();

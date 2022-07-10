@@ -12,6 +12,7 @@ namespace Mononoke
         string Name;
         public int Speed;
         //public Vector2 Pos; // Tile position
+        Texture2D Sprite;
         public Vector2 UltimateDestination() { return Path[0]; }
         public Vector2 Destination() { return Path [Path.Count-2]; }
         public Vector2 Location() { return Path[Path.Count-1]; }
@@ -32,13 +33,12 @@ namespace Mononoke
         float currentSecond = 0f;
         float secondsToMove = 1f; // modified by terrain cost/
 
-        Texture2D sprite;
         public bool Selected = false;
         public MapUnit( Texture2D tex, int speed, string name, Vector2 pos, Actor owner )
         { 
             Speed = speed;
             Name = name;
-            sprite = tex;
+            Sprite = tex;
 
             Attack = new MapUnitAttack();
 
@@ -70,7 +70,8 @@ namespace Mononoke
             return firstFloat * (1 - by) + secondFloat * by;
         }
         public void Draw( SpriteBatch spriteBatch, Vector2 pos ) // pos is tile pos
-        { 
+        {
+            //spriteBatch.Draw( Sprite, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
             if ( Path.Count > 1 )
             {
                 float progress = currentSecond / secondsToMove;
@@ -78,10 +79,14 @@ namespace Mononoke
                                     Lerp ( pos.X * MapHolder.PIXELS_PER_TILE, Destination().X * MapHolder.PIXELS_PER_TILE,  progress)
                                     ,Lerp ( pos.Y * MapHolder.PIXELS_PER_TILE, Destination().Y * MapHolder.PIXELS_PER_TILE, progress ) 
                                     );
-                spriteBatch.DrawString(Mononoke.Font, Name, lerpedPos ,Color.White);
+                spriteBatch.Draw(Sprite, lerpedPos, Color.White);
+                //spriteBatch.DrawString(Mononoke.Font, Name, lerpedPos ,Color.White);
             }
             else
-                spriteBatch.DrawString( Mononoke.Font, Name, pos * MapHolder.PIXELS_PER_TILE, Color.White);
+            { 
+                spriteBatch.Draw(Sprite, pos * MapHolder.PIXELS_PER_TILE, Color.White);
+                //spriteBatch.DrawString( Mononoke.Font, Name, pos * MapHolder.PIXELS_PER_TILE, Color.White);
+            }
         }
         public void SetPath( List<Vector2> path )
         {

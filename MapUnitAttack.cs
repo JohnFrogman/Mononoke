@@ -13,7 +13,7 @@ namespace Mononoke
         public int Damage = 5;
         public bool Update(GameTime gameTime)
         {
-            Debug.WriteLine("Updating attack");
+            //Debug.WriteLine("Updating attack");
             currentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (currentSecond > timeToAttack)
             {

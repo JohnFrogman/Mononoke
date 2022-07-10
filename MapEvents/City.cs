@@ -121,7 +121,7 @@ namespace Mononoke.MapEvents
                 List<RadialMenuItem> l = new List<RadialMenuItem>();
                 l.Add( new RadialMenuItem(
                       MapHolder.PIXELS_PER_TILE * Origin - new Vector2(0, MapHolder.PIXELS_PER_TILE)
-                    , IconHolder.GetIconByName("soldier")
+                    , TextureAssetManager.GetUnitSpriteByName("soldier")
                     , () => { 
                         this.AddSoldier();
                        }
