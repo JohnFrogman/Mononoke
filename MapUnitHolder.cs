@@ -40,19 +40,21 @@ namespace Mononoke
                 MapUnit u = Units[v];
                 if ( u.Stationary() )
                     continue;
-                if ( Units.ContainsKey(u.Destination() ) )
+                if ( Units.ContainsKey(u.Destination() ) ) // Recalculate if next step is occupied
                 {
-                    Debug.WriteLine( "Recalculating path, unit blocking destination");
                     u.SetPath( Pathfinder.GetPath( v, u.UltimateDestination(), true ) );
-                }
+                    if (u.Stationary() ) // Recalculating could lead to the unit being stationary if it's ultimate destination is now occupied or it can't find a path
+                        continue; 
+                } 
+
                 if ( u.MoveUpdate( gameTime ) )
                 {
                     u.CompleteMove();
-                    Units[ u.Location() ] = u;
+                    Units[ u.Location ] = u;
                     Units.Remove( v );
                 }
             }
-            // Foreach unit - if attack isn't ready, do an update. Otherwise do an attack
+            // Foreach unit - if attack is ready, do an attack.
             // When doing an attack: if there's a target already, attack that.
             // if not then aquire a target.
             // If the attack kills the target, queue the target for death.
@@ -60,37 +62,46 @@ namespace Mononoke
             { 
                 if ( kvp.Value.AttackUpdate( gameTime ) ) // Should return true if attack is ready. 
                 {
-                    if ( ValidTarget(kvp.Key, kvp.Value.Target.Item2 ) ) // If it's a valid target, or possible to retarget, attack
+                    if ( ValidTarget( kvp.Value ) ) // If it's a valid target, or possible to retarget, attack
                     {
-                        kvp.Value.Target.Item2.Health -= kvp.Value.Attack.Damage;
-                        if ( kvp.Value.Target.Item2.Health < 1 )
+                        Debug.WriteLine( "Aqcuired target and attacking" );
+                        kvp.Value.Attack.Ready = false;
+                        kvp.Value.Target.Health -= kvp.Value.Attack.Damage;
+                        if ( kvp.Value.Target.Health < 1 )
                         { 
-                            QueueToDie( (kvp.Value.Target.Item1, kvp.Value.Target.Item2) );
+                            QueueToDie( (kvp.Value.Target.Location, kvp.Value.Target) );
                         }
                     }
                 }
             }
             ExecuteDeathQueue();
         }
-        bool ValidTarget( Vector2 pos, MapUnit target )
+        bool ValidTarget( MapUnit attacker )
         {
+            //if ( )
             // if can find unit by it
-            List<Vector2> neighbours = pos.GetNeighbours();
-            foreach (Vector2 n in neighbours)
+            //if ( target != null )
+            //return true;
+            //List<Vector2> potentialTargets = attacker.Location.GetNeighbours();
+            List<Vector2> potentialTargets = attacker.Location.GetTilesInRange( attacker.Attack.Range );
+            MapUnit provisionalTarget = null;
+            foreach (Vector2 n in potentialTargets) // Right now a range of 1, this should in future get all tiles in a range.
             {
-                if ( Units.ContainsKey(n) && Units[n] == target )
-                    return true;
-            }
-            foreach (Vector2 n in neighbours)
-            {
-                if ( Units.ContainsKey(n) && Units[n].Owner != Units[pos].Owner )
-                {
-                    Units[pos].Target = ( n, Units[ n ] );
-                    return true;
+                if ( Units.ContainsKey(n)  )
+                { 
+                    if ( Units[n] == attacker.Target )
+                    { 
+                        return true; // Already has a valid target
+                    }
+                    else
+                    { 
+                        //if ( ) check unit is hostile to
+                        provisionalTarget = Units[n];
+                    }
                 }
             }
-            return false;
-
+            attacker.Target = provisionalTarget;
+            return provisionalTarget != null;
         }
         void QueueToDie( (Vector2, MapUnit) u )
         { 
@@ -102,6 +113,7 @@ namespace Mononoke
             {
                 foreach ( (Vector2, MapUnit) v in DeathQueue )
                 {
+                    Debug.WriteLine("unit at " + v.Item1 + " is dead");
                     //Units[v].Die();
                     Units.Remove( v.Item1 );
                 }
@@ -113,7 +125,7 @@ namespace Mononoke
         {
             foreach (KeyValuePair<Vector2, MapUnit> u in Units)
             {
-                u.Value.Draw( spriteBatch, u.Key );
+                u.Value.Draw( spriteBatch );
                 //Pathfinder.DrawPathPreview( u.Value.Path, spriteBatch );
             }
         }

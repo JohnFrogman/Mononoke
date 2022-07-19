@@ -9,7 +9,7 @@ namespace Mononoke
 {
     class MapHolder
     {
-        public const int PIXELS_PER_TILE = 16;
+        public const int PIXELS_PER_TILE = 32;
         public const int MAP_TILE_WIDTH = 256;
         public const int MAP_PIXEL_WIDTH = PIXELS_PER_TILE * MAP_TILE_WIDTH;
         public const int MAP_TILE_HEIGHT = 256;
@@ -83,6 +83,8 @@ namespace Mononoke
             eTerrainType terrainType = GetTerrainAt( pos );
             if ( terrainType == eTerrainType.Mountain )
                 return 3;
+            else if ( terrainType == eTerrainType.Road )
+                return 0.25f;
             else 
                 return 1;
         }
@@ -90,7 +92,6 @@ namespace Mononoke
         {
             if ( unitsBlock && units.UnitExistsAt(pos) )
             {
-                Debug.WriteLine("unit blockling this position " + pos );
                 return false;
             }
             return TerrainTypeMap.Pathable(GetTerrainAt(pos));

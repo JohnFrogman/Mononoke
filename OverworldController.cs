@@ -113,10 +113,15 @@ namespace Mononoke
                 PressTime = 0f;
             }
             
-            if ( dragging && mousedown && ClickedTile != HoveredTile && HoveredTile != PathPreviewTile )
+            if ( dragging && mousedown && ClickedTile != HoveredTile && HoveredTile != PathPreviewTile ) 
             {
                 PathPreviewTile = HoveredTile;
                 SetDragPath();
+            }
+            else if ( SelectedUnit != null && HoveredTile != PathPreviewTile )
+            {
+                PathPreviewTile = HoveredTile;
+                SetMovePath();
             }
                 
             Camera.Move( sprint /** 100f*/ * camTranslate );
@@ -127,6 +132,12 @@ namespace Mononoke
                 Pathfinder.DrawPathPreview( PathPreview, spriteBatch );
             if (ActiveRadial != null)
                 ActiveRadial.Draw( spriteBatch );
+            if ( SelectedUnit != null )
+            { 
+                DrawUnitSelectionBox( spriteBatch );
+                if ( !SelectedUnit.Stationary() )
+                    DrawDestination( spriteBatch );
+            }
         }
         void DragEnd( )
         {   
@@ -138,6 +149,7 @@ namespace Mononoke
         }
         void Click()
         {
+            PathPreview.Clear();
             if ( SelectedUnit != null )
             {
                 if ( TryUnitMoveClick( HoveredTile ) )
@@ -173,7 +185,7 @@ namespace Mononoke
         {
             Debug.WriteLine("Trying to move a unit to " + tile );
 
-            List<Vector2> path = Pathfinder.GetPath( SelectedUnit.Location(), ClickedTile, true );
+            List<Vector2> path = Pathfinder.GetPath( SelectedUnit.Location, ClickedTile, true );
 
             if ( path.Count > 0 )
             {
@@ -192,12 +204,44 @@ namespace Mononoke
         {
             PathPreview = Pathfinder.GetPath( ClickedTile, PathPreviewTile, false );
         }
+        void SetMovePath()
+        {
+            PathPreview = Pathfinder.GetPath(SelectedUnit.Location, PathPreviewTile, true);
+        }
         bool TryShowRadialAt( Vector2 tilePos, Vector2 renderPos )
         {
             RadialMenu r;
             bool ok = Maps.TryGetRadialMenuAt( tilePos, out r );
             ActiveRadial = r;
             return ok;
+        }
+        void DrawUnitSelectionBox( SpriteBatch spriteBatch )
+        {
+            spriteBatch.Draw( TextureAssetManager.GetSelectionBox(), SelectedUnit.GetSpritePos(), null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f );
+        }
+        void DrawDestination( SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(TextureAssetManager.GetIconByName("move"), SelectedUnit.UltimateDestination() * MapHolder.PIXELS_PER_TILE, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
+        }
+        public void DrawCursor(SpriteBatch spriteBatch)
+        {
+            Texture2D tex = TextureAssetManager.GetCursor(eMouseCursorType.Default);
+            if ( Units.UnitExistsAt( HoveredTile ) )
+            { 
+                tex = TextureAssetManager.GetCursor(eMouseCursorType.SelectUnit);
+            }
+            else if (SelectedUnit != null)
+            { 
+                if ( /*TerrainTypeMap.Pathable( HoveredTile )*/ true )
+                { 
+                    tex = TextureAssetManager.GetCursor( eMouseCursorType.Move );
+                }
+                else
+                {
+                    tex = TextureAssetManager.GetCursor(eMouseCursorType.IllegalMove);
+                }
+            }
+            spriteBatch.Draw( tex , ( HoveredPos / Mononoke.ScreenScaleV2 ) - Camera.Position, null, Color.White, 0f, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0f);
         }
     }
 }

@@ -10,18 +10,28 @@ namespace Mononoke
     {
         float currentSecond = 0f;
         float timeToAttack = 1f;
+        public bool Ready;
         public int Damage = 5;
-        public bool Update(GameTime gameTime)
+        public int Range = 2;
+        public void Update(GameTime gameTime)
         {
             //Debug.WriteLine("Updating attack");
-            currentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (currentSecond > timeToAttack)
-            {
-                currentSecond = 0f;
-                Debug.WriteLine("Ready to attack");
-                return true;
+            if ( !Ready )
+            { 
+                currentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (currentSecond > timeToAttack)
+                {
+                    Ready = true;
+                    currentSecond = 0f;
+                }
             }
-            return false;
+        }
+        public float Progress()
+        {
+            if ( Ready )
+                return 1f;
+            else
+                return currentSecond / timeToAttack;
         }
     }
 }

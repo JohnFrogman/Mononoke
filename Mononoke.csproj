@@ -10,6 +10,7 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="data\textures\icons\sphere.png" />
     <None Remove="Icon.bmp" />
     <None Remove="Icon.ico" />
   </ItemGroup>

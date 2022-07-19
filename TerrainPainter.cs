@@ -37,11 +37,12 @@ namespace Mononoke
                     if ( featureTextureMap.ContainsKey( tt ) && featureTextureMap[tt].ContainsKey(tileFeatureTextures[pos]) )
                     { 
                         tex = featureTextureMap[ tt ][ tileFeatureTextures[pos] ];
-                        scale = MapHolder.PIXELS_PER_TILE / tex.Width;
+                        scale = (float)MapHolder.PIXELS_PER_TILE / (float)tex.Width;
                         spriteBatch.Draw(tex, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), scale, SpriteEffects.None, 0f);
                     }
                 }
             }
+            //spriteBatch.DrawString(Mononoke.Font, pos.X + ", " + pos.Y, pos * MapHolder.PIXELS_PER_TILE, Color.White, 0f, new Vector2(0,0), 0.2f, SpriteEffects.None, 0f );
         }
         public void SetColoursAt( List<Vector2> pos, Color col)
         {

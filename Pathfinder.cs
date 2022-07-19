@@ -14,6 +14,10 @@ namespace Mononoke
 
         MapHolder Maps;
         MapUnitHolder Units;
+
+        static float g;
+        static float h;
+        static float f;
         public Pathfinder( GraphicsDeviceManager graphics, MapHolder mapHolder, MapUnitHolder units)
         {
             Maps = mapHolder;
@@ -22,14 +26,21 @@ namespace Mononoke
             previewTex = new Texture2D( graphics.GraphicsDevice, 1, 1);
             previewTex.SetData(pixels);
         }
-        public List<Vector2> GetPath(Vector2 origin, Vector2 destination, bool unitsBlock = false )
+        public List<Vector2> GetPath(Vector2 origin, Vector2 destination, bool unitsBlock )
         {
             List<PathfindingNode> openNodes = new List<PathfindingNode>();
-            List<Vector2> closedLocations = new List<Vector2>();
-            float g = 0;                                      // distance from start
-            float h = origin.ManhattanDistance( destination); // approximate distance from destination
-            float f = g + h;                                  // cost of node
-            openNodes.Add(new PathfindingNode(origin, g, h));
+            List<Vector2> closedLocations = new List<Vector2>() { origin };
+            List<Vector2> originNeighbours = origin.GetNeighbours();
+            foreach (Vector2 on in originNeighbours)
+            {
+                g = 0 + Maps.GetMapCostAt( on );               // distance from start
+                h = on.ManhattanDistance( destination);        // approximate distance from destination
+                f = g + h;                                     // cost of node
+                if ( Maps.Pathable(on, Units, unitsBlock) )
+                {
+                    openNodes.Add(new PathfindingNode(on, g, h));
+                }
+            }
             while (openNodes.Count > 0)
             {
                 openNodes.Sort((p, q) => p.f.CompareTo(q.f));
@@ -40,12 +51,21 @@ namespace Mononoke
                 if (currentNode.loc == destination)
                 {
                     List<Vector2> result = new List<Vector2>();
-                    while (currentNode.parent != null)
+                    int iterations = 0;
+                    while ( true )
                     {
                         result.Add(currentNode.loc);
-                        currentNode = currentNode.parent;
+                        if (currentNode.parent == null)
+                            return result;
+                        else
+                            currentNode = currentNode.parent;
+                        if (iterations > 9999)
+                        {
+                            throw new Exception( "Reached max iterations of pathfinder, circular path?");
+                            return new List<Vector2>();
+                        }
                     }
-                    return result;
+                    
                 }
                 List<Vector2> Neighbours = currentNode.GetNeighbours();
                 foreach ( Vector2 n in Neighbours)

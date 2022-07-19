@@ -38,7 +38,7 @@ namespace Mononoke
         }
         public static int ManhattanDistance( this Vector2 v1, Vector2 v2 )
         {
-            return (int)MathF.Floor(v1.X -v2.X + v1.Y - v2.Y);
+            return (int)MathF.Floor( MathF.Abs( v1.X - v2.X ) + MathF.Abs( v1.Y - v2.Y ) );
         }
         public static eTileFace GetNeighbourDirection( this Vector2 v1, Vector2 v2 )
         {
@@ -99,31 +99,29 @@ namespace Mononoke
                 return v + new Vector2(1, 0);
             }
         }
-        //public static Vector2 GetNeighbour(this Vector2 v, eTilePaintFace dir)
-        //{
-        //    Vector2 up = new Vector2(0, -1);
-        //    Vector2 right = new Vector2(1, 0);
-        //    switch ( dir )
-        //    {
-        //        case eTilePaintFace.n :
-        //            return v + up;
-        //        case eTilePaintFace.ne:
-        //            return v + up + right;
-        //        case eTilePaintFace.e:
-        //            return v + right;
-        //        case eTilePaintFace.se:
-        //            return v - up + right;
-        //        case eTilePaintFace.s:
-        //            return v - up;
-        //        case eTilePaintFace.sw:
-        //            return v - up - right;
-        //        case eTilePaintFace.w:
-        //            return v - right;
-        //        case eTilePaintFace.nw:
-        //            return v + up - right;
-        //        default :
-        //            throw new System.Exception("Unrecognised direction, should not be possible to get here" );
-        //    }
-        //}
+        public static List<Vector2> GetTilesInRange(this Vector2 v, int range)
+        {
+            // Breadth first search to range. Currently no blockers to range. but 
+            List<Vector2> openNodes = v.GetNeighbours();
+            List<Vector2> closedNodes = new List<Vector2>(){ v };
+            List<Vector2> result = new List<Vector2>();
+            while ( openNodes.Count > 0 )
+            { 
+                int d = openNodes[0].ManhattanDistance(v);
+                if ( d <= range )
+                { 
+                    result.Add(openNodes[0]);
+                    List<Vector2> neighbours = openNodes[0].GetNeighbours();
+                    foreach ( Vector2 n in neighbours )
+                    {
+                        if ( !closedNodes.Contains( n ) && !openNodes.Contains( n ) )
+                            openNodes.Add( n );
+                    }
+                }
+                closedNodes.Add(openNodes[0]);
+                openNodes.RemoveAt(0);
+            }
+            return result;
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace Mononoke
             Controller = new OverworldController(camera, Maps, Provinces, Player, EventQueue, _graphics, game, Units, Pathfinder );
             Units.Initialise( Pathfinder );
 
-            Units.AddUnit( new Vector2(15,15), new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Gobloid", new Vector2(15,15), new Actor("Test actor", Color.Magenta)));
+            Units.AddUnit( new Vector2(15,15), new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Gobloid", new Vector2(15,15), new Actor("Test actor", Color.Magenta), Maps));
 
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
@@ -39,8 +39,10 @@ namespace Mononoke
             Maps.Draw(_spriteBatch, _graphics, result);
             Player.Draw(_spriteBatch, _graphics);
             EventQueue.Draw(_spriteBatch);
-            Controller.Draw(_spriteBatch);
             Units.Draw(_spriteBatch);
+
+            Controller.Draw(_spriteBatch);
+            Controller.DrawCursor(_spriteBatch);
         }
 
         void IGameState.Update(GameTime gameTime)

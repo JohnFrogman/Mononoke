@@ -7,11 +7,8 @@ namespace Mononoke
 {
     public class Mononoke : Game
     {
-        public const int RENDER_WIDTH = 960;
-        public const int RENDER_HEIGHT = 540;
-        
-        public const int VIEWPORT_WIDTH = 1920;
-        public const int VIEWPORT_HEIGHT = 1080;
+        public const int RENDER_WIDTH = 1920;
+        public const int RENDER_HEIGHT = 1080;
 
         //        public const int DRAW_DISTANCE = 2;
 
@@ -20,7 +17,10 @@ namespace Mononoke
         //public static Mononoke Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        
+
+        private double frameRate = 0;
+        private bool ShowFrameCounter = false;
+
         IGameState CurrentState;
 
         Camera2D Camera;
@@ -28,11 +28,11 @@ namespace Mononoke
         public static Effect TestEffect;
         public Mononoke()
         {
-            ScreenScale = new Vector3( VIEWPORT_WIDTH / RENDER_WIDTH, VIEWPORT_HEIGHT / RENDER_HEIGHT, 1.0f);
+            ScreenScale = new Vector3( RENDER_WIDTH, RENDER_HEIGHT, 1.0f);
             ScreenScaleV2 = new Vector2(ScreenScale.X, ScreenScale.Y);
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -40,8 +40,8 @@ namespace Mononoke
             // TODO: Add your initialization logic here
             base.Initialize();  
 
-            _graphics.PreferredBackBufferWidth = VIEWPORT_WIDTH;
-            _graphics.PreferredBackBufferHeight = VIEWPORT_HEIGHT;
+            _graphics.PreferredBackBufferWidth = RENDER_WIDTH;
+            _graphics.PreferredBackBufferHeight = RENDER_HEIGHT;
             _graphics.ApplyChanges();
 
             Font = Content.Load<SpriteFont>("vampire_wars");
@@ -67,6 +67,7 @@ namespace Mononoke
         protected override void Update(GameTime gameTime)
         {
             CurrentState.Update( gameTime );
+             frameRate = 1 / gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -82,8 +83,9 @@ namespace Mononoke
                                 SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale( ScreenScale ));
 
             //TestEffect.CurrentTechnique.Passes[0].Apply();
-
             CurrentState.Draw(_spriteBatch, _graphics);
+            if ( ShowFrameCounter )
+                _spriteBatch.DrawString( Font, frameRate.ToString().Substring( 0, 5 ), -Camera.Position, Color.Black );
 
             _spriteBatch.End();
 

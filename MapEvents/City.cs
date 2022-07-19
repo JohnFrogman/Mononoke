@@ -135,7 +135,7 @@ namespace Mononoke.MapEvents
         void AddSoldier()
         {
             FreeWorkers--;
-            UnitHolder.AddUnit( Origin, new MapUnit(null, 1, "Soldier", Origin, Owner) );
+            UnitHolder.AddUnit( Origin, new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Soldier", Origin, Owner, Maps) );
             Debug.WriteLine("Soldier Added");
         }
     }
