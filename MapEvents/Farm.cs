@@ -4,10 +4,9 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
-using Mononoke.MapEvents;
 using System.Linq;
 
-namespace Mononoke.MapEvents
+namespace Mononoke
 {
     class Farm : ResourceExtractor
     {

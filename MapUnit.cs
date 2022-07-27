@@ -88,15 +88,15 @@ namespace Mononoke
             //spriteBatch.Draw( Sprite, pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
             Vector2 drawPos = GetSpritePos();
 
-            spriteBatch.Draw(Sprite, drawPos, null, Color.White, 0f, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Sprite, drawPos, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
             float healthPortion = (float)_Health / MaxHealth;
             float test = MapHolder.PIXELS_PER_TILE * healthPortion;
 
-            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0,0), null, Color.Black, 0f, new Vector2(0, 0), new Vector2(MapHolder.PIXELS_PER_TILE, 4), SpriteEffects.None, 0f);
-            Vector2 hpScale = new Vector2(MapHolder.PIXELS_PER_TILE * healthPortion, 1);
-            Vector2 attackScale = new Vector2(MapHolder.PIXELS_PER_TILE * Attack.Progress(), 1);
-            spriteBatch.Draw( TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0, 1), null, Color.Green, 0f, new Vector2(0 ,0), hpScale, SpriteEffects.None, 0f );
-            spriteBatch.Draw( TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0, 2), null, Color.White, 0f, new Vector2(0, 0), attackScale, SpriteEffects.None, 0f );
+            //spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0,0), null, Color.Black, 0f, new Vector2(0, 0), new Vector2(MapHolder.PIXELS_PER_TILE, 4), SpriteEffects.None, 0f);
+            Vector2 hpScale = new Vector2(MapHolder.PIXELS_PER_TILE * healthPortion, 2);
+            Vector2 attackScale = new Vector2(MapHolder.PIXELS_PER_TILE * Attack.Progress(), 2);
+            spriteBatch.Draw( TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0, 26), null, new Color( 0, 255, 0, 255 ), 0f, new Vector2(0 ,0), hpScale, SpriteEffects.None, 0f );
+            spriteBatch.Draw( TextureAssetManager.GetSimpleSquare(), drawPos + new Vector2(0, 29), null, Color.White, 0f, new Vector2(0, 0), attackScale, SpriteEffects.None, 0f );
         }
         public void SetPath( List<Vector2> path )
         {

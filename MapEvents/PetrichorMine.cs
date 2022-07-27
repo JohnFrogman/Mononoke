@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace Mononoke.MapEvents
+namespace Mononoke
 {
     class PetrichorMine : ResourceExtractor
     {
@@ -17,7 +17,7 @@ namespace Mononoke.MapEvents
         }
         protected override eTerrainType GetExpansionType()
         {
-            throw new System.NotImplementedException();
+            return eTerrainType.PetrichorMine;
         }
     }
 }

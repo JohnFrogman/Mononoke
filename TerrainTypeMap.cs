@@ -34,6 +34,11 @@ namespace Mononoke
 
         ,Farmland
         ,Urban
+        ,CityCentre
+        ,Foundry
+    
+        ,PetrichorMine
+        ,LintExtractor
 
         ,DeepOcean
         ,ShallowOcean
@@ -78,9 +83,18 @@ namespace Mononoke
             //,   { eTerrainType.GrassyHills,         new Color(  58, 117,  26, 255 ) }
             //,   { eTerrainType.Taiga,               new Color(  31, 128, 105, 255 ) }
             //,   { eTerrainType.Marsh,               new Color(  50, 128, 109, 255 ) }
+            
+//57, 73, 173
 
+//212, 57, 73
+
+            ,   { eTerrainType.PetrichorMine,       new Color( 57, 73, 173, 255 ) }
+            ,   { eTerrainType.LintExtractor,       new Color( 212, 57, 73, 255 ) }
             ,   { eTerrainType.Farmland,            new Color( 213, 240, 161, 255 ) }
+
             ,   { eTerrainType.Urban,               new Color( 166, 166, 166, 255 ) }
+            ,   { eTerrainType.Foundry,             new Color( 165, 165, 165, 255 ) }
+            ,   { eTerrainType.CityCentre,          new Color( 164, 164, 164, 255 ) }
 
             ,   { eTerrainType.DeepOcean,           new Color(   0,   9, 123, 255) }
             ,   { eTerrainType.ShallowOcean,        new Color(   0,  13, 179, 255) }

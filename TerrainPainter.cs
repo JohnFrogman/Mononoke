@@ -26,7 +26,7 @@ namespace Mononoke
         public override void DrawTile(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos)
         {
             Texture2D tex;
-            float scale = MapHolder.PIXELS_PER_TILE;
+            float scale = 1f;//MapHolder.PIXELS_PER_TILE;
             //Color col = TileColourMap[pos];
             if ( tileBaseTextures.ContainsKey(pos) )
             { 

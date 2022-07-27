@@ -142,5 +142,15 @@ namespace Mononoke
             }
             return result;
         }
+        public void Save(string "slot", GraphicsDevice graphics)
+        {
+            Texture2D tex = new Texture2D( graphics, MapHolder.MAP_PIXEL_WIDTH, MapHolder.MAP_PIXEL_HEIGHT );
+            Color[] data = new Color[ MapHolder.MAP_PIXEL_WIDTH * MapHolder.MAP_PIXEL_HEIGHT ];
+            foreach ( KeyValuePair<Vector2, Color> kvp in TileColourMap )
+            { 
+                data[]
+            }
+            TileColourMap
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace Mononoke
         {
             string path = "data/textures/cursor_sheet.png";
             BrokenTexture = broken; 
-            int tileSize = 16;
+            int tileSize = 32;
             
             Texture2D spriteSheet = Texture2D.FromFile(graphics.GraphicsDevice, path);
 

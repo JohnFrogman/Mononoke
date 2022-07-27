@@ -6,12 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Mononoke
 {
-    class Factory : MapEvent
+    class MunitionsFactory : MapEvent
     { 
-        int CashPerAlloy = 50; // One day turn this into a variable price based on the economy?
-        int pendingProduction; // Amount of resources the factory has production for
-        int maxSpace;
-        public Factory( Vector2 pos ) : base ( pos )
+        static int MunitionPerAlloy = 10;
+        int Munitions = 0;
+        static int munitionSpace = 100;
+        int pendingProduction; // Amount of resources we have production for
+        public MunitionsFactory( Vector2 pos ) : base ( pos )
         {
         }
 
@@ -28,7 +29,7 @@ namespace Mononoke
             else
             { 
                 clicker.Alloys--;
-                pendingProduction += CashPerAlloy;
+                pendingProduction += MunitionPerAlloy;
                 CheckEmpty();
             }
 
@@ -36,10 +37,14 @@ namespace Mononoke
 
         protected override void OnExpire()
         {
+            pendingProduction--;
+            Munitions++;
+            CheckEmpty();
+
         }
         void CheckEmpty()
         {
-            Paused = pendingProduction > 0;
+            Paused = pendingProduction > 0 && munitionSpace > Munitions;
         }
     }
 }

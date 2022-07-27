@@ -41,7 +41,6 @@ namespace Mononoke
 
         public Actor GetActor( Color col)
         {
-            //return new Actor("Test",);
             return ActorsByColour[col];
         }
     }

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
-namespace Mononoke.MapEvents
+namespace Mononoke
 {
     abstract class ResourceExtractor : ExpandableMapEvent
     {
@@ -31,7 +31,10 @@ namespace Mononoke.MapEvents
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE, Color.Black);
+            base.Draw(spriteBatch);
+            //spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE, Color.Black, 0, Vector2.Zero, 0.4f, SpriteEffects.None, 0f);
+            spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE + new Vector2(8, 0), Color.Black, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+            //spriteBatch.DrawString(Mononoke.Font, Current.ToString(), Origin * MapHolder.PIXELS_PER_TILE, Color.Black);
         }
         public override void OnClick(Player clicker)
         {

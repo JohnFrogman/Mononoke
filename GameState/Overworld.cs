@@ -3,55 +3,83 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace Mononoke
 {
     class Overworld : IGameState
     {
-        private OverworldController Controller;
-        private MapHolder Maps;
-        private ProvinceHolder Provinces;
-        private ActorHolder Actors;
-        private Player Player;
-        private GameEventQueue EventQueue;
-        private Camera2D Camera;
-        private MapUnitHolder Units;
-        private Pathfinder Pathfinder;
+        private string mSaveSlotName = "";
+        private OverworldController mController;
+        private MapHolder mMaps;
+        private ProvinceHolder mProvinces;
+        private ActorHolder mActors;
+        private Player mPlayer;
+        private GameEventQueue mEventQueue;
+        private Camera2D mCamera;
+        private MapUnitHolder mUnits;
+        private Pathfinder mPathfinder;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game )
         {
-            Camera = camera;
-            Units = new MapUnitHolder( );
-            Maps = new MapHolder(_graphics, Units);
-            Pathfinder = new Pathfinder( _graphics, Maps, Units );
-            Actors = new ActorHolder();
-            Provinces = new ProvinceHolder(Actors, Maps);
-            Player = new Player(camera, _graphics);
-            EventQueue = new GameEventQueue(Player);
-            Controller = new OverworldController(camera, Maps, Provinces, Player, EventQueue, _graphics, game, Units, Pathfinder );
-            Units.Initialise( Pathfinder );
+            mCamera = camera;
+            mUnits = new MapUnitHolder( );
+            mMaps = new MapHolder(_graphics, mUnits);
+            mPathfinder = new Pathfinder( _graphics, mMaps, mUnits );
+            mActors = new ActorHolder();
+            mProvinces = new ProvinceHolder(mActors, mMaps);
+            mPlayer = new Player(camera, _graphics);
+            mEventQueue = new GameEventQueue(mPlayer);
+            mController = new OverworldController( this, camera, mMaps, mProvinces, mPlayer, mEventQueue, _graphics, game, mUnits, mPathfinder );
+            mUnits.Initialise( mPathfinder );
 
-            Units.AddUnit( new Vector2(15,15), new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Gobloid", new Vector2(15,15), new Actor("Test actor", Color.Magenta), Maps));
+            mUnits.AddUnit( new Vector2(15,15), new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Gobloid", new Vector2(15,15), new NonPlayerActor("Test actor", Color.Magenta, eActorBehavior.Raider), mMaps));
 
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
-            Vector2 result = Vector2.Floor(-Camera.Position / MapHolder.PIXELS_PER_TILE);
-            Maps.Draw(_spriteBatch, _graphics, result);
-            Player.Draw(_spriteBatch, _graphics);
-            EventQueue.Draw(_spriteBatch);
-            Units.Draw(_spriteBatch);
+            Vector2 result = Vector2.Floor(-mCamera.Position / MapHolder.PIXELS_PER_TILE);
+            mEventQueue.Draw(_spriteBatch);
+            mMaps.Draw(_spriteBatch, _graphics, result);
+            mUnits.Draw(_spriteBatch);
+            mPlayer.Draw(_spriteBatch, _graphics);
 
-            Controller.Draw(_spriteBatch);
-            Controller.DrawCursor(_spriteBatch);
+            mController.Draw(_spriteBatch);
+            mController.DrawCursor(_spriteBatch);
         }
 
         void IGameState.Update(GameTime gameTime)
         {
-            Controller.Update(gameTime);
-            EventQueue.Update(gameTime);
-            Maps.Update(gameTime);
-            Player.Update( gameTime);
-            Units.Update(gameTime);
+            mEventQueue.Update(gameTime);
+            mMaps.Update(gameTime);
+            mPlayer.Update( gameTime);
+            mUnits.Update(gameTime);
+            mController.Update(gameTime);
         }
+
+        // Need to save out units, maps, Actors, Provinces and the player
+        public void Save()
+        { 
+            if ( mSaveSlotName == "" ) // New save, need to generate a slot name.
+            {
+                mSaveSlotName = mPlayer.GetSaveName();
+                string str = mSaveSlotName;
+                int i = 0;
+                while ( Directory.Exists( "data/save/" + str )
+                {
+                    ++i;
+                    str = mSaveSlotName + "_" + i;
+                }
+                mSaveSlotName = str;
+            }
+            mMaps.Save( mSaveSlotName );
+            mUnits.Save( mSaveSlotName );
+            mActors.Save( mSaveSlotName );
+            mPlayer.Save( mSaveSlotName );
+            //mProvinces.Save( mSaveSlotName );
+        }
+        public void Load()
+        { 
+        }
+
     }
 }

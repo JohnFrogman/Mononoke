@@ -29,7 +29,7 @@ namespace Mononoke
         }
         public bool TryClick( Vector2 pos )
         { 
-            if ( rect.Contains(pos / Mononoke.ScreenScaleV2) )
+            if ( rect.Contains(pos ) )
             {
                 if ( onClick == null)
                     return false;

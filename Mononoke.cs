@@ -12,24 +12,21 @@ namespace Mononoke
 
         //        public const int DRAW_DISTANCE = 2;
 
-        public static Vector3 ScreenScale;
-        public static Vector2 ScreenScaleV2;
         //public static Mononoke Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
         private double frameRate = 0;
-        private bool ShowFrameCounter = false;
+        private bool ShowFrameCounter = true;
 
         IGameState CurrentState;
 
         Camera2D Camera;
         public static SpriteFont Font { get; private set;}
         public static Effect TestEffect;
+
         public Mononoke()
         {
-            ScreenScale = new Vector3( RENDER_WIDTH, RENDER_HEIGHT, 1.0f);
-            ScreenScaleV2 = new Vector2(ScreenScale.X, ScreenScale.Y);
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
@@ -80,7 +77,7 @@ namespace Mononoke
             //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
             //               SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
-                                SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale( ScreenScale ));
+                                SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale( new Vector3( 1f, 1f, 1f) ));
 
             //TestEffect.CurrentTechnique.Passes[0].Apply();
             CurrentState.Draw(_spriteBatch, _graphics);

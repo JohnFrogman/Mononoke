@@ -17,12 +17,18 @@ namespace Mononoke
         Texture2D FoodIcon;
         Texture2D WealthIcon;
         Texture2D PetrichorIcon;
+        Texture2D LintIcon;
+        Texture2D MunitionsIcon;
+        Texture2D AlloyIcon;
         Texture2D DateBox;
+
+        Color col;
 
         Vector2 spacing = new Vector2(60, 0);
 
         public HUD( Player player, Camera2D camera, GraphicsDeviceManager graphics )
         {
+            col = new Color(161, 200, 255);
             LoadIcons( graphics );
             Player = player;
             Camera = camera;
@@ -50,13 +56,13 @@ namespace Mononoke
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics )
         {
-            Vector2 origin = -Camera.Position + new Vector2( 0, 0);
+            Vector2 origin = -Camera.Position;// + new Vector2( 0, 0);
 
             Vector2 DateboxPos = origin;
             Vector2 DayMonthPos = origin + new Vector2 ( 2, 2);
             Vector2 YearPos = DateboxPos + new Vector2(52, 0);
 
-            Vector2 foodIconPos = DateboxPos + new Vector2( 64, 0) + spacing;
+            Vector2 foodIconPos = DateboxPos + new Vector2( 64, 8) + spacing;
             Vector2 foodTextPos = foodIconPos + new Vector2(48, 0);
 
             Vector2 wealthIconPos = foodTextPos + spacing;
@@ -74,6 +80,8 @@ namespace Mononoke
             //Vector2 WeaponsIconPos = AlloyTextPos + spacing;
             //Vector2 WeaponsTextPos = WeaponsIconPos + new Vector2(48, 0);
 
+            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), origin, null, col, 0f, Vector2.Zero, new Vector2(Mononoke.RENDER_WIDTH, 48), SpriteEffects.None, 0f);
+
             spriteBatch.Draw(DateBox, DateboxPos, Color.White);
             spriteBatch.DrawString(Mononoke.Font, IntegerToDay(Player.Time) + " " + IntegerToMonth( Player.Time ) , DayMonthPos, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
             spriteBatch.DrawString(Mononoke.Font, IntegerToYear( Player.Time ) , YearPos, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None, 0);
@@ -87,11 +95,13 @@ namespace Mononoke
             spriteBatch.Draw( PetrichorIcon, pIconPos, Color.White);
             spriteBatch.DrawString(Mononoke.Font, Player.Petrichor.ToString(), pTextPos, Color.White);
 
-            spriteBatch.Draw(PetrichorIcon, lIconPos, Color.White);
-            spriteBatch.DrawString(Mononoke.Font, Player.Linoleum.ToString(), lTextPos, Color.White);
+            spriteBatch.Draw(LintIcon, lIconPos, Color.White);
+            spriteBatch.DrawString(Mononoke.Font, Player.Lint.ToString(), lTextPos, Color.White);
 
-            spriteBatch.Draw(PetrichorIcon, AlloyIconPos, Color.White);
+            spriteBatch.Draw(AlloyIcon, AlloyIconPos, Color.White);
             spriteBatch.DrawString(Mononoke.Font, Player.Alloys.ToString(), AlloyTextPos, Color.White);
+
+            //spriteBatch.Draw(baseTextureMap[tileBaseTextures[pos]], pos * MapHolder.PIXELS_PER_TILE, null, Color.White, 0, new Vector2(0, 0), scale, SpriteEffects.None, 0f);
 
             //spriteBatch.Draw(PetrichorIcon, lIconPos, Color.White);
             //spriteBatch.DrawString(Mononoke.Font, Player.Weapons.ToString(), lTextPos, Color.White);
@@ -100,25 +110,15 @@ namespace Mononoke
         }
         private void LoadIcons( GraphicsDeviceManager graphics )
         {
-            string str = "data/textures/icons/food.png";
-            if (!File.Exists(str))
-            {
-                throw new Exception("Icon does not exist at this path " + str);
-            }
-            FoodIcon = Texture2D.FromFile(graphics.GraphicsDevice, str);
-            str = "data/textures/icons/wealth.png";
-            if (!File.Exists(str))
-            {
-                throw new Exception("Icon does not exist at this path " + str);
-            }
-            WealthIcon = Texture2D.FromFile(graphics.GraphicsDevice, str);
-            str = "data/textures/icons/ore1.png";
-            if (!File.Exists(str))
-            {
-                throw new Exception("Icon does not exist at this path " + str);
-            }
-            PetrichorIcon = Texture2D.FromFile(graphics.GraphicsDevice, str);
-            str = "data/textures/gui/date.png";
+            FoodIcon = TextureAssetManager.GetIconByName( "food");
+            WealthIcon = TextureAssetManager.GetIconByName("wealth");
+            PetrichorIcon = TextureAssetManager.GetIconByName("petrichor");
+            LintIcon = TextureAssetManager.GetIconByName("lint");
+            AlloyIcon = TextureAssetManager.GetIconByName("enamel");
+            MunitionsIcon = TextureAssetManager.GetIconByName("ammo");
+            DateBox = TextureAssetManager.GetIconByName("food");
+
+            string str = "data/textures/gui/date.png";
             if (!File.Exists(str))
             {
                 throw new Exception("Icon does not exist at this path " + str);

@@ -129,6 +129,19 @@ namespace Mononoke
                 //Pathfinder.DrawPathPreview( u.Value.Path, spriteBatch );
             }
         }
+        public bool TryGetUnitsAt( List<Vector2> tiles, out List<MapUnit> units )
+        {
+            units = new List<MapUnit>();
+            foreach ( Vector2 t in tiles )
+            {
+                MapUnit u;
+                if ( TryGetUnitAt( t, out u ) )
+                { 
+                    units.Add( u );
+                }
+            }
+            return units.Count > 0;
+        }
         public bool TryGetUnitAt( Vector2 pos, out MapUnit unit )
         {
             unit = null;

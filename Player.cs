@@ -13,8 +13,8 @@ namespace Mononoke
         //bool Sprinting;
     
         public int Food = 0;
-        public int Petrichor = 0;
-        public int Linoleum = 0;
+        public int Petrichor = 4;
+        public int Lint = 1;
         public int Alloys = 0;
 
         public int Wealth = 0;
@@ -115,6 +115,11 @@ namespace Mononoke
         }
         public void Save()
         {
+        }
+        // return capital name or something else cool in future.
+        public string GetSaveName()
+        {
+            return "Cimmeria";
         }
     }
 }

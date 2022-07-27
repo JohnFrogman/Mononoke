@@ -6,7 +6,6 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Mononoke.MapEvents;
 
 namespace Mononoke
 {

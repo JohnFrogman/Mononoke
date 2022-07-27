@@ -58,7 +58,7 @@ namespace Mononoke
             Cursors = new MouseCursorHolder( graphics, brokenTexture );
             selectionBox = Texture2D.FromFile(graphics.GraphicsDevice, "data/textures/unit_select_box.png" );
 
-            Icons = new TextureHolder( graphics, "data/textures/gui/", brokenTexture );
+            Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
             UnitSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
             initialised = true;
         }

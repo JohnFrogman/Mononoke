@@ -5,6 +5,11 @@
 	}
 	,{
 		"Colour" : "00ff00"
-		,"Name" : "Green player"
+		,"Name" : "Another player"
 	}
+ ,{
+		"Colour" : "adadad"
+		,"Name"  : "Pigloid savages" 
+		,"Personality" :  "Raiders"
+  }
 ]

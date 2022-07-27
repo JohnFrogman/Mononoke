@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
-using Mononoke.MapEvents;
 namespace Mononoke
 {
     class MapHolder
@@ -17,19 +16,19 @@ namespace Mononoke
         public const int SCREEN_TILE_WIDTH = 2 + Mononoke.RENDER_WIDTH / PIXELS_PER_TILE;
         public const int SCREEN_TILE_HEIGHT = 2 + Mononoke.RENDER_HEIGHT / PIXELS_PER_TILE;
 
-        TerrainPainter TerrainPainter;
-        MapPainter ProvincePainter;
+        TerrainPainter mTerrainPainter;
+        MapPainter mProvincePainter;
         Dictionary< Vector2, MapEvent > MapEvents;
         public MapHolder( GraphicsDeviceManager graphics, MapUnitHolder units )        
         {
-            TerrainPainter = new TerrainPainter( "data/maps/test_terrain.png", graphics );
-            ProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics );
-            ProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics);
+            mTerrainPainter = new TerrainPainter( "data/maps/test_terrain.png", graphics );
+            mProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics );
+            mProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics);
             SetMapEvents( units );
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
-            TerrainPainter.Draw( spriteBatch, graphics, pos ); // Terrain Colours
+            mTerrainPainter.Draw( spriteBatch, graphics, pos ); // Terrain Colours
             foreach (MapEvent r in MapEvents.Values)
                 r.Draw(spriteBatch);
         }
@@ -44,17 +43,25 @@ namespace Mononoke
                     if ( !MapEvents.ContainsKey(pos))
                     {
                         MapEvent ev = null;
-                        if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
+                        if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
                         {
                             ev = new Farm(pos);
                         }
-                        else if (TerrainTypeMap.GetColourTerrainType(TerrainPainter.TileColourMap[pos]) == eTerrainType.Urban)
+                        else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.Urban)
                         {
                             ev = new City(pos, this, units);
                         }
+                        else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.PetrichorMine)
+                        {
+                            ev = new PetrichorMine(pos);
+                        }
+                        else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.LintExtractor)
+                        {
+                            ev = new LintExtractor(pos);
+                        }
                         if ( ev != null )
                         { 
-                            List<Vector2> positions = TerrainPainter.GetClumpAt(pos);
+                            List<Vector2> positions = mTerrainPainter.GetClumpAt(pos);
                             foreach (Vector2 p in positions)
                             {
                                 //ev.AddPosition( p );
@@ -68,15 +75,29 @@ namespace Mononoke
 
         public Color GetProvinceColourAt( Vector2 pos )
         {
-            return ProvincePainter.GetColourAt(pos);
+            return mProvincePainter.GetColourAt(pos);
         }
         public eTerrainType GetTerrainAt(Vector2 pos)
         {
-            return TerrainTypeMap.GetColourTerrainType( TerrainPainter.GetColourAt(pos) );
+            return TerrainTypeMap.GetColourTerrainType( mTerrainPainter.GetColourAt(pos) );
+        }
+        public void SetTerrainAt( Vector2 pos, eTerrainType terrain )
+        {
+            mTerrainPainter.SetColourAt(pos, TerrainTypeMap.GetTerrainColour(terrain));
+        }
+        public bool TrySetMapEventAt( Vector2 pos, MapEvent ev )
+        { 
+            if ( MapEvents.ContainsKey( pos ) )
+                return false;
+            else
+            {
+                MapEvents.Add( pos, ev );
+                return true;
+            }
         }
         public void SetTerrainAt(List<Vector2> pos, eTerrainType terrain)
         {
-            TerrainPainter.SetColoursAt( pos, TerrainTypeMap.GetTerrainColour( terrain ) );
+            mTerrainPainter.SetColoursAt( pos, TerrainTypeMap.GetTerrainColour( terrain ) );
         }
         public float GetMapCostAt( Vector2 pos )
         {
@@ -152,6 +173,10 @@ namespace Mononoke
                 }
             }
             return false;
+        }
+        public void Save( string slot )
+        {
+            mTerrainPainter
         }
     }
 }
