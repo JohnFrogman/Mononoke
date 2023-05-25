@@ -13,7 +13,7 @@ namespace Mononoke
         Vector2 renderPos; 
         Vector2 centre;
         Texture2D icon;
-        Color colour;
+        //Color colour;
         private clickEvent onClick;
 
         public RadialMenuItem( Vector2 pos, Texture2D t, clickEvent callback )

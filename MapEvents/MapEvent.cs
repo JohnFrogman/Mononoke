@@ -7,6 +7,12 @@ using System.Diagnostics;
 
 namespace Mononoke
 {
+
+    class MapEventInfo
+    {
+        int CurrentSecond { get; set; }
+        
+    }
     abstract class MapEvent
     {
         protected float CurrentSecond = 0;
@@ -14,9 +20,12 @@ namespace Mononoke
         protected bool Paused = false;
         protected Vector2 Origin;
         protected List<Vector2> Tiles;
+        protected Actor mOwner;
 
-        public MapEvent(Vector2 pos )
+
+        public MapEvent(Vector2 pos, Actor owner )
         {
+            mOwner = owner;
             Origin = pos;
             Tiles = new List<Vector2>() { pos };
         }
@@ -52,6 +61,25 @@ namespace Mononoke
         {
             Debug.WriteLine( "Can't link these events ");
             return false;
+        }
+        public string ToJson()
+        { 
+            string result = "{";
+            result += "CurrentSecond : " + CurrentSecond;
+            result += "Origin : " + Origin.ToJson();
+            result += "[";
+            foreach ( Vector2 t in Tiles )
+                result += t.ToJson() + ",";
+            result = result.Substring( result.Length - 1 );
+            result += "]";
+            result += GetChildJson();
+            result += "}";
+            return result;
+        }
+        protected abstract string GetChildJson();
+        public virtual void UnitEntered(MapUnit mapUnit)
+        {
+            mOwner = mapUnit.Owner;
         }
     }
 }

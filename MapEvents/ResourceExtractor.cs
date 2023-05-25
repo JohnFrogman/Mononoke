@@ -26,7 +26,7 @@ namespace Mononoke
                 return _Current;
             }
         }
-        public ResourceExtractor(Vector2 pos) : base(pos)
+        public ResourceExtractor(Vector2 pos, Actor owner) : base(pos, owner)
         {
         }
         public override void Draw(SpriteBatch spriteBatch)
@@ -54,6 +54,14 @@ namespace Mononoke
         protected override void OnExpire()
         {
             Current += Increment * Level;
+        }
+        protected override string GetChildJson()
+        {
+            string result = ",\"Max\" : " + Max;
+            result += ",\"Current\" : " + _Current;
+            result += ",\"Increment\" : " + Increment;
+            result += GetChildJson();
+            return result;
         }
         //public abstract bool TryLink(MapEvent partner, MapHolder maps);
 

@@ -8,20 +8,20 @@ namespace Mononoke
 {
     public static class TextureMap
     {
-        private static bool initialised = false;
-        private static Dictionary<eTerrainType, Texture> terrainMap;
-        private static Texture TestTexture;
-        public static Texture GetTerrainTypeTexture( eTerrainType t )
-        {
+        //private static bool initialised = false;
+        //private static Dictionary<eTerrainType, Texture> terrainMap;
+        //private static Texture TestTexture;
+        //public static Texture GetTerrainTypeTexture( eTerrainType t )
+        //{
             
-            if ( !initialised )
-                Initialise();
-            return TestTexture;
-            if ( terrainMap.ContainsKey( t ) ) 
-                return terrainMap[t];
+           // if ( !initialised )
+           //     Initialise();
+            //return TestTexture;
+            //if ( terrainMap.ContainsKey( t ) ) 
+            //    return terrainMap[t];
 
-            throw new System.Exception( "[TextureMap] Invalid type for terrain." + t);
-        }
+            //throw new System.Exception( "[TextureMap] Invalid type for terrain." + t);
+        //}
         private static void Initialise()
         {
             //string path = "data/textures/forest.png";
@@ -49,7 +49,7 @@ namespace Mononoke
             //,   { eTerrainType.Reef,                new Color(  88, 154, 224, 255) }
             //};
             //colourMap = terrainMap.ToDictionary((i) => i.Value, (i) => i.Key);
-            initialised = true;
+            //initialised = true;
         }
     }
 }

@@ -8,10 +8,10 @@ namespace Mononoke
 {
     class Factory : MapEvent
     { 
-        int CashPerAlloy = 50; // One day turn this into a variable price based on the economy?
+        static int CashPerAlloy = 50; // One day turn this into a variable price based on the economy?
         int pendingProduction; // Amount of resources the factory has production for
-        int maxSpace;
-        public Factory( Vector2 pos ) : base ( pos )
+        //int maxSpace;
+        public Factory( Vector2 pos, Actor owner ) : base ( pos, owner )
         {
         }
 
@@ -40,6 +40,12 @@ namespace Mononoke
         void CheckEmpty()
         {
             Paused = pendingProduction > 0;
+        }
+        protected override string GetChildJson()
+        {
+            string result = ",\"Type\" : \"Factory\" ";
+            result += ",\"pendingProduction\" : " + pendingProduction;
+            return result;
         }
     }
 }

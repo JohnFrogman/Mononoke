@@ -8,7 +8,7 @@ namespace Mononoke
 {
     class MouseCursorHolder
     {
-        Dictionary<string, Texture2D> Textures;
+        //Dictionary<string, Texture2D> Textures;
         Texture2D BrokenTexture;
         public Texture2D MoveCursor { private set; get; }
         public Texture2D DefaultCursor { private set; get; }

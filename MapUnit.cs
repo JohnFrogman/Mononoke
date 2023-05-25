@@ -4,23 +4,23 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Mononoke
 {
     class MapUnit
     {
-        string Name;
-        public int Speed;
+        string mName;
+        string mTypeID;
         //public Vector2 Pos; // Tile position
         Texture2D Sprite;
         public Vector2 UltimateDestination() { return Path[0]; }
         public Vector2 Destination() { return Path [Path.Count-1]; }
-        public Vector2 Location;
+        public Vector2 mLocation;
         public List<Vector2> Path { get; private set; }
 
         public MapUnit Target;
         public MapUnitAttack Attack { get; private set;}
-        MapHolder Maps;
 
         public int ZoneOfControl = 2;
 
@@ -37,36 +37,42 @@ namespace Mononoke
         public Actor Owner;
 
         float currentSecond = 0f;
-        float baseSpeed = 0.2f;
-        float secondsToMove () { return baseSpeed * Maps.GetMapCostAt(Destination()); } // modified by terrain cost/
+        float mBaseTimeToMove = 0.2f;
+        float secondsToMove = 0.2f; // modified by terrain cost/
 
         public bool Selected = false;
-        public MapUnit( Texture2D tex, int speed, string name, Vector2 pos, Actor owner, MapHolder maps )
-        { 
-            Location = pos;
-            Speed = speed;
-            Name = name;
-            Sprite = tex;
-            Maps = maps;
-            Attack = new MapUnitAttack();
+        public MapUnit( string id, MapUnitInfo info, Vector2 pos, Actor owner )
+        {
+            mTypeID = id;
+            MaxHealth = info.Health;
+            mLocation = pos;
+            mBaseTimeToMove = info.TimeToMove;
+            mName = info.Name;
+            Sprite = TextureAssetManager.GetUnitSpriteByName(info.SpriteID);
+            ZoneOfControl = info.ZoneOfControl;
+            Attack = new MapUnitAttack( info.Damage, info.Range, info.AttackPeriod);
+            Owner = owner;
+            Owner.AddUnit( this );
 
-            Path = new List<Vector2>(){ };
+            Path = new List<Vector2>() { };
         }
         public bool MoveUpdate( GameTime gameTime ) // returns true if move complete
         {
             currentSecond += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if ( currentSecond >  secondsToMove() )
+            if ( currentSecond >  secondsToMove )
             {
                 currentSecond = 0f;
                 return true;
             }
             return false;
         }
-        public void CompleteMove()
+        public void CompleteMove( MapHolder maps )
         {
-            Location = Destination();
+            mLocation = Destination();
+            maps.UnitEntered(mLocation, this);
             if ( Path.Count > 0 )
             { 
+                secondsToMove = mBaseTimeToMove * maps.GetMapCostAt(Destination());
                 SetPath( Path.GetRange( 0, Path.Count - 1 ) );
             }
         }
@@ -114,17 +120,39 @@ namespace Mononoke
         {
             if (Path.Count > 0)
             {
-                float progress = currentSecond / secondsToMove();
+                float progress = currentSecond / secondsToMove;
                 Vector2 lerpedPos = new Vector2(
-                                    Lerp( Location.X * MapHolder.PIXELS_PER_TILE, Destination().X * MapHolder.PIXELS_PER_TILE, progress)
-                                    , Lerp(Location.Y * MapHolder.PIXELS_PER_TILE, Destination().Y * MapHolder.PIXELS_PER_TILE, progress)
+                                    Lerp( mLocation.X * MapHolder.PIXELS_PER_TILE, Destination().X * MapHolder.PIXELS_PER_TILE, progress)
+                                    , Lerp(mLocation.Y * MapHolder.PIXELS_PER_TILE, Destination().Y * MapHolder.PIXELS_PER_TILE, progress)
                                     );
                 return lerpedPos;
             }
             else
             {
-                return Location * MapHolder.PIXELS_PER_TILE;
+                return mLocation * MapHolder.PIXELS_PER_TILE;
             }
+        }
+        public string ToJson()
+        {
+            string result = String.Format( "{{"
+            + ",\"Location\" : {0} "
+            + ",\"TypeID\" : {1} "
+            + ",\"Health\" : {2} "
+            + ",\"CurrentSecond\" : {3} "
+            , mLocation.ToJson(), mTypeID, Health, currentSecond);
+            if ( Path.Count > 0 )
+            { 
+                result += ",\"Path\" : [";
+                foreach ( Vector2 v in Path )
+                {
+                    result += v.ToJson();
+                    result += ",";
+                }
+                result = result.Substring( 0, result.Length - 1 );
+                result += "]";
+            }
+            result += "}";
+            return result;
         }
     }
 }

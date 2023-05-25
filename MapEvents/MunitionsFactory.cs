@@ -12,7 +12,7 @@ namespace Mononoke
         int Munitions = 0;
         static int munitionSpace = 100;
         int pendingProduction; // Amount of resources we have production for
-        public MunitionsFactory( Vector2 pos ) : base ( pos )
+        public MunitionsFactory( Vector2 pos, Actor owner ) : base ( pos, owner)
         {
         }
 
@@ -45,6 +45,13 @@ namespace Mononoke
         void CheckEmpty()
         {
             Paused = pendingProduction > 0 && munitionSpace > Munitions;
+        }
+        protected override string GetChildJson()
+        {
+            string result = ",\"Type\" : \"MunitionsFactory\" ";
+            result += ",\"Munitions\" : " + Munitions;
+            result += ",\"pendingProduction\" : " + pendingProduction;
+            return result;
         }
     }
 }

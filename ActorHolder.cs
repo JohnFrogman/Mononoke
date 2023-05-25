@@ -25,7 +25,7 @@ namespace Mononoke
         {
             if ( !File.Exists( path ) )
             {
-                throw new Exception("This province file does not exist " + path);
+                throw new Exception("This actors file does not exist " + path);
             }
             JsonDocument doc = JsonDocument.Parse( File.ReadAllText( path ) );
             JsonElement e = doc.RootElement;
@@ -41,7 +41,12 @@ namespace Mononoke
 
         public Actor GetActor( Color col)
         {
-            return ActorsByColour[col];
+            if ( !ActorsByColour.ContainsKey(col) )
+            {
+                return null;
+            }
+            else 
+                return ActorsByColour[col];
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.Json;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using System.IO;
 namespace Mononoke
 {
     class MapUnitHolder
@@ -20,18 +21,18 @@ namespace Mononoke
         {
             Pathfinder = pathfinder;
         }
-        public void AddUnit( Vector2 pos, MapUnit unit )
+        public void AddUnit( MapUnit unit )
         { 
-            if ( Units.ContainsKey(pos) )
+            if ( Units.ContainsKey( unit.mLocation ) )
             {
                 throw new Exception("Can't add a unit where a unit already exists!");
             }
             else
             {
-                Units.Add( pos, unit );
+                Units.Add( unit.mLocation, unit );
             }
         }
-        public void Update( GameTime gameTime )
+        public void Update( GameTime gameTime, MapHolder maps )
         {
             // Need to update each unit. only update if the next step of their journey is free. If it's not then recalculate path.
             List<Vector2 > tiles = new List<Vector2>( Units.Keys );
@@ -49,8 +50,8 @@ namespace Mononoke
 
                 if ( u.MoveUpdate( gameTime ) )
                 {
-                    u.CompleteMove();
-                    Units[ u.Location ] = u;
+                    u.CompleteMove( maps );
+                    Units[ u.mLocation ] = u;
                     Units.Remove( v );
                 }
             }
@@ -69,7 +70,7 @@ namespace Mononoke
                         kvp.Value.Target.Health -= kvp.Value.Attack.Damage;
                         if ( kvp.Value.Target.Health < 1 )
                         { 
-                            QueueToDie( (kvp.Value.Target.Location, kvp.Value.Target) );
+                            QueueToDie( (kvp.Value.Target.mLocation, kvp.Value.Target) );
                         }
                     }
                 }
@@ -83,7 +84,7 @@ namespace Mononoke
             //if ( target != null )
             //return true;
             //List<Vector2> potentialTargets = attacker.Location.GetNeighbours();
-            List<Vector2> potentialTargets = attacker.Location.GetTilesInRange( attacker.Attack.Range );
+            List<Vector2> potentialTargets = attacker.mLocation.GetTilesInRange( attacker.Attack.Range );
             MapUnit provisionalTarget = null;
             foreach (Vector2 n in potentialTargets) // Right now a range of 1, this should in future get all tiles in a range.
             {
@@ -157,6 +158,24 @@ namespace Mononoke
         public bool UnitExistsAt( Vector2 pos )
         {
             return Units.ContainsKey(pos);
+        }
+
+        public void Save( string slot )
+        {
+            //JsonSerializer.Serialize( mUnits, )
+            string json = "[";
+            foreach ( KeyValuePair<Vector2, MapUnit> kvp in Units )
+            {
+                json += String.Format( "{{{0}:{1}}}", kvp.Key.ToString(), kvp.Value.ToJson() );
+                json += ",";
+            }
+            json = json.Substring( 0, json.Length - 1 );
+            json += "]";
+            File.WriteAllText( slot + "/units.json", json );
+        }
+        public void Load( string slot )
+        {   
+
         }
     }
 }

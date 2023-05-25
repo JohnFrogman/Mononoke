@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace Mononoke
 {
-    public class Player : Actor
+    class Player : Actor
     {
         //uint Authority = 0; // Souls
         
-        float BaseSpeed = 40f;
+        //float BaseSpeed = 40f;
         //bool Sprinting;
     
         public int Food = 0;
@@ -20,24 +20,6 @@ namespace Mononoke
         public int Wealth = 0;
         
         private HUD hud;
-
-        // Health
-        int _Stability = 10;
-        public int Stability { 
-            set {
-                if ( value <= MaxStability )
-                    _Stability = value;
-                if ( value <= 0 )
-                { 
-                    _Stability = 0;
-                    //GameOver();
-                }
-            }
-            get {
-                return _Stability;
-            }
-        }
-        int MaxStability = 10;
 
         uint _CurrentStamina;
         public uint CurrentStamina 

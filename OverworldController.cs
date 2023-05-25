@@ -78,7 +78,7 @@ namespace Mononoke
             }
             if (kstate.IsKeyUp(Keys.S) && kstate.IsKeyUp(Keys.LeftControl))
             {
-                mOverworld.Load();
+                //mOverworld.Load();
                 SavePressed= false;
             }
             else if ( !SavePressed && kstate.IsKeyDown(Keys.L) && kstate.IsKeyDown(Keys.LeftControl))
@@ -155,7 +155,7 @@ namespace Mononoke
                 PathPreviewTile = HoveredTile;
                 SetDragPath();
             }
-            else if (SelectedUnits.Count == 1 && (HoveredTile != PathPreviewTile || PathPreviewOriginTile != SelectedUnits[0].Location))
+            else if (SelectedUnits.Count == 1 && (HoveredTile != PathPreviewTile || PathPreviewOriginTile != SelectedUnits[0].mLocation))
             {
                 SetMovePath();
             }
@@ -205,7 +205,15 @@ namespace Mononoke
                         tilesInBound.Add( new Vector2( x, y ) );
                     }
                 }
-                mUnits.TryGetUnitsAt( tilesInBound, out SelectedUnits );
+                List<MapUnit> units;
+                mUnits.TryGetUnitsAt( tilesInBound, out units );
+                foreach ( MapUnit u in units )
+                {
+                    if ( u.Owner == mPlayer )
+                    { 
+                        SelectedUnits.Add( u );
+                    }
+                }
             }
             else if (PathPreview.Count > 0 && mMaps.TryDragAt( ClickedTile, HoveredTile, mPlayer, PathPreview.GetRange(1, PathPreview.Count -1) ) )
             {
@@ -244,8 +252,12 @@ namespace Mononoke
             MapUnit u;
             if ( mUnits.TryGetUnitAt(tile, out u) )
             { 
-                SelectedUnits = new List<MapUnit>() { u };
-                return true;
+                if ( u.Owner == mPlayer )
+                { 
+                    SelectedUnits = new List<MapUnit>() { u };
+                    return true;
+                }
+                else return false;
             }
             return false;
         }
@@ -255,7 +267,7 @@ namespace Mononoke
             bool moveOk = false;
             foreach ( MapUnit u in SelectedUnits )
             { 
-                List<Vector2> path = mPathfinder.GetPath( u.Location, ClickedTile, true );
+                List<Vector2> path = mPathfinder.GetPath( u.mLocation, ClickedTile, true );
 
                 if ( path.Count > 0 )
                 {
@@ -277,7 +289,7 @@ namespace Mononoke
         }
         void SetMovePath()
         {
-            PathPreviewOriginTile = SelectedUnits[0].Location;
+            PathPreviewOriginTile = SelectedUnits[0].mLocation;
             PathPreviewTile = HoveredTile;
             PathPreview = mPathfinder.GetPath(PathPreviewOriginTile, PathPreviewTile, true);
         }

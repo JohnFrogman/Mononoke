@@ -12,7 +12,7 @@ namespace Mononoke
         protected static eTerrainType[] AllowedTerrains;
         protected abstract eTerrainType GetExpansionType();
 
-        public ExpandableMapEvent(Vector2 pos) : base( pos )
+        public ExpandableMapEvent(Vector2 pos, Actor owner ) : base( pos, owner )
         {
         }
         public virtual bool TryExpand( MapHolder mh )

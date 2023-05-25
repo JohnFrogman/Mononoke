@@ -8,17 +8,18 @@ namespace Mononoke
 {
     class City : ExpandableMapEvent, IDraggable
     {
-        int Max = 10;
+        static int Max = 10;
         int _Current = 0;
 
-        int GrowthThreshold = 5;
-        int TurnsToGrow = 1;
+        static int GrowthThreshold = 5;
+        static int TurnsToGrow = 1;
         int growthTickDown = 5;
 
         List<Vector2> FreeWorkers; // positions of free workers.
 
-        MapHolder Maps;
-        MapUnitHolder UnitHolder;
+        MapHolder mMaps;
+        MapUnitHolder mUnitHolder;
+        MapUnitTypeHolder mUnitTypeHolder;
         int Current
         {
             set
@@ -33,13 +34,12 @@ namespace Mononoke
                 return _Current;
             }
         }
-        Player Owner;
-        public City( Vector2 pos, MapHolder maps, MapUnitHolder unitHolder, Player owner = null) : base ( pos )
+        public City( Vector2 pos, MapHolder maps, MapUnitHolder unitHolder, MapUnitTypeHolder unitTypeHolder, Actor owner ) : base ( pos, owner )
         {
             AllowedTerrains = new eTerrainType[] { eTerrainType.Forest, eTerrainType.Road }; // do not add other building types to this!!
-            UnitHolder = unitHolder;
-            Owner = owner;
-            Maps = maps;
+            mUnitHolder = unitHolder;
+            mMaps = maps;
+            mUnitTypeHolder = unitTypeHolder;
             FreeWorkers = new List<Vector2>();
         }
         public override void Draw(SpriteBatch spriteBatch)
@@ -59,8 +59,8 @@ namespace Mononoke
         {
             if ( Current - 1 < 0 )
             {
-                if ( Owner != null )
-                    Owner.Stability--;
+                if ( mOwner != null )
+                    mOwner.Stability--;
             }
             else
             { 
@@ -71,7 +71,7 @@ namespace Mononoke
                 growthTickDown--;
                 if ( growthTickDown <= 0 )
                 {
-                    TryExpand( Maps );
+                    TryExpand( mMaps );
                     growthTickDown = TurnsToGrow;
                 }
             }
@@ -118,6 +118,8 @@ namespace Mononoke
         public override bool TryGetRadialMenu(out RadialMenu r)
         {
             r = null;
+            if ( mOwner == null )
+                return false;
             if (FreeWorkers.Count > 0)
             { 
                 List<RadialMenuItem> l = new List<RadialMenuItem>();
@@ -153,16 +155,15 @@ namespace Mononoke
         void AddSoldier()
         {
             ConsumeWorker();
-            UnitHolder.AddUnit( Origin, new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Soldier", Origin, Owner, Maps) );
-            Debug.WriteLine("Soldier Added");
+            mUnitHolder.AddUnit( mUnitTypeHolder.BuildUnitByTypeName("infantry", Origin, mOwner));
         }
         void AddFoundry()
         {
             Vector2 pos = ConsumeWorker();
-            Foundry ev = new Foundry( pos );
-            if ( Maps.TrySetMapEventAt( pos, ev ) )
+            Foundry ev = new Foundry( pos, mOwner );
+            if ( mMaps.TrySetMapEventAt( pos, ev ) )
             { 
-                Maps.SetTerrainAt( pos, eTerrainType.Foundry );
+                mMaps.SetTerrainAt( pos, eTerrainType.Foundry );
             }
             else
             { 
@@ -175,6 +176,23 @@ namespace Mononoke
             Vector2 pos = FreeWorkers[0];
             FreeWorkers.RemoveAt(0);
             return pos;
+        }
+
+
+        protected override string GetChildJson()
+        {
+            string result = ",\"Type\" : \"City\" ";
+            result += ",\"Current\" : " + _Current;
+            result += ",\"growthTickDown\" : " + growthTickDown;
+            result += ",\"FreeWorkers\" : {";
+            foreach ( Vector2 v in FreeWorkers )
+            { 
+                result += v.ToJson();
+                result += ",";
+            }
+            result = result.Substring(0, result.Length - 1 );
+            result += "}";
+            return result;
         }
     }
 }

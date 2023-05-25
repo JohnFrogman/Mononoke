@@ -34,6 +34,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="data\NewFolder\" />
+    <Compile Remove="data\NewFolder\**" />
+    <Content Remove="data\NewFolder\**" />
+    <EmbeddedResource Remove="data\NewFolder\**" />
+    <None Remove="data\NewFolder\**" />
   </ItemGroup>
 </Project>

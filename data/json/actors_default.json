@@ -1,15 +1,31 @@
 [
 	{
-		"Colour" : "ff0000"
-		,"Name" : "player"
+		"Colour": "ff0000",
+		"Name": "player"
+	},
+	{
+		"Colour": "660000",
+		"Name": "Cult of the Midnight Rose",
+		"Personality": "Inscrutable"
+	},
+	{
+		"Colour": "004a0a",
+		"Name": "Nature's Fury",
+		"Personality": "Expansionist"
+	},
+	{
+		"Colour": "171e59",
+		"Name": "Pertinax",
+		"Personality": "Isolationist"
+	},
+	{
+		"Colour": "84e0d3",
+		"Name": "The Blooded Blade",
+		"Personality": "Raider"
+	},
+	{
+		"Colour": "adadad",
+		"Name": "Pigloid Savages",
+		"Personality": "Aggressive Savage"
 	}
-	,{
-		"Colour" : "00ff00"
-		,"Name" : "Another player"
-	}
- ,{
-		"Colour" : "adadad"
-		,"Name"  : "Pigloid savages" 
-		,"Personality" :  "Raiders"
-  }
 ]

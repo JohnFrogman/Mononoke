@@ -15,7 +15,6 @@ namespace Mononoke
     }
     public static class TextureAssetManager
     {
-        private static bool initialised = false;
         private static TextureHolder Icons;
         private static TextureHolder UnitSprites;
         private static Texture2D simpleSpuare;
@@ -60,7 +59,6 @@ namespace Mononoke
 
             Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
             UnitSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
-            initialised = true;
         }
         public static Texture2D GetIconByName( string str )
         { 

@@ -4,6 +4,9 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+
 namespace Mononoke
 {
     class MapHolder
@@ -19,12 +22,12 @@ namespace Mononoke
         TerrainPainter mTerrainPainter;
         MapPainter mProvincePainter;
         Dictionary< Vector2, MapEvent > MapEvents;
-        public MapHolder( GraphicsDeviceManager graphics, MapUnitHolder units )        
+        public MapHolder( GraphicsDeviceManager graphics, MapUnitHolder units, MapUnitTypeHolder unitTypes )        
         {
             mTerrainPainter = new TerrainPainter( "data/maps/test_terrain.png", graphics );
             mProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics );
             mProvincePainter = new MapPainter("data/maps/test_provinces.png", graphics);
-            SetMapEvents( units );
+            SetMapEvents( units, unitTypes );
         }
         public void Draw( SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos )
         {
@@ -32,7 +35,7 @@ namespace Mononoke
             foreach (MapEvent r in MapEvents.Values)
                 r.Draw(spriteBatch);
         }
-        public void SetMapEvents( MapUnitHolder units )
+        public void SetMapEvents( MapUnitHolder units, MapUnitTypeHolder unitTypes )
         {
             MapEvents = new Dictionary<Vector2, MapEvent>();
             for (int x = 0; x < MAP_TILE_WIDTH; x++)
@@ -45,19 +48,19 @@ namespace Mononoke
                         MapEvent ev = null;
                         if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.Farmland)
                         {
-                            ev = new Farm(pos);
+                            ev = new Farm(pos, null );
                         }
                         else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.Urban)
                         {
-                            ev = new City(pos, this, units);
+                            ev = new City(pos, this, units, unitTypes, null  );
                         }
                         else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.PetrichorMine)
                         {
-                            ev = new PetrichorMine(pos);
+                            ev = new PetrichorMine(pos, null);
                         }
                         else if (TerrainTypeMap.GetColourTerrainType(mTerrainPainter.TileColourMap[pos]) == eTerrainType.LintExtractor)
                         {
-                            ev = new LintExtractor(pos);
+                            ev = new LintExtractor(pos, null);
                         }
                         if ( ev != null )
                         { 
@@ -174,9 +177,57 @@ namespace Mononoke
             }
             return false;
         }
-        public void Save( string slot )
+        public void Save( string slot, GraphicsDevice graphics )
         {
-            mTerrainPainter
+            mTerrainPainter.Save( slot, graphics );
+            SaveMapEvents( slot );
+        }
+        public void Load( string slot, MapUnitHolder units, MapUnitTypeHolder unitTypes, GraphicsDeviceManager graphics )
+        {
+            mTerrainPainter = new TerrainPainter(slot + "/terrain.png", graphics);
+            LoadMapEvents(units, unitTypes, slot);
+            //LoadMapEvents( slot );
+        }
+        
+        void LoadMapEvents( MapUnitHolder units, MapUnitTypeHolder unitTypes, string slot )
+        {
+
+            //string path = slot + "map_events.json";
+            //if (!File.Exists(path))
+            //{
+            //    throw new Exception("The map events file does not exist " + path);
+            //}
+            //JsonDocument doc = JsonDocument.Parse(File.ReadAllText(path));
+            //JsonElement e = doc.RootElement;
+            //JsonElement.ObjectEnumerator itr = e.EnumerateObject();
+
+            //MapEvents = new Dictionary<Vector2, MapEvent>();
+
+            //foreach (JsonProperty i in itr)
+            //{
+            //    JsonElement e = i.Value.ToString
+             
+            //}
+
+        }
+        void SaveMapEvents(string slot)
+        {
+            string json = "{";
+            foreach ( KeyValuePair<Vector2, MapEvent> kvp in MapEvents )
+            {
+                json += kvp.Key.ToJson();
+                json += ",";
+            }
+            json = json.Substring( json.Length - 1 );
+            json += "}";
+            File.WriteAllText(slot + "/map_events.json", json);
+        }
+        public void UnitEntered( Vector2 location, MapUnit unit)
+        {
+            if ( MapEvents.ContainsKey(location) )
+            {
+                MapEvents[location].UnitEntered( unit );  
+            }
         }
     }
 }

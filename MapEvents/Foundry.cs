@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Mononoke
 {
@@ -13,7 +12,7 @@ namespace Mononoke
         static int dualProductionRatio = 16; // Using 1 of each produces at a ratio of 2 : 16, twice as efficient
         int producing = 0;
         int stored = 0;
-        public Foundry( Vector2 pos ) : base ( pos )
+        public Foundry( Vector2 pos, Actor owner) : base ( pos, owner)
         { 
         }
         public override void Draw(SpriteBatch spriteBatch)
@@ -64,6 +63,13 @@ namespace Mononoke
                 stored++;
             }
             SetProducing();
+        }
+        protected override string GetChildJson()
+        {
+            string result = ",\"Type\" : \"Foundry\" ";
+            result += ",\"producing\" : " + producing;
+            result += ",\"stored\" : " + stored;
+            return result;
         }
     }
 }

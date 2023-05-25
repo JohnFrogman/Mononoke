@@ -7,7 +7,7 @@ namespace Mononoke
 {
     class LintExtractor : ResourceExtractor
     {
-        public LintExtractor(Vector2 pos) : base(pos)
+        public LintExtractor(Vector2 pos, Actor owner) : base(pos, owner)
         {
             AllowedTerrains = new eTerrainType[] { eTerrainType.Forest };
         }
@@ -18,6 +18,10 @@ namespace Mononoke
         protected override eTerrainType GetExpansionType()
         {
             return eTerrainType.LintExtractor;
+        }
+        protected override string GetChildJson()
+        {
+            return ",\"Type\" : \"LintExtractor\" ";
         }
     }
 }

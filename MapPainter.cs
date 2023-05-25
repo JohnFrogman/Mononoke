@@ -142,15 +142,18 @@ namespace Mononoke
             }
             return result;
         }
-        public void Save(string "slot", GraphicsDevice graphics)
+        public void Save(string slot, GraphicsDevice graphics)
         {
-            Texture2D tex = new Texture2D( graphics, MapHolder.MAP_PIXEL_WIDTH, MapHolder.MAP_PIXEL_HEIGHT );
-            Color[] data = new Color[ MapHolder.MAP_PIXEL_WIDTH * MapHolder.MAP_PIXEL_HEIGHT ];
+            Texture2D tex = new Texture2D( graphics, MapHolder.MAP_TILE_WIDTH, MapHolder.MAP_TILE_HEIGHT );
+            Color[] data = new Color[ MapHolder.MAP_TILE_WIDTH * MapHolder.MAP_TILE_HEIGHT];
             foreach ( KeyValuePair<Vector2, Color> kvp in TileColourMap )
             { 
-                data[]
+                int i = (int)kvp.Key.X + (int)kvp.Key.Y * MapHolder.MAP_TILE_WIDTH;
+                data[ i ] = kvp.Value;
             }
-            TileColourMap
+            tex.SetData( data );
+            Stream stream = File.Create( slot + "/terrain.png");
+            tex.SaveAsPng( stream, MapHolder.MAP_TILE_WIDTH, MapHolder.MAP_TILE_HEIGHT );
         }
     }
 }

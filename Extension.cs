@@ -123,5 +123,9 @@ namespace Mononoke
             }
             return result;
         }
+        public static string ToJson( this Vector2 v )
+        {
+            return String.Format( "{{\"X\" : {0}, \"Y\" : {1} )}}", v.X, v.Y );
+        }
     }
 }

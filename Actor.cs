@@ -7,17 +7,41 @@ using System.Text.Json;
 
 namespace Mononoke
 {
-    public abstract class Actor
+    abstract class Actor
     {
         public const string NAME_PROPERTY_STR = "Name";
         public const string COLOUR_PROPERTY_STR = "Colour";
         public const string PERSONALITY_PROPERTY_STR = "Personality";
         public Color Colour;
         public string Name;
+        List<MapUnit> Units;
+
+        // Health
+        int _Stability = 10;
+        public int Stability
+        {
+            set
+            {
+                if (value <= MaxStability)
+                    _Stability = value;
+                if (value <= 0)
+                {
+                    _Stability = 0;
+                    //GameOver();
+                }
+            }
+            get
+            {
+                return _Stability;
+            }
+        }
+        int MaxStability = 10;
+
         public Actor( string name, Color colour )
         {
             Colour = colour;
             Name = name;
+            Units = new List<MapUnit>();
         }
         public static Actor FromJson( JsonElement json )
         {
@@ -50,6 +74,14 @@ namespace Mononoke
             //    throw new System.Exception("Not a valid behavior");
             //    //return null;
             //}
+        }
+        public void AddUnit( MapUnit u )
+        {
+            Units.Add( u );
+        }
+        public void RemoveUnit( MapUnit u )
+        {
+            Units.Remove( u );
         }
     }
 }

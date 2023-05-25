@@ -19,11 +19,16 @@ namespace Mononoke
         private Camera2D mCamera;
         private MapUnitHolder mUnits;
         private Pathfinder mPathfinder;
+        private GraphicsDeviceManager mGraphics;
+        private MapUnitTypeHolder mUnitTypeHolder;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game )
         {
+            mSaveSlotName = "Cimmeria";
             mCamera = camera;
+            mGraphics = _graphics;
             mUnits = new MapUnitHolder( );
-            mMaps = new MapHolder(_graphics, mUnits);
+            mUnitTypeHolder = new MapUnitTypeHolder( );
+            mMaps = new MapHolder( _graphics, mUnits, mUnitTypeHolder );
             mPathfinder = new Pathfinder( _graphics, mMaps, mUnits );
             mActors = new ActorHolder();
             mProvinces = new ProvinceHolder(mActors, mMaps);
@@ -32,8 +37,10 @@ namespace Mononoke
             mController = new OverworldController( this, camera, mMaps, mProvinces, mPlayer, mEventQueue, _graphics, game, mUnits, mPathfinder );
             mUnits.Initialise( mPathfinder );
 
-            mUnits.AddUnit( new Vector2(15,15), new MapUnit( TextureAssetManager.GetUnitSpriteByName("soldier"), 1, "Gobloid", new Vector2(15,15), new NonPlayerActor("Test actor", Color.Magenta, eActorBehavior.Raider), mMaps));
-
+            Actor TA = new NonPlayerActor("Test actor", Color.Magenta, eActorBehavior.Raider);
+            Vector2 pos = new Vector2(15, 15);
+            mUnits.AddUnit( mUnitTypeHolder.BuildUnitByTypeName( "infantry", pos, TA ) );
+            mUnits.AddUnit( mUnitTypeHolder.BuildUnitByTypeName("infantry", new Vector2( 10, 10 ), mPlayer));
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
@@ -52,7 +59,7 @@ namespace Mononoke
             mEventQueue.Update(gameTime);
             mMaps.Update(gameTime);
             mPlayer.Update( gameTime);
-            mUnits.Update(gameTime);
+            mUnits.Update(gameTime, mMaps );
             mController.Update(gameTime);
         }
 
@@ -64,21 +71,40 @@ namespace Mononoke
                 mSaveSlotName = mPlayer.GetSaveName();
                 string str = mSaveSlotName;
                 int i = 0;
-                while ( Directory.Exists( "data/save/" + str )
+                while ( Directory.Exists( Mononoke.SAVE_PATH + str ) )
                 {
                     ++i;
                     str = mSaveSlotName + "_" + i;
                 }
                 mSaveSlotName = str;
+                Directory.CreateDirectory( Mononoke.SAVE_PATH + mSaveSlotName );
             }
-            mMaps.Save( mSaveSlotName );
-            mUnits.Save( mSaveSlotName );
-            mActors.Save( mSaveSlotName );
-            mPlayer.Save( mSaveSlotName );
+            else // Not a new save so clear everything in the folder.
+            {
+                //DirectoryInfo di = new DirectoryInfo(Mononoke.SAVE_PATH + mSaveSlotName);
+                //foreach (FileInfo file in di.GetFiles())
+                //{
+                //    file.Delete();
+                //}
+                //foreach (DirectoryInfo dir in di.GetDirectories())
+                //{
+                //    dir.Delete(true);
+                //}
+                //foreach (FileInfo file in di.EnumerateFiles())
+                //{
+                //    file.Delete();
+                //}
+            }
+            mMaps.Save( Mononoke.SAVE_PATH + mSaveSlotName, mGraphics.GraphicsDevice );
+            mUnits.Save( Mononoke.SAVE_PATH + mSaveSlotName );
+            //mActors.Save( mSaveSlotName );
+            //mPlayer.Save( mSaveSlotName );
             //mProvinces.Save( mSaveSlotName );
         }
-        public void Load()
+        public void Load( )
         { 
+            mMaps.Load( Mononoke.SAVE_PATH + mSaveSlotName, mUnits, mUnitTypeHolder, mGraphics );
+            mUnits.Load( Mononoke.SAVE_PATH + mSaveSlotName);
         }
 
     }

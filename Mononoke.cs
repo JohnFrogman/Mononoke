@@ -9,7 +9,7 @@ namespace Mononoke
     {
         public const int RENDER_WIDTH = 1920;
         public const int RENDER_HEIGHT = 1080;
-
+        public const string SAVE_PATH = "data/save/";
         //        public const int DRAW_DISTANCE = 2;
 
         //public static Mononoke Game;

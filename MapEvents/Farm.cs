@@ -11,7 +11,7 @@ namespace Mononoke
     class Farm : ResourceExtractor
     {
         
-        public Farm( Vector2 pos ) : base ( pos )
+        public Farm( Vector2 pos, Actor owner ) : base ( pos, owner )
         {
             AllowedTerrains = new eTerrainType[] { eTerrainType.Forest };
         }

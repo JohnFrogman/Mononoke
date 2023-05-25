@@ -13,6 +13,14 @@ namespace Mononoke
         public bool Ready;
         public int Damage = 5;
         public int Range = 2;
+
+        public MapUnitAttack( int damage, int range, float attackPeriod )
+        { 
+            Damage = damage;
+            Range = range;
+            timeToAttack = attackPeriod;
+        }
+
         public void Update(GameTime gameTime)
         {
             //Debug.WriteLine("Updating attack");
