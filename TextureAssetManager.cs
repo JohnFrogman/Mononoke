@@ -45,8 +45,8 @@ namespace Mononoke
         
         public static void Initialise( GraphicsDeviceManager graphics )
         {
-            Texture2D brokenTexture = new Texture2D(graphics.GraphicsDevice, MapHolder.PIXELS_PER_TILE, MapHolder.PIXELS_PER_TILE);
-            Color[] pixels = new Color[MapHolder.PIXELS_PER_TILE * MapHolder.PIXELS_PER_TILE];
+            Texture2D brokenTexture = new Texture2D(graphics.GraphicsDevice, 1,1);
+            Color[] pixels = new Color[1];
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = Color.Magenta;
@@ -55,7 +55,6 @@ namespace Mononoke
             SetSimpleSquare( graphics );
 
             Cursors = new MouseCursorHolder( graphics, brokenTexture );
-            selectionBox = Texture2D.FromFile(graphics.GraphicsDevice, "data/textures/unit_select_box.png" );
 
             Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
             UnitSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
@@ -64,7 +63,7 @@ namespace Mononoke
         { 
             return Icons.GetTextureByName( str );
         }
-        public static Texture2D GetUnitSpriteByName(string str)
+        public static Texture2D GetPortraitSpriteByName(string str)
         {
             return UnitSprites.GetTextureByName(str);
         }

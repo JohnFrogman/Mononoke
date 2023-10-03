@@ -28,16 +28,6 @@ namespace Mononoke
         {
             Vector2 newPos = ( Position + direction );
             Position += direction;
-            if ( Position.X >= 0 )
-                Position = new Vector2( 0f, Position.Y );
-            else if ( Position.X <= -MapHolder.MAP_PIXEL_WIDTH + Graphics.PreferredBackBufferWidth )
-                Position = new Vector2( -MapHolder.MAP_PIXEL_WIDTH + Graphics.PreferredBackBufferWidth, Position.Y );
-            
-            if ( Position.Y >= 0 )   
-                Position = new Vector2( Position.X, 0f );
-            else if ( Position.Y <= -MapHolder.MAP_PIXEL_HEIGHT + Graphics.PreferredBackBufferHeight )   
-                Position = new Vector2( Position.X, -MapHolder.MAP_PIXEL_HEIGHT + Graphics.PreferredBackBufferHeight );
-
         }
 
         public Matrix GetTransform()

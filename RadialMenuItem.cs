@@ -18,7 +18,7 @@ namespace Mononoke
 
         public RadialMenuItem( Vector2 pos, Texture2D t, clickEvent callback )
         {
-            radius = MapHolder.PIXELS_PER_TILE / 2 ;
+            radius = 2;
             icon = t;
             renderPos = pos;
             centre = pos + new Vector2( radius, radius );

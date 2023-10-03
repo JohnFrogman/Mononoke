@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Myra.Graphics2D.UI;
+using Myra.Graphics2D.Brushes;
+using Myra.Graphics2D.TextureAtlases;
 
 namespace Mononoke
 {
@@ -11,55 +14,36 @@ namespace Mononoke
     {
         private string mSaveSlotName = "";
         private OverworldController mController;
-        private MapHolder mMaps;
-        private ProvinceHolder mProvinces;
-        private ActorHolder mActors;
-        private Player mPlayer;
-        private GameEventQueue mEventQueue;
+        private GUI mGui;
         private Camera2D mCamera;
-        private MapUnitHolder mUnits;
-        private Pathfinder mPathfinder;
         private GraphicsDeviceManager mGraphics;
-        private MapUnitTypeHolder mUnitTypeHolder;
-        public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game )
+        List<Apprentice> mApprentices;
+        GUI mGUI;
+        public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
             mCamera = camera;
             mGraphics = _graphics;
-            mUnits = new MapUnitHolder( );
-            mUnitTypeHolder = new MapUnitTypeHolder( );
-            mMaps = new MapHolder( _graphics, mUnits, mUnitTypeHolder );
-            mPathfinder = new Pathfinder( _graphics, mMaps, mUnits );
-            mActors = new ActorHolder();
-            mProvinces = new ProvinceHolder(mActors, mMaps);
-            mPlayer = new Player(camera, _graphics);
-            mEventQueue = new GameEventQueue(mPlayer);
-            mController = new OverworldController( this, camera, mMaps, mProvinces, mPlayer, mEventQueue, _graphics, game, mUnits, mPathfinder );
-            mUnits.Initialise( mPathfinder );
+            mController = new OverworldController( this, camera, _graphics, game );
+            mApprentices = new List<Apprentice>();
+            mApprentices.Add(new Apprentice("Nalia", "nalia"));
+            mApprentices.Add(new Apprentice("Jarnathan", "jarnathan"));
+            mApprentices.Add(new Apprentice("Billie", "jarnathan"));
+            mGui = new GUI(camera, _graphics, mApprentices);
+            BuildGUI(desktop);
+            //AddApprentice(new Apprentice("Nalia", "nalia"));
 
-            Actor TA = new NonPlayerActor("Test actor", Color.Magenta, eActorBehavior.Raider);
-            Vector2 pos = new Vector2(15, 15);
-            mUnits.AddUnit( mUnitTypeHolder.BuildUnitByTypeName( "infantry", pos, TA ) );
-            mUnits.AddUnit( mUnitTypeHolder.BuildUnitByTypeName("infantry", new Vector2( 10, 10 ), mPlayer));
         }
+        
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
-            Vector2 result = Vector2.Floor(-mCamera.Position / MapHolder.PIXELS_PER_TILE);
-            mEventQueue.Draw(_spriteBatch);
-            mMaps.Draw(_spriteBatch, _graphics, result);
-            mUnits.Draw(_spriteBatch);
-            mPlayer.Draw(_spriteBatch, _graphics);
-
+            mGui.Draw(_spriteBatch, _graphics);
             mController.Draw(_spriteBatch);
             mController.DrawCursor(_spriteBatch);
         }
 
         void IGameState.Update(GameTime gameTime)
         {
-            mEventQueue.Update(gameTime);
-            mMaps.Update(gameTime);
-            mPlayer.Update( gameTime);
-            mUnits.Update(gameTime, mMaps );
             mController.Update(gameTime);
         }
 
@@ -68,7 +52,7 @@ namespace Mononoke
         { 
             if ( mSaveSlotName == "" ) // New save, need to generate a slot name.
             {
-                mSaveSlotName = mPlayer.GetSaveName();
+                mSaveSlotName = "Test";
                 string str = mSaveSlotName;
                 int i = 0;
                 while ( Directory.Exists( Mononoke.SAVE_PATH + str ) )
@@ -95,17 +79,73 @@ namespace Mononoke
                 //    file.Delete();
                 //}
             }
-            mMaps.Save( Mononoke.SAVE_PATH + mSaveSlotName, mGraphics.GraphicsDevice );
-            mUnits.Save( Mononoke.SAVE_PATH + mSaveSlotName );
             //mActors.Save( mSaveSlotName );
             //mPlayer.Save( mSaveSlotName );
             //mProvinces.Save( mSaveSlotName );
         }
         public void Load( )
         { 
-            mMaps.Load( Mononoke.SAVE_PATH + mSaveSlotName, mUnits, mUnitTypeHolder, mGraphics );
-            mUnits.Load( Mononoke.SAVE_PATH + mSaveSlotName);
         }
+        void AddApprentice(Apprentice a)
+        { 
+        }
+        void ApprenticeClick(Apprentice a)
+        { 
+            mController.SetCameraDestination(a.Location);
+        }
+        
+        void BuildGUI(Desktop d)
+        { 
+            d.Widgets.Clear();
+            Panel mainPanel = new Panel();
+            mainPanel.Background = new SolidBrush(Color.Transparent);
+            d.Root = mainPanel;
 
+            VerticalStackPanel apprenticeView = new VerticalStackPanel();
+            apprenticeView.Spacing = 10;
+            foreach (Apprentice a in mApprentices)
+            {
+                Panel aV = new Panel();               
+                aV.Background = new SolidBrush(Color.Red);
+                aV.Width = 150;
+                aV.Height = 50;
+                Image portrait = new Image();
+                portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
+                portrait.HorizontalAlignment = HorizontalAlignment.Left;
+                portrait.VerticalAlignment = VerticalAlignment.Center;
+                portrait.PaddingLeft = 6;
+
+                aV.AddChild(portrait);
+                TextButton button = new TextButton();
+                //button.Text = a.Name;
+                button.Width = 150;
+                button.Height = 50;
+                button.Background = new SolidBrush(Color.Transparent);
+                button.PressedBackground = new SolidBrush(Color.Transparent);
+                button.OverBackground = new SolidBrush(Color.Transparent);
+                button.Click += (sa, aa) =>
+                {
+                    ApprenticeClick(a);
+                };
+
+                Label name = new Label();
+                name.Text = a.Name;
+                name.HorizontalAlignment = HorizontalAlignment.Right;
+                name.VerticalAlignment = VerticalAlignment.Center;
+                
+                aV.AddChild(button);
+                aV.AddChild(name);
+                //aV.Left = -30;
+                //aV.Top = -20;
+                aV.HorizontalAlignment = HorizontalAlignment.Right;
+                aV.VerticalAlignment = VerticalAlignment.Center;
+                //button.
+
+                apprenticeView.AddChild(aV);
+            }
+            mainPanel.AddChild(apprenticeView);
+
+
+        }
     }
 }

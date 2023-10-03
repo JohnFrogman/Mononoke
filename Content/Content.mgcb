@@ -23,7 +23,6 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:terrain.png
 
 #begin vampire_wars.spritefont
 /importer:FontDescriptionImporter

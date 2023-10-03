@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Mononoke
 {
@@ -54,10 +55,9 @@ namespace Mononoke
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
             _spriteBatch.Draw(Background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), backgroundScale, SpriteEffects.None, 0f);
-            //_spriteBatch.Draw( Background, new Rectangle( new Point(0,0), new Point(Mononoke.RENDER_WIDTH, Mononoke.RENDER_WIDTH) ), Color.White );
-
             foreach (GUIButton btn in buttons)
                 btn.Draw( _spriteBatch);
+            DrawCursor( _spriteBatch);
         }
 
         void IGameState.Update(GameTime _gameTime)
@@ -70,10 +70,16 @@ namespace Mononoke
             {
                 if ( btn.TryClick(pos))
                 { 
-                    Debug.WriteLine("Clicked button: " + btn.text);
+                    Debug.WriteLine("Clicked button: " + btn.Text);
                 }
             }
         }
-
+        public void DrawCursor(SpriteBatch spriteBatch)
+        {
+            Texture2D tex = TextureAssetManager.GetCursor(eMouseCursorType.Default);
+            MouseState mstate = Mouse.GetState();
+            Vector2 MousePos = mstate.Position.ToVector2();
+            spriteBatch.Draw(tex, MousePos, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0f);
+        }
     }
 }

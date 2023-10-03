@@ -10,22 +10,23 @@ namespace Mononoke
     {
         Rectangle rect;
         Texture2D tex;
-        public string text;
+        public string Text;
         //delegate void onClick();
         //Delegate onClick;
         //delegate void onClick();
         private clickEvent onClick;
 
-        public GUIButton( Rectangle r, Texture2D t, string str, clickEvent callback )
+        public GUIButton( Rectangle r, Texture2D t, string text, clickEvent callback )
         { 
             rect = r;
             tex = t;
-            text = str;
+            Text = text;
             onClick = callback;
         }
         public void Draw(SpriteBatch _spriteBatch )
         {
             _spriteBatch.Draw( tex, rect, Color.White);
+            _spriteBatch.DrawString( Mononoke.Font, Text, new Vector2( rect.Left, rect.Top), Color.White );
         }
         public bool TryClick( Vector2 pos )
         { 
