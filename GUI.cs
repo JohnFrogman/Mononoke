@@ -24,7 +24,7 @@ namespace Mononoke
         Color col;
 
         Vector2 spacing = new Vector2(60, 0);
-        public GUI( Camera2D camera, GraphicsDeviceManager graphics, List<Apprentice> apprentices )
+        public GUI( Camera2D camera, GraphicsDeviceManager graphics )
         {
             col = new Color(161, 200, 255);
             LoadIcons( graphics );

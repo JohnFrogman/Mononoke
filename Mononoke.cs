@@ -49,7 +49,7 @@ namespace Mononoke
             Camera = new Camera2D( _graphics );
 
             TextureAssetManager.Initialise( _graphics );
-            CurrentState = new MainMenu( _graphics, this);
+            //CurrentState = new MainMenu( _graphics, this);
             CurrentState = new Overworld(Camera, _graphics, this, mDesktop);
             //NewGame();
             //Camera.Zoom = 1f;
@@ -86,8 +86,8 @@ namespace Mononoke
 
             //TestEffect.CurrentTechnique.Passes[0].Apply();
             CurrentState.Draw(_spriteBatch, _graphics);
-            if ( ShowFrameCounter )
-                _spriteBatch.DrawString( Font, frameRate.ToString().Substring( 0, 5 ), -Camera.Position, Color.Black );
+            //if ( ShowFrameCounter )
+                //_spriteBatch.DrawString( Font, frameRate.ToString().Substring( 0, 5 ), -Camera.Position, Color.Black );
 
             _spriteBatch.End();
             mDesktop.Render();

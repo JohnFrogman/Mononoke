@@ -7,6 +7,10 @@ using System.IO;
 using Myra.Graphics2D.UI;
 using Myra.Graphics2D.Brushes;
 using Myra.Graphics2D.TextureAtlases;
+using nkast.Aether.Physics2D.Dynamics;
+using Microsoft.Xna.Framework.Input;
+using nkast.Aether.Physics2D.Common;
+using Microsoft.Xna.Framework.Media;
 
 namespace Mononoke
 {
@@ -17,7 +21,10 @@ namespace Mononoke
         private GUI mGui;
         private Camera2D mCamera;
         private GraphicsDeviceManager mGraphics;
-        List<Apprentice> mApprentices;
+        private Player mPlayer;
+        private World mWorld;
+        private List<Collidable> mCollidables;
+
         GUI mGUI;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
@@ -25,26 +32,33 @@ namespace Mononoke
             mCamera = camera;
             mGraphics = _graphics;
             mController = new OverworldController( this, camera, _graphics, game );
-            mApprentices = new List<Apprentice>();
-            mApprentices.Add(new Apprentice("Nalia", "nalia"));
-            mApprentices.Add(new Apprentice("Jarnathan", "jarnathan"));
-            mApprentices.Add(new Apprentice("Billie", "jarnathan"));
-            mGui = new GUI(camera, _graphics, mApprentices);
+            mGui = new GUI(camera, _graphics );
             BuildGUI(desktop);
-            //AddApprentice(new Apprentice("Nalia", "nalia"));
-
+            mWorld = new World();
+            mWorld.Gravity = Vector2.Zero;
+            mPlayer = new Player(new Car(mWorld));
+            mCollidables = new List<Collidable>();
+            mCollidables.Add( new Collidable(mWorld, new Vector2 (30, 30), new Vector2 (200, 100)));
         }
-        
+
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
+            foreach (Collidable collidable in mCollidables)
+            {
+                collidable.Draw(_spriteBatch);
+            }
+            mPlayer.Draw(_spriteBatch);
             mGui.Draw(_spriteBatch, _graphics);
-            mController.Draw(_spriteBatch);
-            mController.DrawCursor(_spriteBatch);
+            //mController.Draw(_spriteBatch);
+            //mController.DrawCursor(_spriteBatch);
         }
 
         void IGameState.Update(GameTime gameTime)
         {
-            mController.Update(gameTime);
+            mPlayer.Update(gameTime);
+            float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //We update the world
+            mWorld.Step(totalSeconds);
         }
 
         // Need to save out units, maps, Actors, Provinces and the player
@@ -86,66 +100,57 @@ namespace Mononoke
         public void Load( )
         { 
         }
-        void AddApprentice(Apprentice a)
-        { 
-        }
-        void ApprenticeClick(Apprentice a)
-        { 
-            mController.SetCameraDestination(a.Location);
-        }
-        
+
         void BuildGUI(Desktop d)
         { 
-            d.Widgets.Clear();
-            Panel mainPanel = new Panel();
-            mainPanel.Background = new SolidBrush(Color.Transparent);
-            d.Root = mainPanel;
+            //d.Widgets.Clear();
+            //Panel mainPanel = new Panel();
+            //mainPanel.Background = new SolidBrush(Color.Transparent);
+            //d.Root = mainPanel;
 
-            VerticalStackPanel apprenticeView = new VerticalStackPanel();
-            apprenticeView.Spacing = 10;
-            foreach (Apprentice a in mApprentices)
-            {
-                Panel aV = new Panel();               
-                aV.Background = new SolidBrush(Color.Red);
-                aV.Width = 150;
-                aV.Height = 50;
-                Image portrait = new Image();
-                portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-                portrait.HorizontalAlignment = HorizontalAlignment.Left;
-                portrait.VerticalAlignment = VerticalAlignment.Center;
-                portrait.PaddingLeft = 6;
+            //VerticalStackPanel apprenticeView = new VerticalStackPanel();
+            //apprenticeView.Spacing = 10;
+            //foreach (Apprentice a in mApprentices)
+            //{
+            //    Panel aV = new Panel();               
+            //    aV.Background = new SolidBrush(Color.Red);
+            //    aV.Width = 150;
+            //    aV.Height = 50;
+            //    Image portrait = new Image();
+            //    portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
+            //    portrait.HorizontalAlignment = HorizontalAlignment.Left;
+            //    portrait.VerticalAlignment = VerticalAlignment.Center;
+            //    portrait.PaddingLeft = 6;
 
-                aV.AddChild(portrait);
-                TextButton button = new TextButton();
-                //button.Text = a.Name;
-                button.Width = 150;
-                button.Height = 50;
-                button.Background = new SolidBrush(Color.Transparent);
-                button.PressedBackground = new SolidBrush(Color.Transparent);
-                button.OverBackground = new SolidBrush(Color.Transparent);
-                button.Click += (sa, aa) =>
-                {
-                    ApprenticeClick(a);
-                };
+            //    aV.AddChild(portrait);
+            //    TextButton button = new TextButton();
+            //    //button.Text = a.Name;
+            //    button.Width = 150;
+            //    button.Height = 50;
+            //    button.Background = new SolidBrush(Color.Transparent);
+            //    button.PressedBackground = new SolidBrush(Color.Transparent);
+            //    button.OverBackground = new SolidBrush(Color.Transparent);
+            //    button.Click += (sa, aa) =>
+            //    {
+            //        ApprenticeClick(a);
+            //    };
 
-                Label name = new Label();
-                name.Text = a.Name;
-                name.HorizontalAlignment = HorizontalAlignment.Right;
-                name.VerticalAlignment = VerticalAlignment.Center;
+            //    Label name = new Label();
+            //    name.Text = a.Name;
+            //    name.HorizontalAlignment = HorizontalAlignment.Right;
+            //    name.VerticalAlignment = VerticalAlignment.Center;
                 
-                aV.AddChild(button);
-                aV.AddChild(name);
-                //aV.Left = -30;
-                //aV.Top = -20;
-                aV.HorizontalAlignment = HorizontalAlignment.Right;
-                aV.VerticalAlignment = VerticalAlignment.Center;
-                //button.
+            //    aV.AddChild(button);
+            //    aV.AddChild(name);
+            //    //aV.Left = -30;
+            //    //aV.Top = -20;
+            //    aV.HorizontalAlignment = HorizontalAlignment.Right;
+            //    aV.VerticalAlignment = VerticalAlignment.Center;
+            //    //button.
 
-                apprenticeView.AddChild(aV);
-            }
-            mainPanel.AddChild(apprenticeView);
-
-
+            //    apprenticeView.AddChild(aV);
+            //}
+            //mainPanel.AddChild(apprenticeView);
         }
     }
 }
