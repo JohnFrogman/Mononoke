@@ -11,6 +11,7 @@ using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.Xna.Framework.Input;
 using nkast.Aether.Physics2D.Common;
 using Microsoft.Xna.Framework.Media;
+using tainicom.Aether.Physics2D.Samples;
 
 namespace Mononoke
 {
@@ -24,23 +25,21 @@ namespace Mononoke
         private Player mPlayer;
         private World mWorld;
         private List<Collidable> mCollidables;
-
         GUI mGUI;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
             mCamera = camera;
             mGraphics = _graphics;
-            mController = new OverworldController( this, camera, _graphics, game );
-            mGui = new GUI(camera, _graphics );
+            mController = new OverworldController(this, camera, _graphics, game);
+            mGui = new GUI(camera, _graphics);
             BuildGUI(desktop);
             mWorld = new World();
             mWorld.Gravity = Vector2.Zero;
             mPlayer = new Player(new Car(mWorld));
             mCollidables = new List<Collidable>();
-            mCollidables.Add( new Collidable(mWorld, new Vector2 (30, 30), new Vector2 (200, 100)));
+            mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));
         }
-
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
             foreach (Collidable collidable in mCollidables)
@@ -49,6 +48,7 @@ namespace Mononoke
             }
             mPlayer.Draw(_spriteBatch);
             mGui.Draw(_spriteBatch, _graphics);
+
             //mController.Draw(_spriteBatch);
             //mController.DrawCursor(_spriteBatch);
         }

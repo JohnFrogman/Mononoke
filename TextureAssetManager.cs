@@ -16,7 +16,7 @@ namespace Mononoke
     public static class TextureAssetManager
     {
         private static TextureHolder Icons;
-        private static TextureHolder UnitSprites;
+        private static TextureHolder mCarSprites;
         private static Texture2D simpleSpuare;
         private static Texture2D selectionBox;
         private static MouseCursorHolder Cursors;
@@ -57,15 +57,15 @@ namespace Mononoke
             Cursors = new MouseCursorHolder( graphics, brokenTexture );
 
             Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
-            UnitSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
+            mCarSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
         }
         public static Texture2D GetIconByName( string str )
         { 
             return Icons.GetTextureByName( str );
         }
-        public static Texture2D GetPortraitSpriteByName(string str)
+        public static Texture2D GetCarSpriteByName(string str)
         {
-            return UnitSprites.GetTextureByName(str);
+            return mCarSprites.GetTextureByName(str);
         }
         public static Texture2D GetSimpleSquare()
         { 

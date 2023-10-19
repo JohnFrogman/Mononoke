@@ -59,6 +59,7 @@ namespace Mononoke
                 { 
                     mCar.SetBrake(0f); 
                 }
+
                 mCar.Update(gameTime);
             }
             //mOldKeyState = state;
