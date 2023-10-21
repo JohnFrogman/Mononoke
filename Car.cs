@@ -32,6 +32,7 @@ namespace Mononoke
         Body mBody;
         float mRadius = 2.5f;
         float mWheelBase;
+        float mFrontWheelAngle;
 
         Texture2D mColliderSprite;
         Vector2 mColliderTextureOrigin;
@@ -51,6 +52,7 @@ namespace Mononoke
             mColliderTextureOrigin = mColliderTextureSize / 2f;
 
             mBody = world.CreateBody(new Vector2(500f, 500f), 0, BodyType.Dynamic);
+            
             mBody.LinearDamping = 1.0f;
             mBody.AngularDamping = 1.0f;
 
@@ -58,6 +60,8 @@ namespace Mononoke
             // Give it some bounce and friction
             fixture.Restitution = 0.3f;
             fixture.Friction = 20f;
+
+            mFrontWheelAngle = mBody.Rotation;
         }
 
         //void 
@@ -67,19 +71,28 @@ namespace Mononoke
         }
         public void Update(GameTime gameTime)
         {
-            //Vector2 heading = mBody.GetWorldVector(Vector2.UnitY);
+            Vector2 heading = mBody.GetWorldVector(Vector2.UnitY);
             // https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
-            if ( mSteeringPos != 0 )
-            { 
-                Vector2 frontWheel = mBody.Position + mWheelBase / 2f * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
-                Vector2 backWheel = mBody.Position - mWheelBase / 2f * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
+            //if ( mSteeringPos != 0 )
+            //{
+            //    //Vector2 frontWheel = mBody.Position + mWheelBase / 2f * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
+            //    //Vector2 backWheel = mBody.Position - mWheelBase / 2f * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
 
-                backWheel += mBody.LinearVelocity * (float)gameTime.ElapsedGameTime.Seconds * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
-                frontWheel += mBody.LinearVelocity * gameTime.ElapsedGameTime.Seconds * new Vector2((float)Math.Cos(mBody.Rotation + mSteeringPos), (float)Math.Sin(mBody.Rotation + mSteeringPos));
+            //    Vector2 frontWheel = mBody.Position + ((mWheelBase/2f ) * mBody.GetWorldVector(Vector2.UnitY));
+            //    Vector2 backWheel = mBody.Position - ((mWheelBase/2f )* mBody.GetWorldVector(Vector2.UnitY));
 
-                //carLocation = (frontWheel + backWheel) / 2f;
-                mBody.Rotation = 100f *  (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
-            }
+            //    frontWheel = new Vector2(
+            //          (float)Math.Cos(mSteeringPos * frontWheel.X) - (float)Math.Sin(mSteeringPos * frontWheel.Y)
+            //        , (float)Math.Sin(mSteeringPos * frontWheel.X) + (float)Math.Cos(mSteeringPos * frontWheel.Y));
+
+            //    //backWheel += mBody.LinearVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mBody.Rotation), (float)Math.Sin(mBody.Rotation));
+            //    //frontWheel += mBody.LinearVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mBody.Rotation + mSteeringPos), (float)Math.Sin(mBody.Rotation + mSteeringPos));
+
+            //    //frontWheel += mBody.LinearVelocity;
+
+            //    //carLocation = (frontWheel + backWheel) / 2f;
+            //    mBody.Rotation += (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
+            //}
             // Vector2 wheelForward;
             // wheelForward.X = (float)Math.Cos(bodyForward.X * mSteeringPos) - (float)Math.Sin(mSteeringPos * bodyForward.Y);
             // wheelForward.Y = (float)Math.Sin(bodyForward.X * mSteeringPos) + (float)Math.Cos(mSteeringPos * bodyForward.Y);
@@ -89,8 +102,44 @@ namespace Mononoke
             SetWheelRPM();
             //// F = T⋅GR / R⋅2π force applied by the wheels on the car
             //float Force = 
+            //mBody.ApplyTorque(mSteeringPos * 1000f);
 
-             mBody.ApplyForce(2000f * mBody.GetWorldVector(Vector2.UnitY) * mGas);
+
+            //Vector2 frontWheel = mBody.Position + ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+            //Vector2 backWheel = mBody.Position - ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+
+            //Vector2 f2 = mBody.GetWorldVector(Vector2.UnitY); //Vector2.Normalize(frontWheel);
+            //if (mSteeringPos != 0)
+            //{
+            //    f2 = new Vector2(
+            //      f2.X * (float)Math.Cos(mSteeringPos) - f2.Y * (float)Math.Sin(mSteeringPos)
+            //    , f2.X * (float)Math.Sin(mSteeringPos) + f2.Y * (float)Math.Cos(mSteeringPos));
+            //    //mBody.Rotation = mBody.Rotation + mSteeringPos;
+            //}
+
+            //frontWheel = frontWheel + f2;
+
+            //mWheelAngle += 
+            mFrontWheelAngle = mSteeringPos + mBody.Rotation;
+            if (mBody.LinearVelocity.Magnitude() < 0.5)
+            {
+                mBody.LinearVelocity = Vector2.Zero;
+                mBody.AngularVelocity = 0;
+            }
+            if ( mBody.LinearVelocity.Magnitude() > 0 )
+            { 
+                if ( mFrontWheelAngle < mBody.Rotation )
+                {
+                    mBody.Rotation += 0.05f;
+                }
+                else if (mFrontWheelAngle > mBody.Rotation)
+                {
+                    mBody.Rotation -= 0.05f;
+                }
+            }
+            mBody.ApplyForce(2000f * mBody.GetWorldVector(Vector2.UnitY) * mGas);
+
+
 
             //mBody.Rotation += mSteeringPos * 0.06f;
         }
@@ -107,10 +156,23 @@ namespace Mononoke
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(Mononoke.Font, "Car", mBody.Position, Color.Black);
-            //spriteBatch.Draw(mSprite, mBody.Position + (mSize*0.5f), null, Color.White, mBody.Rotation, Vector2.Zero, mSize, SpriteEffects.None, 1f);        }
-            //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.Green, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.FlipVertically, 0f);
             spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.FlipVertically, 0f);
+
+            Vector2 frontWheel = mBody.Position + ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+            Vector2 backWheel = mBody.Position - ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+
+            Vector2 f2 = Vector2.Normalize(frontWheel);
+            if ( mSteeringPos != 0 )
+            { 
+                f2 = new Vector2(
+                  f2.X * (float)Math.Cos(mSteeringPos) - f2.Y * (float)Math.Sin(mSteeringPos)
+                , f2.X * (float)Math.Sin(mSteeringPos) + f2.Y * (float)Math.Cos(mSteeringPos));
+            }
+            frontWheel = frontWheel + f2;
+            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), frontWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
+            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), backWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
+
+            //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.Green, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.FlipVertically, 0f);
         }
         public void SetGas(float gas)
         {

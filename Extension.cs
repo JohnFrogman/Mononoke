@@ -5,6 +5,8 @@ using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Reflection.Metadata.Ecma335;
+
 namespace Mononoke
 {
     public static class Extension
@@ -43,6 +45,10 @@ namespace Mononoke
         public static string ToJson( this Vector2 v )
         {
             return String.Format( "{{\"X\" : {0}, \"Y\" : {1} )}}", v.X, v.Y );
+        }
+        public static float Magnitude(this Vector2 v)
+        {
+            return v.X * v.X + v.Y * v.Y;
         }
     }
 }

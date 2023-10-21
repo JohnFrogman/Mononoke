@@ -11,7 +11,6 @@ using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.Xna.Framework.Input;
 using nkast.Aether.Physics2D.Common;
 using Microsoft.Xna.Framework.Media;
-using tainicom.Aether.Physics2D.Samples;
 
 namespace Mononoke
 {

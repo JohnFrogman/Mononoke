@@ -29,11 +29,11 @@ namespace Mononoke
             }
             else
             { 
-                if (state.IsKeyDown(Keys.A))
+                if (state.IsKeyDown(Keys.D))
                 { 
                     mCar.SetSteer(-1.0f);
                 }
-                else if (state.IsKeyDown(Keys.D))
+                else if (state.IsKeyDown(Keys.A))
                 { 
                     mCar.SetSteer(1.0f);
                 }
