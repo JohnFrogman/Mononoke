@@ -38,9 +38,12 @@ namespace Mononoke
         Vector2 mColliderTextureOrigin;
         Vector2 mColliderTextureSize;
 
+        Camera2D mCamera;
         const float EngineConstant = 3000f;
-        public Car(World world)
+        public Car(World world, Camera2D camera)
+            : Collidable(World world, Vector2 pos, BodyType.Dynamic, Texture2D sprite)
         {
+            mCamera = camera;
             mSprite = TextureAssetManager.GetCarSpriteByName("car");
             mTextureSize = new Vector2(mSprite.Width, mSprite.Height);
             mTextureOrigin = mTextureSize / 2f;
@@ -53,7 +56,7 @@ namespace Mononoke
 
             mBody = world.CreateBody(new Vector2(500f, 500f), 0, BodyType.Dynamic);
             
-            mBody.LinearDamping = 1.0f;
+            mBody.LinearDamping = 0.1f;
             mBody.AngularDamping = 1.0f;
 
             Fixture fixture = mBody.CreateRectangle(mSize.X, mSize.Y, 0.01f, Vector2.Zero);
@@ -71,6 +74,7 @@ namespace Mononoke
         }
         public void Update(GameTime gameTime)
         {
+            mCamera.Position = -mBody.Position / 2f;
             Vector2 heading = mBody.GetWorldVector(Vector2.UnitY);
             // https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
             //if ( mSteeringPos != 0 )
@@ -137,7 +141,7 @@ namespace Mononoke
                     mBody.Rotation -= 0.05f;
                 }
             }
-            mBody.ApplyForce(2000f * mBody.GetWorldVector(Vector2.UnitY) * mGas);
+            mBody.ApplyForce(10000f * mBody.GetWorldVector(Vector2.UnitY) * mGas);
 
 
 

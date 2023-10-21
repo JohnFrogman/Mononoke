@@ -16,15 +16,18 @@ namespace Mononoke
         Vector2 mSize;
         Vector2 mTextureOrigin;
         Vector2 mTextureSize;
-        public Collidable( World world, Vector2 pos, Vector2 size)
+        public Collidable( World world, Vector2 pos, BodyType type, Texture2D sprite, Vector2 size)
         {
-            mSize = size;
-            mBody = world.CreateBody(pos, 0, BodyType.Static);
+            mSprite = sprite;
+            mBody = world.CreateBody(pos, 0, type);
             Fixture pfixture = mBody.CreateRectangle(size.X, size.Y, 1f, Vector2.Zero);
             // Give it some bounce and friction
             pfixture.Restitution = 0.3f;
             pfixture.Friction = 0.5f;
-            mSprite = TextureAssetManager.GetSimpleSquare();
+            if (size == null)
+                mSize = mTextureSize;
+            else
+                mSize = size;
             mTextureSize = new Vector2(mSprite.Width , mSprite.Height);
             mTextureOrigin = mTextureSize /2f;
         }

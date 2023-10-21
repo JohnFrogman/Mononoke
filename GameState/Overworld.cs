@@ -35,7 +35,7 @@ namespace Mononoke
             BuildGUI(desktop);
             mWorld = new World();
             mWorld.Gravity = Vector2.Zero;
-            mPlayer = new Player(new Car(mWorld));
+            mPlayer = new Player(new Car(mWorld, mCamera), mWorld);
             mCollidables = new List<Collidable>();
             mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));
         }
