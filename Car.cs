@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input; 
 using nkast.Aether.Physics2D;
+using nkast.Aether.Physics2D.Collision.Shapes;
 using nkast.Aether.Physics2D.Common;
 using nkast.Aether.Physics2D.Dynamics;
 using System;
@@ -11,7 +12,7 @@ using System.Text.Unicode;
 
 namespace Mononoke
 {
-    internal class Car 
+    internal class Car : Collidable
     {
         float mThrottle; 
         float mFuel;
@@ -21,50 +22,38 @@ namespace Mononoke
         int CurrentGear = 0;
         float[] mGearCoefficients = new float[6] { 4.0f, 2.2f, 1.4f, 1.2f, 1f, 0.7f };
         float _SteeringPos = 0f;
-        Texture2D mSprite;
 
         float mSteeringPos = 0f;
         float mGas = 0f;
         float mBrake = 0f;
-        Vector2 mSize;
-        Vector2 mTextureOrigin;
-        Vector2 mTextureSize;
-        Body mBody;
+
         float mRadius = 2.5f;
         float mWheelBase;
         float mFrontWheelAngle;
 
-        Texture2D mColliderSprite;
-        Vector2 mColliderTextureOrigin;
-        Vector2 mColliderTextureSize;
-
+        Interactable doors;
         Camera2D mCamera;
         const float EngineConstant = 3000f;
-        public Car(World world, Camera2D camera)
-            : Collidable(World world, Vector2 pos, BodyType.Dynamic, Texture2D sprite)
+        public Car(World world, Camera2D camera, Vector2 pos, Texture2D sprite)
+            : base(world, pos, BodyType.Dynamic, sprite )
         {
             mCamera = camera;
             mSprite = TextureAssetManager.GetCarSpriteByName("car");
-            mTextureSize = new Vector2(mSprite.Width, mSprite.Height);
-            mTextureOrigin = mTextureSize / 2f;
-            mSize = mTextureSize;
+
             mWheelBase = mSize.Y / 2f;
-
-            mColliderSprite = TextureAssetManager.GetSimpleSquare();
-            mColliderTextureSize = new Vector2(mColliderSprite.Width, mColliderSprite.Height);
-            mColliderTextureOrigin = mColliderTextureSize / 2f;
-
-            mBody = world.CreateBody(new Vector2(500f, 500f), 0, BodyType.Dynamic);
-            
+          
             mBody.LinearDamping = 0.1f;
             mBody.AngularDamping = 1.0f;
 
-            Fixture fixture = mBody.CreateRectangle(mSize.X, mSize.Y, 0.01f, Vector2.Zero);
-            // Give it some bounce and friction
-            fixture.Restitution = 0.3f;
-            fixture.Friction = 20f;
-
             mFrontWheelAngle = mBody.Rotation;
+
+            Vector2 size = new Vector2(60f, 20f);
+            Vector2 offset = new Vector2(0, 0);
+            Vertices vertices = PolygonTools.CreateRectangle( size.X/2f, size.Y/2f);
+            vertices.Translate(offset);
+            PolygonShape shape = new PolygonShape(vertices, 0.1f);
+            doors = new Interactable(shape,  size, offset);
+            mBody.Add(doors);
         }
 
         //void 
@@ -74,7 +63,7 @@ namespace Mononoke
         }
         public void Update(GameTime gameTime)
         {
-            mCamera.Position = -mBody.Position / 2f;
+           // mCamera.Position = -mBody.Position / 2f;
             Vector2 heading = mBody.GetWorldVector(Vector2.UnitY);
             // https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
             //if ( mSteeringPos != 0 )
@@ -124,6 +113,12 @@ namespace Mononoke
             //frontWheel = frontWheel + f2;
 
             //mWheelAngle += 
+            if (mGas > 0)
+            {
+                int i;
+                i = 0;
+                ++i;
+            }
             mFrontWheelAngle = mSteeringPos + mBody.Rotation;
             if (mBody.LinearVelocity.Magnitude() < 0.5)
             {
@@ -142,41 +137,35 @@ namespace Mononoke
                 }
             }
             mBody.ApplyForce(10000f * mBody.GetWorldVector(Vector2.UnitY) * mGas);
-
-
-
-            //mBody.Rotation += mSteeringPos * 0.06f;
         }
         
         void SetEngineRPM()
         {
 
-            //double rpm -=
-            //double rpm += mGas * EngineConstant;
-
         }
         void SetWheelRPM()
         { 
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch) 
         {
-            spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.FlipVertically, 0f);
+            doors.Draw(spriteBatch);
+            base.Draw(spriteBatch);
+        //    spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.FlipVertically, 0f);
 
-            Vector2 frontWheel = mBody.Position + ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
-            Vector2 backWheel = mBody.Position - ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+        //    Vector2 frontWheel = mBody.Position + ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
+        //    Vector2 backWheel = mBody.Position - ((mWheelBase / 2f) * mBody.GetWorldVector(Vector2.UnitY));
 
-            Vector2 f2 = Vector2.Normalize(frontWheel);
-            if ( mSteeringPos != 0 )
-            { 
-                f2 = new Vector2(
-                  f2.X * (float)Math.Cos(mSteeringPos) - f2.Y * (float)Math.Sin(mSteeringPos)
-                , f2.X * (float)Math.Sin(mSteeringPos) + f2.Y * (float)Math.Cos(mSteeringPos));
-            }
-            frontWheel = frontWheel + f2;
-            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), frontWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
-            spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), backWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
-
-            //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.Green, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.FlipVertically, 0f);
+        //    Vector2 f2 = Vector2.Normalize(frontWheel);
+        //    if ( mSteeringPos != 0 )
+        //    { 
+        //        f2 = new Vector2(
+        //          f2.X * (float)Math.Cos(mSteeringPos) - f2.Y * (float)Math.Sin(mSteeringPos)
+        //        , f2.X * (float)Math.Sin(mSteeringPos) + f2.Y * (float)Math.Cos(mSteeringPos));
+        //    }
+        //    frontWheel = frontWheel + f2;
+        //    spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), frontWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
+        //    spriteBatch.Draw(TextureAssetManager.GetSimpleSquare(), backWheel, null, Color.White, mBody.Rotation, Vector2.Zero, new Vector2(1f, 1f), SpriteEffects.FlipVertically, 0f);
+        //    //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.Green, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.FlipVertically, 0f);
         }
         public void SetGas(float gas)
         {

@@ -24,6 +24,8 @@ namespace Mononoke
         private Player mPlayer;
         private World mWorld;
         private List<Collidable> mCollidables;
+        private List<Interactable> mInteractables;
+        private Car mCar;
         GUI mGUI;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
@@ -35,9 +37,11 @@ namespace Mononoke
             BuildGUI(desktop);
             mWorld = new World();
             mWorld.Gravity = Vector2.Zero;
-            mPlayer = new Player(new Car(mWorld, mCamera), mWorld);
+            mPlayer = new Player(mWorld, new Vector2(30,30), this);
+            mCar = new Car(mWorld, mCamera, new Vector2(450f, 450f), TextureAssetManager.GetCarSpriteByName("car"));
             mCollidables = new List<Collidable>();
-            mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));
+            mInteractables = new List<Interactable>();
+            //mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
@@ -45,6 +49,7 @@ namespace Mononoke
             {
                 collidable.Draw(_spriteBatch);
             }
+            mCar.Draw(_spriteBatch);
             mPlayer.Draw(_spriteBatch);
             mGui.Draw(_spriteBatch, _graphics);
 
@@ -55,6 +60,39 @@ namespace Mononoke
         void IGameState.Update(GameTime gameTime)
         {
             mPlayer.Update(gameTime);
+            //KeyboardState state = Keyboard.GetState();
+            //if (state.IsKeyDown(Keys.D))
+            //{
+            //    mCar.SetSteer(-1.0f);
+            //}
+            //else if (state.IsKeyDown(Keys.A))
+            //{
+            //    mCar.SetSteer(1.0f);
+            //}
+            //else
+            //{
+            //    mCar.SetSteer(0.0f);
+            //}
+
+            //if (state.IsKeyDown(Keys.W))
+            //{
+            //    mCar.SetGas(1.0f);
+            //}
+            //else
+            //{
+            //    mCar.SetGas(0f);
+            //}
+
+            //if (state.IsKeyDown(Keys.S))
+            //{
+            //    mCar.SetBrake(1.0f);
+            //}
+            //else
+            //{
+            //    mCar.SetBrake(0f);
+            //}
+            //    mCar.Update(gameTime);
+
             float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //We update the world
             mWorld.Step(totalSeconds);

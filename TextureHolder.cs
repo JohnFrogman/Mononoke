@@ -10,7 +10,7 @@ namespace Mononoke
 {
     class TextureHolder
     {
-        Dictionary<string, Texture2D> Textures;
+        Dictionary<string, Texture2D> Textures = new();
         Texture2D BrokenTexture;
         public TextureHolder( GraphicsDeviceManager graphics, string directory, Texture2D broken )
         {
@@ -19,7 +19,6 @@ namespace Mononoke
             {
                 throw new Exception("Directory does not exist! " + directory);
             }
-            Textures = new Dictionary<string, Texture2D>();
             string[] files = Directory.GetFiles( directory );
             foreach (string f in files)
             {

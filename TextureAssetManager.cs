@@ -75,6 +75,10 @@ namespace Mononoke
         {
             return selectionBox;
         }
+        public static Texture2D GetPlayerSprite()
+        { 
+            return mCarSprites.GetTextureByName("soldier");
+        }
         static void SetSimpleSquare( GraphicsDeviceManager graphics )
         {
             simpleSpuare = new Texture2D( graphics.GraphicsDevice, 1, 1 );
