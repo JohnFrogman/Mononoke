@@ -38,7 +38,7 @@ namespace Mononoke
             mWorld = new World();
             mWorld.Gravity = Vector2.Zero;
             mPlayer = new Player(mWorld, new Vector2(30,30), this);
-            mCar = new Car(mWorld, mCamera, new Vector2(450f, 450f), TextureAssetManager.GetCarSpriteByName("car"));
+            mCar = new Car(mWorld, mCamera, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car"));
             mCollidables = new List<Collidable>();
             mInteractables = new List<Interactable>();
             //mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));

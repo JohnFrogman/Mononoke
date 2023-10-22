@@ -35,7 +35,7 @@ namespace Mononoke
         Camera2D mCamera;
         const float EngineConstant = 3000f;
         public Car(World world, Camera2D camera, Vector2 pos, Texture2D sprite)
-            : base(world, pos, BodyType.Dynamic, sprite )
+            : base(world, pos, BodyType.Kinematic, sprite )
         {
             mCamera = camera;
             mSprite = TextureAssetManager.GetCarSpriteByName("car");
@@ -54,6 +54,7 @@ namespace Mononoke
             PolygonShape shape = new PolygonShape(vertices, 0.1f);
             doors = new Interactable(shape,  size, offset);
             mBody.Add(doors);
+            mBody.IsBullet = true;
         }
 
         //void 
