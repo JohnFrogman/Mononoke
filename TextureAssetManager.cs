@@ -18,7 +18,6 @@ namespace Mononoke
         private static TextureHolder Icons;
         private static TextureHolder mCarSprites;
         private static Texture2D simpleSpuare;
-        private static Texture2D selectionBox;
         private static MouseCursorHolder Cursors;
         public static Texture2D GetCursor( eMouseCursorType type )
         {
@@ -70,10 +69,6 @@ namespace Mononoke
         public static Texture2D GetSimpleSquare()
         { 
             return simpleSpuare;
-        }
-        public static Texture2D GetSelectionBox()
-        {
-            return selectionBox;
         }
         public static Texture2D GetPlayerSprite()
         { 

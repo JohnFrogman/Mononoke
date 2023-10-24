@@ -83,11 +83,11 @@ namespace Mononoke
             //               SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                                 SamplerState.PointClamp, null, null, null, viewMatrix * Matrix.CreateScale( new Vector3( 1f, 1f, 1f) ));
-
+            //Camera.Move(Vector2.One * 1);
             //TestEffect.CurrentTechnique.Passes[0].Apply();
             CurrentState.Draw(_spriteBatch, _graphics);
-            //if ( ShowFrameCounter )
-                //_spriteBatch.DrawString( Font, frameRate.ToString().Substring( 0, 5 ), -Camera.Position, Color.Black );
+            if ( ShowFrameCounter )
+                _spriteBatch.DrawString( Font, frameRate.ToString().Substring( 0, 5 ), -Camera.Position, Color.Black );
 
             _spriteBatch.End();
             mDesktop.Render();

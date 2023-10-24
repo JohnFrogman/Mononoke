@@ -14,65 +14,83 @@ namespace Mononoke
 {
     internal class Player : Collidable
     {
-        string Name = "Pink";
-
         Controller mController;
         Overworld mOverworld;
-        public Player(World world, Vector2 pos, Overworld overworld) 
+        Car mCar;
+        Camera2D mCamera;
+        public Player(World world, Vector2 pos, Overworld overworld, Camera2D camera) 
             : base( world, pos, BodyType.Kinematic, TextureAssetManager.GetPlayerSprite() )
         {
+            mCamera = camera;
             mOverworld = overworld;
+        }
+        public Rectangle Rectangle()
+        {
+            return new Rectangle((mBody.Position - mSize/2f).ToPoint(), mSize.ToPoint());
+        }
+        public void EnterCar(Car car)
+        {
+            mCar = car;
+            foreach (Fixture f in mBody.FixtureList)
+                f.CollidesWith = Category.None;
         }
         public void Update(GameTime gameTime)
         {
+            mCamera.Position = -mBody.Position + new Vector2(960, 540);
             KeyboardState state = Keyboard.GetState();
             // We make it possible to rotate the player body
-            if ( true)//mCar == null)
+            if ( mCar == null)
             {
                 HandleWalkInput(state);
             }
-            //else
-            //{ 
-            //    if (state.IsKeyDown(Keys.D))
-            //    { 
-            //        mCar.SetSteer(-1.0f);
-            //    }
-            //    else if (state.IsKeyDown(Keys.A))
-            //    { 
-            //        mCar.SetSteer(1.0f);
-            //    }
-            //    else
-            //    { 
-            //        mCar.SetSteer(0.0f);
-            //    }
+            else
+            {
+                mBody.Position = mCar.Position();
+                if (state.IsKeyDown(Keys.E))
+                {
+                    mCar = null;
+                    foreach (Fixture f in mBody.FixtureList)
+                        f.CollidesWith = Category.All;
+                    return;
+                }
+                if (state.IsKeyDown(Keys.D))
+                {
+                    mCar.SetSteer(-1.0f);
+                }
+                else if (state.IsKeyDown(Keys.A))
+                {
+                    mCar.SetSteer(1.0f);
+                }
+                else
+                {
+                    mCar.SetSteer(0.0f);
+                }
 
-            //    if (state.IsKeyDown(Keys.W))
-            //    {
-            //        mCar.SetGas(1.0f);
-            //    }
-            //    else 
-            //    { 
-            //        mCar.SetGas(0f); 
-            //    }
+                if (state.IsKeyDown(Keys.W))
+                {
+                    mCar.SetGas(1.0f);
+                }
+                else
+                {
+                    mCar.SetGas(0f);
+                }
 
-            //    if (state.IsKeyDown(Keys.S))
-            //    {
-            //        mCar.SetBrake(1.0f);
-            //    }
-            //    else 
-            //    { 
-            //        mCar.SetBrake(0f); 
-            //    }
-
-            //    mCar.Update(gameTime);
-            //}
-            //mOldKeyState = state;
-
-            //mController.Update(gameTime);
+                if (state.IsKeyDown(Keys.S))
+                {
+                    mCar.SetBrake(1.0f);
+                }
+                else
+                {
+                    mCar.SetBrake(0f);
+                }
+            }
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         { 
-            spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.FlipVertically, 0f);
+            if ( mCar == null )
+                spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.None, 0f);
+            
+            //base.Draw(spriteBatch);
         }
         void HandleWalkInput(KeyboardState state)
         {
@@ -95,7 +113,7 @@ namespace Mononoke
             }
             if (state.IsKeyDown(Keys.E))
             {
-                //mOverworld.TryInteract();
+                mOverworld.TryInteract();
             }
             mBody.LinearVelocity = resultantVelocity * 100f;
         }

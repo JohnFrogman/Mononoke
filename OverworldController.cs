@@ -20,7 +20,7 @@ namespace Mononoke
         float PressTime = 0f;
         Overworld mOverworld;
 
-        bool SavePressed; 
+        //bool SavePressed; 
         public OverworldController( Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics, Mononoke game ) 
         {
             mOverworld = overworld;

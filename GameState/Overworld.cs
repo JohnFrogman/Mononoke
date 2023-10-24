@@ -22,26 +22,28 @@ namespace Mononoke
         private Camera2D mCamera;
         private GraphicsDeviceManager mGraphics;
         private Player mPlayer;
-        private World mWorld;
-        private List<Collidable> mCollidables;
-        private List<Interactable> mInteractables;
+        private World mWorld = new();
+        private List<Collidable> mCollidables = new();
+        private List<Interactable> mInteractables = new();
+        private List<Interactable> mActiveInteractables = new();
         private Car mCar;
-        GUI mGUI;
+
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
             mCamera = camera;
             mGraphics = _graphics;
             mController = new OverworldController(this, camera, _graphics, game);
-            mGui = new GUI(camera, _graphics);
-            BuildGUI(desktop);
-            mWorld = new World();
+            mGui = new GUI(desktop);
             mWorld.Gravity = Vector2.Zero;
-            mPlayer = new Player(mWorld, new Vector2(30,30), this);
-            mCar = new Car(mWorld, mCamera, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car"));
-            mCollidables = new List<Collidable>();
-            mInteractables = new List<Interactable>();
-            //mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), new Vector2(50, 50)));
+            mPlayer = new Player(mWorld, new Vector2(30,30), this, mCamera);
+            mCar = new Car(mWorld, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car_big"), this);
+            mPlayer.EnterCar(mCar);
+            mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), BodyType.Static, TextureAssetManager.GetPlayerSprite()));
+        }      
+        public void RegisterInteractable(Interactable i)
+        { 
+            mInteractables.Add(i);
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
@@ -51,15 +53,42 @@ namespace Mononoke
             }
             mCar.Draw(_spriteBatch);
             mPlayer.Draw(_spriteBatch);
-            mGui.Draw(_spriteBatch, _graphics);
 
             //mController.Draw(_spriteBatch);
             //mController.DrawCursor(_spriteBatch);
         }
-
+        public void TryInteract()
+        {
+            foreach (Interactable i in mActiveInteractables)
+            { 
+                i.Interact();
+            } 
+        }
+        public void EnterCar(Car car)
+        { 
+            mPlayer.EnterCar(car);
+        }
         void IGameState.Update(GameTime gameTime)
         {
+            MouseState mstate = Mouse.GetState();
+            foreach (Interactable i in mInteractables)
+            {
+                //if (i.Update(gameTime, mstate.Position.ToVector2()))
+                //    {  }
+                if (i.Update(gameTime, mPlayer.Rectangle()))
+                {
+                    if (!mActiveInteractables.Contains(i))
+                    {
+                        mActiveInteractables.Add(i);
+                    }
+                }
+                else
+                { 
+                    mActiveInteractables.Remove(i); 
+                }
+            }
             mPlayer.Update(gameTime);
+            mCar.Update(gameTime);
             //KeyboardState state = Keyboard.GetState();
             //if (state.IsKeyDown(Keys.D))
             //{
@@ -136,58 +165,6 @@ namespace Mononoke
         }
         public void Load( )
         { 
-        }
-
-        void BuildGUI(Desktop d)
-        { 
-            //d.Widgets.Clear();
-            //Panel mainPanel = new Panel();
-            //mainPanel.Background = new SolidBrush(Color.Transparent);
-            //d.Root = mainPanel;
-
-            //VerticalStackPanel apprenticeView = new VerticalStackPanel();
-            //apprenticeView.Spacing = 10;
-            //foreach (Apprentice a in mApprentices)
-            //{
-            //    Panel aV = new Panel();               
-            //    aV.Background = new SolidBrush(Color.Red);
-            //    aV.Width = 150;
-            //    aV.Height = 50;
-            //    Image portrait = new Image();
-            //    portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-            //    portrait.HorizontalAlignment = HorizontalAlignment.Left;
-            //    portrait.VerticalAlignment = VerticalAlignment.Center;
-            //    portrait.PaddingLeft = 6;
-
-            //    aV.AddChild(portrait);
-            //    TextButton button = new TextButton();
-            //    //button.Text = a.Name;
-            //    button.Width = 150;
-            //    button.Height = 50;
-            //    button.Background = new SolidBrush(Color.Transparent);
-            //    button.PressedBackground = new SolidBrush(Color.Transparent);
-            //    button.OverBackground = new SolidBrush(Color.Transparent);
-            //    button.Click += (sa, aa) =>
-            //    {
-            //        ApprenticeClick(a);
-            //    };
-
-            //    Label name = new Label();
-            //    name.Text = a.Name;
-            //    name.HorizontalAlignment = HorizontalAlignment.Right;
-            //    name.VerticalAlignment = VerticalAlignment.Center;
-                
-            //    aV.AddChild(button);
-            //    aV.AddChild(name);
-            //    //aV.Left = -30;
-            //    //aV.Top = -20;
-            //    aV.HorizontalAlignment = HorizontalAlignment.Right;
-            //    aV.VerticalAlignment = VerticalAlignment.Center;
-            //    //button.
-
-            //    apprenticeView.AddChild(aV);
-            //}
-            //mainPanel.AddChild(apprenticeView);
         }
     }
 }
