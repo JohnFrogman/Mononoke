@@ -21,9 +21,12 @@ namespace Mononoke
         //uint UnitPerStamina = 1;
         //uint UnitPerHp = 1;
         Label mTimeLabel;
+        Car mCar;
+        Label mSpeedLabel;
         Vector2 spacing = new Vector2(60, 0);
-        public GUI(Desktop desktop)
+        public GUI(Desktop desktop, Car car)
         {
+            mCar = car;
             desktop.Widgets.Clear();
             Panel mainPanel = new Panel();
             mainPanel.Background = new SolidBrush(Color.Transparent);
@@ -37,6 +40,11 @@ namespace Mononoke
             mTimeLabel = new Label();
             mTimeLabel.Text = "14:32";
             headerPanel.AddChild(mTimeLabel);
+
+            mSpeedLabel = new Label();
+            mSpeedLabel.Text = "";
+            headerPanel.AddChild(mSpeedLabel);
+
             mainPanel.AddChild(headerPanel);
 
 
@@ -72,5 +80,9 @@ namespace Mononoke
         //{
         //    return ((t % 360) % 30).ToString();
         //}
+        public void Update(GameTime gameTime)
+        {
+            mSpeedLabel.Text = mCar.Speed() + " m/s";
+        }
     }
 }

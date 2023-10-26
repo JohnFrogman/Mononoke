@@ -48,7 +48,7 @@ namespace Mononoke
         }
         public static float Magnitude(this Vector2 v)
         {
-            return v.X * v.X + v.Y * v.Y;
+            return (float)Math.Sqrt( v.X * v.X + v.Y * v.Y);
         }
     }
 }

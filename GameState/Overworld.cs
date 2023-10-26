@@ -34,10 +34,10 @@ namespace Mononoke
             mCamera = camera;
             mGraphics = _graphics;
             mController = new OverworldController(this, camera, _graphics, game);
-            mGui = new GUI(desktop);
             mWorld.Gravity = Vector2.Zero;
             mPlayer = new Player(mWorld, new Vector2(30,30), this, mCamera);
             mCar = new Car(mWorld, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car_big"), this);
+            mGui = new GUI(desktop, mCar);
             mPlayer.EnterCar(mCar);
             mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), BodyType.Static, TextureAssetManager.GetPlayerSprite()));
         }      
@@ -89,6 +89,7 @@ namespace Mononoke
             }
             mPlayer.Update(gameTime);
             mCar.Update(gameTime);
+            mGui.Update(gameTime);
             //KeyboardState state = Keyboard.GetState();
             //if (state.IsKeyDown(Keys.D))
             //{

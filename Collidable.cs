@@ -49,5 +49,14 @@ namespace Mononoke
             //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.AntiqueWhite, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.None, 0f);
             //spriteBatch.Draw(mSprite, mBody.Position - ( new Vector2(25f,25f) ), null, Color.White, mBody.Rotation, Vector2.Zero, mSize, SpriteEffects.None, 1f);
         }
+        public virtual void Update(GameTime gameTime)  
+        {
+            if (mBody.BodyType != BodyType.Static)
+            {
+                Vector2 frictiveForce = -mBody.LinearVelocity * mBody.Mass * 0.8f; // 8 is gravity * coefficient of frictoin, 10*0.8, in future can split this depending on the sruface.
+                Vector2 airResistance = -mBody.LinearVelocity * mBody.LinearVelocity * 0.03f * mSize.Y;
+                //mBody.ApplyForce(frictiveForce + airResistance);
+            }
+        }
     }
 }   
