@@ -47,7 +47,7 @@ namespace Mononoke
             ////mBody.Rotation -= r * mSteeringPos * 2.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
             //mBody.ApplyTorque(-mSteeringPos * 500f);
             HandleControls();
-            mRotation -= 3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds);
             AddForce(Forward() * mGas * 10000f);
             base.Update(gameTime);
         }

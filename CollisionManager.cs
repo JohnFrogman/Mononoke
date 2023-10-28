@@ -10,14 +10,18 @@ namespace Mononoke
     internal static class CollisionManager
     {
         static List<Collidable> collidableList = new();
-        public static Collidable CollidesWith(Collidable c, Vector2 pos)
+        public static bool Collidies(Collidable c)
         {
             foreach ( Collidable collidable in collidableList)
             {
-                if ( collidable != c && collidable.Intersects(c))
-                    return c;
+                if (collidable != c && collidable.Intersects(c))
+                {
+                    c.OnCollide(collidable);
+                    collidable.OnCollide(c);
+                    return true;
+                }
             }
-            return null;
+            return false;
         }
         public static void CheckCollisions()
         {

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection.PortableExecutable;
+using nkast.Aether.Physics2D.Collision.Shapes;
 
 namespace Mononoke
 {
@@ -27,7 +28,9 @@ namespace Mononoke
         protected Vector2 mVelocity; // units should be metres per second.
 
         Vector2 mCurrentForce;
-        List<Vector2> mVertices;
+        float mNewRotation;
+
+        float mBounce = 0.5f;
         public Collidable(Vector2 pos, bool isStatic, Texture2D sprite, float mass)
         {
             mSprite = sprite;
@@ -44,18 +47,20 @@ namespace Mononoke
             { 
                 mVelocity *= 0.99f;
                 Vector2 newPos = mPosition + PIXELS_PER_METRE * mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (CollisionManager.CollidesWith(this, newPos) == null)
+                if (!CollisionManager.Collidies(this))
                 { 
                     mPosition = newPos;
                     mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
+                    mRotation += mNewRotation;
                 }
                 else
                 {
-                    mVelocity = Vector2.Zero;
+                    //mVelocity = Vector2.Zero;
                 }
 
                 //Friction();
                 //AirResistance();
+                mNewRotation = 0;
                 mCurrentForce = Vector2.Zero;
             }
         }
@@ -91,25 +96,86 @@ namespace Mononoke
             
             //spriteBatch.Draw(mSprite, mBody.Position - ( new Vector2(25f,25f) ), null, Color.White, mBody.Rotation, Vector2.Zero, mSize, SpriteEffects.None, 1f);
         }
+        public List<Vector2> Vertices()
+        {
+            List<Vector2> v = new List<Vector2>() {
+                new Vector2(-mSize.X * 0.5f, -mSize.Y * 0.5f)
+                ,new Vector2(mSize.X * 0.5f, -mSize.Y * 0.5f)
+                ,new Vector2(mSize.X * 0.5f, mSize.Y * 0.5f)
+                ,new Vector2(-mSize.X * 0.5f, mSize.Y * 0.5f)
+            };
+            v[0] = v[0].RotateRadians(mRotation) + mPosition;
+            v[1] = v[1].RotateRadians(mRotation) + mPosition;
+            v[2] = v[2].RotateRadians(mRotation) + mPosition;
+            v[3] = v[3].RotateRadians(mRotation) + mPosition;
+            return v;
+        }
         public bool Intersects(Collidable other)
         {
-            Rectangle r1 = new Rectangle((mPosition - (mSize * 0.5f) ).ToPoint(), mSize.ToPoint());
-            Rectangle r2 = new Rectangle((other.mPosition - (other.mSize * 0.5f)).ToPoint(), other.mSize.ToPoint());
-            return r1.Intersects(r2);
+            List<Vector2> v1 = Vertices();
+            List<Vector2> v2 = other.Vertices();
+            // AS it's a rectangle there are only 2 axes in each collidable
+            List<Vector2> axes = new() {
+                (v1[0] - v1[1]).PerpendicularClockwise()
+            ,   (v1[1] - v1[2]).PerpendicularClockwise()
+            //,   (v1[2] - v1[3]).PerpendicularClockwise()
+            //,   (v1[3] - v1[0]).PerpendicularClockwise()
+
+            ,   (v2[0] - v2[1]).PerpendicularClockwise()
+            ,   (v2[1] - v2[2]).PerpendicularClockwise()
+            //,   (v2[2] - v2[3]).PerpendicularClockwise()
+            //,   (v2[3] - v2[0]).PerpendicularClockwise()
+            };
+            foreach (Vector2 axis in axes)
+            {
+                float minV1 = Vector2.Dot(axis, v1[0]);
+                float maxV1 = minV1;
+                float minV2 = Vector2.Dot(axis, v2[0]);
+                float maxV2 = minV2;
+                for (int i = 0; i < 4; ++i)
+                {
+                    float p = Vector2.Dot(v1[i], axis);
+                    if (p < minV1)
+                    {
+                        minV1 = p;
+                    }
+                    else if (p > maxV1)
+                    {
+                        maxV1 = p;
+                    }
+
+                    p = Vector2.Dot(v2[i], axis);
+                    if (p < minV2)
+                    {
+                        minV2 = p;
+                    }
+                    else if (p > maxV2)
+                    {
+                        maxV2 = p;
+                    }
+                }
+                if (maxV1 < minV2 || maxV2 < minV1)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         public virtual void OnCollide(Collidable other)
         {
+            // If it's not static push the collider away/out of the other one
             if (!mStatic)
             {
                 Vector2 dir = mPosition - other.mPosition;
                 dir.Normalize();
+                mPosition += dir;
+                mVelocity = -mVelocity * mBounce;
                 //AddForce( dir * mMass );
             }
-            //mVelocity = -mVelocity;
-            
-            int i;
-            i = 0;
-            ++ i;
+        }
+        protected void Rotate(float rotation)
+        {
+            mNewRotation = rotation;
         }
         //public virtual void Update(GameTime gameTime)  
         //{

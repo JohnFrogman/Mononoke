@@ -60,5 +60,13 @@ namespace Mononoke
             Matrix m = Matrix.CreateRotationZ((float)(Math.PI / 180f) * angle);
             return Vector2.Transform(v, m);
         }
+        public static Vector2 PerpendicularClockwise(this Vector2 v)
+        {
+            return new Vector2(v.Y, -v.X);
+        }
+        public static Vector2 PerpendicularAnticlockwise(this Vector2 v)
+        {
+            return new Vector2(-v.Y, v.X);
+        }
     }
 }
