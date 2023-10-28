@@ -28,35 +28,32 @@ namespace Mononoke
 
         Interactable doors;
         public Car(World world, Vector2 pos, Texture2D sprite, Overworld overworld)
-            : base(world, pos, BodyType.Dynamic, sprite )
+            : base(pos, false, sprite, 700)
         {
-            mBody.AngularDamping = 0.01f;
-            mBody.LinearDamping = 0f;
-        //    mWheelBase = mSize.Y / 2f;
-            Vector2 size = new Vector2(90f, 30f);
-            Vector2 offset = new Vector2(-45f, -15f);//new Vector2(20f, );
-            doors = new Interactable(size, offset, overworld, () => { overworld.EnterCar(this);}, mBody);
-
+            //doors = new Interactable(size, offset, overworld, () => { overworld.EnterCar(this);}, mBody);
         }
 
         public override void Update(GameTime gameTime)
         {
-            Vector2 forwardVelocity = mBody.GetWorldVector(Vector2.UnitY) * ( Vector2.Dot(mBody.GetWorldVector(Vector2.UnitY), mBody.LinearVelocity));
-            Vector2 rightVelocity = mBody.GetWorldVector(Vector2.UnitX) * (Vector2.Dot(mBody.GetWorldVector(Vector2.UnitX), mBody.LinearVelocity));
+            //Vector2 forwardVelocity = mBody.GetWorldVector(Vector2.UnitY) * ( Vector2.Dot(mBody.GetWorldVector(Vector2.UnitY), mBody.LinearVelocity));
+            //Vector2 rightVelocity = mBody.GetWorldVector(Vector2.UnitX) * (Vector2.Dot(mBody.GetWorldVector(Vector2.UnitX), mBody.LinearVelocity));
 
-            mBody.LinearVelocity = forwardVelocity + 0.95f * rightVelocity;
-
-            mBody.LinearVelocity += 300000f * (float)gameTime.ElapsedGameTime.TotalSeconds * mGas * mBody.GetWorldVector(Vector2.UnitY);
-            //mBody.ApplyForce(mBody.GetWorldVector(Vector2.UnitY) * 100000000000f);
-            float r = Math.Clamp((float)(mBody.LinearVelocity.Magnitude() / 8f), 0f, 1f );
+            ////mBody.LinearVelocity = forwardVelocity + 0.95f * rightVelocity;
             
-            mBody.Rotation -= r * mSteeringPos * 2.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //mBody.ApplyTorque(-mSteeringPos * 500000f);
-            //base.Update(gameTime);
+            ////mBody.LinearVelocity += 300000f * (float)gameTime.ElapsedGameTime.TotalSeconds * mGas * mBody.GetWorldVector(Vector2.UnitY);
+            //mBody.ApplyForce(mBody.GetWorldVector(Vector2.UnitY) * 9999999999f * mGas);
+            ////float r = Math.Clamp((float)(mBody.LinearVelocity.Magnitude() / 8f), 0f, 1f );
+            
+            ////mBody.Rotation -= r * mSteeringPos * 2.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //mBody.ApplyTorque(-mSteeringPos * 500f);
+            HandleControls();
+            mRotation -= 3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            AddForce(Forward() * mGas * 10000f);
+            base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch) 
         {
-            doors.Draw(spriteBatch);
+         //   doors.Draw(spriteBatch);
             base.Draw(spriteBatch);
         }
         public void SetGas(float gas)
@@ -88,8 +85,41 @@ namespace Mononoke
         }
         public float Speed()
         {
-            return mBody.LinearVelocity.Magnitude();
+            return mVelocity.Magnitude();
         }
+        void HandleControls()
+        {
+            KeyboardState state = Keyboard.GetState();
+            if (state.IsKeyDown(Keys.D))
+            {
+                SetSteer(-1.0f);
+            }
+            else if (state.IsKeyDown(Keys.A))
+            {
+                SetSteer(1.0f);
+            }
+            else
+            {
+                SetSteer(0.0f);
+            }
 
+            if (state.IsKeyDown(Keys.W))
+            {
+                SetGas(1.0f);
+            }
+            else
+            {
+                SetGas(0f);
+            }
+
+            if (state.IsKeyDown(Keys.S))
+            {
+                SetBrake(1.0f);
+            }
+            else
+            {
+                SetBrake(0f);
+            }
+        }
     }
 }

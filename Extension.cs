@@ -50,5 +50,15 @@ namespace Mononoke
         {
             return (float)Math.Sqrt( v.X * v.X + v.Y * v.Y);
         }
+        public static Vector2 RotateRadians(this Vector2 v, float angle)
+        {
+            Matrix m = Matrix.CreateRotationZ(angle);
+            return Vector2.Transform(v, m);
+        }
+        public static Vector2 RotateDegrees(this Vector2 v, float angle)
+        {
+            Matrix m = Matrix.CreateRotationZ((float)(Math.PI / 180f) * angle);
+            return Vector2.Transform(v, m);
+        }
     }
 }

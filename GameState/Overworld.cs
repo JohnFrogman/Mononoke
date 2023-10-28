@@ -11,6 +11,7 @@ using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.Xna.Framework.Input;
 using nkast.Aether.Physics2D.Common;
 using Microsoft.Xna.Framework.Media;
+using nkast.Aether.Physics2D.Controllers;
 
 namespace Mononoke
 {
@@ -27,7 +28,7 @@ namespace Mononoke
         private List<Interactable> mInteractables = new();
         private List<Interactable> mActiveInteractables = new();
         private Car mCar;
-
+        VelocityLimitController velocityLimitController;
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
@@ -35,11 +36,14 @@ namespace Mononoke
             mGraphics = _graphics;
             mController = new OverworldController(this, camera, _graphics, game);
             mWorld.Gravity = Vector2.Zero;
-            mPlayer = new Player(mWorld, new Vector2(30,30), this, mCamera);
+            velocityLimitController = new VelocityLimitController(float.MaxValue, float.MaxValue);
+            mWorld.Add(velocityLimitController);
             mCar = new Car(mWorld, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car_big"), this);
+            //mPlayer = new Player(mWorld, new Vector2(30,30), this, mCamera);
             mGui = new GUI(desktop, mCar);
-            mPlayer.EnterCar(mCar);
-            mCollidables.Add(new Collidable(mWorld, new Vector2(500, 400), BodyType.Static, TextureAssetManager.GetPlayerSprite()));
+            //mPlayer.EnterCar(mCar);
+
+            mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100));
         }      
         public void RegisterInteractable(Interactable i)
         { 
@@ -52,7 +56,7 @@ namespace Mononoke
                 collidable.Draw(_spriteBatch);
             }
             mCar.Draw(_spriteBatch);
-            mPlayer.Draw(_spriteBatch);
+            //mPlayer.Draw(_spriteBatch);
 
             //mController.Draw(_spriteBatch);
             //mController.DrawCursor(_spriteBatch);
@@ -87,9 +91,10 @@ namespace Mononoke
                     mActiveInteractables.Remove(i); 
                 }
             }
-            mPlayer.Update(gameTime);
+           // mPlayer.Update(gameTime);
             mCar.Update(gameTime);
             mGui.Update(gameTime);
+            mCamera.Position = -mCar.mPosition + new Vector2(960, 540);
             //KeyboardState state = Keyboard.GetState();
             //if (state.IsKeyDown(Keys.D))
             //{
@@ -124,8 +129,9 @@ namespace Mononoke
             //    mCar.Update(gameTime);
 
             float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            CollisionManager.CheckCollisions();
             //We update the world
-            mWorld.Step(totalSeconds);
+            //mWorld.Step(totalSeconds);
         }
 
         // Need to save out units, maps, Actors, Provinces and the player

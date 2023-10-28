@@ -19,38 +19,36 @@ namespace Mononoke
         Car mCar;
         Camera2D mCamera;
         public Player(World world, Vector2 pos, Overworld overworld, Camera2D camera) 
-            : base( world, pos, BodyType.Kinematic, TextureAssetManager.GetPlayerSprite() )
+            : base( pos, false,TextureAssetManager.GetPlayerSprite(), 1 )
         {
             mCamera = camera;
             mOverworld = overworld;
         }
         public Rectangle Rectangle()
         {
-            return new Rectangle((mBody.Position - mSize/2f).ToPoint(), mSize.ToPoint());
+            return new Rectangle((mPosition - mSize/2f).ToPoint(), mSize.ToPoint());
         }
         public void EnterCar(Car car)
         {
             mCar = car;
-            foreach (Fixture f in mBody.FixtureList)
-                f.CollidesWith = Category.None;
+            //foreach (Fixture f in mBody.FixtureList)
+              //  f.CollidesWith = Category.None;
         }
         public void Update(GameTime gameTime)
         {
-            mCamera.Position = -mBody.Position + new Vector2(960, 540);
+            mCamera.Position = -mPosition + new Vector2(960, 540);
             KeyboardState state = Keyboard.GetState();
             // We make it possible to rotate the player body
             if ( mCar == null)
             {
-                HandleWalkInput(state);
+                //HandleWalkInput(state);
             }
             else
             {
-                mBody.Position = mCar.Position();
+               //mPosition = mCar.Position;
                 if (state.IsKeyDown(Keys.E))
                 {
                     mCar = null;
-                    foreach (Fixture f in mBody.FixtureList)
-                        f.CollidesWith = Category.All;
                     return;
                 }
                 if (state.IsKeyDown(Keys.D))
@@ -85,13 +83,13 @@ namespace Mononoke
                 }
             }
         }
-        public override void Draw(SpriteBatch spriteBatch)
-        { 
-            if ( mCar == null )
-                spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.None, 0f);
-            
-            //base.Draw(spriteBatch);
-        }
+        //public override void Draw(SpriteBatch spriteBatch)
+        //{
+        //    if (mCar == null)
+        //        spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.None, 0f);
+
+        //    base.Draw(spriteBatch);
+        //}
         void HandleWalkInput(KeyboardState state)
         {
             Vector2 resultantVelocity = Vector2.Zero;
@@ -115,7 +113,7 @@ namespace Mononoke
             {
                 mOverworld.TryInteract();
             }
-            mBody.LinearVelocity = resultantVelocity * 100f;
+            //mBody.LinearVelocity = resultantVelocity * 100f;
         }
         void Interact()
         { 

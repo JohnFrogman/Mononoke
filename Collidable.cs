@@ -13,50 +13,112 @@ namespace Mononoke
     internal class Collidable
     {
         protected Texture2D mSprite;
-        protected Body mBody;
         protected Vector2 mSize;
-        protected Vector2 mTextureOrigin;
-        protected Vector2 mTextureSize;
 
         Texture2D mColliderSprite;
-        Vector2 mColliderTextureOrigin;
-        Vector2 mColliderTextureSize;
 
-        public Collidable(World world, Vector2 pos, BodyType type, Texture2D sprite )
+        public Vector2 mPosition;
+        protected float mRotation;
+        protected bool mStatic;
+        Collidable Parent;
+
+        protected float mMass;
+        public const int PIXELS_PER_METRE = 26;
+        protected Vector2 mVelocity; // units should be metres per second.
+
+        Vector2 mCurrentForce;
+        List<Vector2> mVertices;
+        public Collidable(Vector2 pos, bool isStatic, Texture2D sprite, float mass)
         {
             mSprite = sprite;
-            mTextureSize = new Vector2(mSprite.Width, mSprite.Height);
-            mSize = mTextureSize;
-            mTextureOrigin = mTextureSize / 2f;
-
+            mStatic = isStatic;
+            mSize = new Vector2(mSprite.Width, mSprite.Height);
             mColliderSprite = TextureAssetManager.GetSimpleSquare();
-            mColliderTextureSize = new Vector2(mColliderSprite.Width, mColliderSprite.Height);
-            mColliderTextureOrigin = mColliderTextureSize / 2f;
-
-            mBody = world.CreateBody(pos, 0, type);
-
-            Fixture pfixture = mBody.CreateRectangle(mSize.X, mSize.Y, 0.1f, Vector2.Zero);
-            pfixture.Restitution = 0.3f;
-            pfixture.Friction = 0.5f;
+            mMass = mass;
+            mPosition = pos;
+            CollisionManager.RegisterCollidable(this);
         }
-        public Vector2 Position()
+        public virtual void Update(GameTime gameTime)
         {
-            return mBody.Position;
+            if (!mStatic)
+            { 
+                mVelocity *= 0.99f;
+                Vector2 newPos = mPosition + PIXELS_PER_METRE * mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (CollisionManager.CollidesWith(this, newPos) == null)
+                { 
+                    mPosition = newPos;
+                    mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
+                }
+                else
+                {
+                    mVelocity = Vector2.Zero;
+                }
+
+                //Friction();
+                //AirResistance();
+                mCurrentForce = Vector2.Zero;
+            }
+        }
+        public Vector2 Forward()
+        {
+            return -Vector2.UnitY.RotateRadians(mRotation);
+        }
+        public void AddForce(Vector2 force)
+        {
+            mCurrentForce += force;
+            // f/m = a;
+        }
+        void AirResistance()
+        { 
+            // F = Coefficient * v * v * A
+            AddForce(-mVelocity * mVelocity * 0.3f);// not including area for now.
+        }
+
+        void Friction()
+        { 
+            // F = coefficient * weight
+            //if ( mVelocity.Magnitude() > 0 )
+            //{
+                AddForce( -Forward() * mMass * 8f );
+            //}
+           
         }
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(mSprite, mBody.Position, null, Color.White, mBody.Rotation, mTextureOrigin, mSize / mTextureSize, SpriteEffects.FlipVertically, 0f);
-            //spriteBatch.Draw(mColliderSprite, mBody.Position, null, Color.AntiqueWhite, mBody.Rotation, mColliderTextureOrigin, mSize / mColliderTextureSize, SpriteEffects.None, 0f);
+            spriteBatch.Draw(mColliderSprite, mPosition, null, Color.AntiqueWhite, mRotation, /*mSize*0.5f*/new Vector2(0.5f,0.5f), mSize, SpriteEffects.None, 0f);
+            spriteBatch.Draw(mSprite, mPosition, null, Color.White, mRotation, mSize*0.5f, 1f, SpriteEffects.None, 0f);
+          // spriteBatch.Draw(mSprite, new Rectangle(mPosition.ToPoint(), mSize.ToPoint()), null, Color.White, mRotation, Vector2.Zero, SpriteEffects.None, 0f);
+            
             //spriteBatch.Draw(mSprite, mBody.Position - ( new Vector2(25f,25f) ), null, Color.White, mBody.Rotation, Vector2.Zero, mSize, SpriteEffects.None, 1f);
         }
-        public virtual void Update(GameTime gameTime)  
+        public bool Intersects(Collidable other)
         {
-            if (mBody.BodyType != BodyType.Static)
-            {
-                Vector2 frictiveForce = -mBody.LinearVelocity * mBody.Mass * 0.8f; // 8 is gravity * coefficient of frictoin, 10*0.8, in future can split this depending on the sruface.
-                Vector2 airResistance = -mBody.LinearVelocity * mBody.LinearVelocity * 0.03f * mSize.Y;
-                //mBody.ApplyForce(frictiveForce + airResistance);
-            }
+            Rectangle r1 = new Rectangle((mPosition - (mSize * 0.5f) ).ToPoint(), mSize.ToPoint());
+            Rectangle r2 = new Rectangle((other.mPosition - (other.mSize * 0.5f)).ToPoint(), other.mSize.ToPoint());
+            return r1.Intersects(r2);
         }
+        public virtual void OnCollide(Collidable other)
+        {
+            if (!mStatic)
+            {
+                Vector2 dir = mPosition - other.mPosition;
+                dir.Normalize();
+                //AddForce( dir * mMass );
+            }
+            //mVelocity = -mVelocity;
+            
+            int i;
+            i = 0;
+            ++ i;
+        }
+        //public virtual void Update(GameTime gameTime)  
+        //{
+        //    if (mBody.BodyType != BodyType.Static)
+        //    {
+        //        Vector2 frictiveForce = -mBody.LinearVelocity * mBody.Mass * 0.8f; // 8 is gravity * coefficient of frictoin, 10*0.8, in future can split this depending on the sruface.
+        //        Vector2 airResistance = -mBody.LinearVelocity * mBody.LinearVelocity * 0.03f * mSize.Y;
+        //        //mBody.ApplyForce(frictiveForce + airResistance);
+        //    }
+        //}
     }
-}   
+}
