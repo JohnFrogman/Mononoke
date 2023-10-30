@@ -8,6 +8,8 @@ using System.IO;
 using Myra.Graphics2D.UI;
 using Myra.Graphics2D.Brushes;
 using Myra.Graphics2D.TextureAtlases;
+using Myra.Graphics2D;
+
 namespace Mononoke
 {
     struct GUIData { 
@@ -23,6 +25,7 @@ namespace Mononoke
         Label mTimeLabel;
         Car mCar;
         Label mSpeedLabel;
+        Grid mInventoryGrid;
         Vector2 spacing = new Vector2(60, 0);
         public GUI(Desktop desktop, Car car)
         {
@@ -48,9 +51,13 @@ namespace Mononoke
             mainPanel.AddChild(headerPanel);
 
 
-
-
-
+            mInventoryGrid = new Grid();
+            mInventoryGrid.Padding = new Thickness(5);
+            mInventoryGrid.Background = new SolidBrush(Color.Black);
+            mInventoryGrid.Width = 500;
+            mInventoryGrid.Height = 500;
+            mInventoryGrid.Visible = false;
+            mainPanel.AddChild(mInventoryGrid);
                 //Image icon = new Image();
                 //icon.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
                 //icon.HorizontalAlignment = HorizontalAlignment.Left;
@@ -83,6 +90,28 @@ namespace Mononoke
         public void Update(GameTime gameTime)
         {
             mSpeedLabel.Text = mCar.Speed() + " m/s";
+        }
+        public void ShowInventory(Inventory inv)
+        { 
+            mInventoryGrid.Enabled = true;
+            for (int i = 0; i < mInventoryGrid.Width; i++)
+            {
+                for (int j = 0; j < mInventoryGrid.Height; j++)
+                {
+                    Panel inventoryBackground = new Panel();
+                    aV.Background = new SolidBrush(Color.Gray);
+                    aV.Width = 150;
+                    aV.Height = 50;
+                    Image portrait = new Image();
+                    portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
+                    portrait.HorizontalAlignment = HorizontalAlignment.Left;
+                    portrait.VerticalAlignment = VerticalAlignment.Center;
+                    portrait.PaddingLeft = 6;
+                    Image img = new Image();
+                    img.
+                    mInventoryGrid.AddChild()
+                }
+            }
         }
     }
 }

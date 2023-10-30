@@ -8,5 +8,10 @@ namespace Mononoke
 {
     internal class Inventory
     {
+        public InventoryItem[,] ItemMap; 
+        public Inventory(int width, int height) 
+        {
+            ItemMap = new InventoryItem[width, height];
+        }
     }
 }

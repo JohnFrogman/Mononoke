@@ -58,6 +58,7 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
+            mGui.ShowInventory(car.Boot);
             //mPlayer.EnterCar(car);
         }
         void IGameState.Update(GameTime gameTime)
