@@ -1,14 +1,6 @@
-﻿using info.lundin.math;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input; 
-using nkast.Aether.Physics2D;
-using nkast.Aether.Physics2D.Collision.Shapes;
-using nkast.Aether.Physics2D.Common;
-using nkast.Aether.Physics2D.Dynamics;
-using System;
-using System.Collections.Generic;
-using System.Text.Unicode;
 
 namespace Mononoke
 {
@@ -26,34 +18,34 @@ namespace Mononoke
         float mGas = 0f;
         float mBrake = 0f;
 
-        Interactable doors;
-        public Car(World world, Vector2 pos, Texture2D sprite, Overworld overworld)
-            : base(pos, false, sprite, 700)
-        {
-            //doors = new Interactable(size, offset, overworld, () => { overworld.EnterCar(this);}, mBody);
-        }
+        Collidable mDoors;
+        Collidable mBootInteractionArea;
 
+        Inventory mBoot;
+        public Car(Overworld ow, Vector2 pos, Texture2D sprite, Overworld overworld)
+            : base(pos, false, sprite, 700, Vector2.Zero)
+        {
+            mStatic = true;
+            mDoors = new Collidable( Vector2.UnitY * sprite.Height * -0.15f, true, null, 1, new Vector2(100f,30f),true, () => { overworld.EnterCar(this);}, this);
+            mBootInteractionArea = new Collidable( Vector2.UnitY * sprite.Height * 0.3f, true, null, 1, new Vector2(80f, sprite.Height * 0.5f), true, () => { overworld.OpenBoot(this); }, this);
+        }
+        public Vector2 ExitPos()
+        {
+            return mPosition + new Vector2(50f, mSprite.Height * -0.15f).RotateRadians(mRotation);
+        }
         public override void Update(GameTime gameTime)
         {
-            //Vector2 forwardVelocity = mBody.GetWorldVector(Vector2.UnitY) * ( Vector2.Dot(mBody.GetWorldVector(Vector2.UnitY), mBody.LinearVelocity));
-            //Vector2 rightVelocity = mBody.GetWorldVector(Vector2.UnitX) * (Vector2.Dot(mBody.GetWorldVector(Vector2.UnitX), mBody.LinearVelocity));
-
-            ////mBody.LinearVelocity = forwardVelocity + 0.95f * rightVelocity;
-            
-            ////mBody.LinearVelocity += 300000f * (float)gameTime.ElapsedGameTime.TotalSeconds * mGas * mBody.GetWorldVector(Vector2.UnitY);
-            //mBody.ApplyForce(mBody.GetWorldVector(Vector2.UnitY) * 9999999999f * mGas);
-            ////float r = Math.Clamp((float)(mBody.LinearVelocity.Magnitude() / 8f), 0f, 1f );
-            
-            ////mBody.Rotation -= r * mSteeringPos * 2.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //mBody.ApplyTorque(-mSteeringPos * 500f);
-            HandleControls();
+            mDoors.Update(gameTime);
+            mBootInteractionArea.Update(gameTime);
             Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds);
             AddForce(Forward() * mGas * 10000f);
+            //HandleControls();
             base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch) 
         {
-         //   doors.Draw(spriteBatch);
+            mDoors.Draw(spriteBatch);
+            mBootInteractionArea.Draw(spriteBatch);
             base.Draw(spriteBatch);
         }
         public void SetGas(float gas)

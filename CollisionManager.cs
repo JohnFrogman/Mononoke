@@ -12,16 +12,22 @@ namespace Mononoke
         static List<Collidable> collidableList = new();
         public static bool Collidies(Collidable c)
         {
+            bool ret = false;
             foreach ( Collidable collidable in collidableList)
             {
+                if (!collidable.Active)
+                    continue;
                 if (collidable != c && collidable.Intersects(c))
                 {
                     c.OnCollide(collidable);
                     collidable.OnCollide(c);
-                    return true;
+                    if (!collidable.IsTrigger)
+                    {
+                        ret = true;
+                    }
                 }
             }
-            return false;
+            return ret;
         }
         public static void CheckCollisions()
         {

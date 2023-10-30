@@ -17,6 +17,7 @@ namespace Mononoke
     {
         private static TextureHolder Icons;
         private static TextureHolder mCarSprites;
+        private static TextureHolder mTerrain;
         private static Texture2D simpleSpuare;
         private static MouseCursorHolder Cursors;
         public static Texture2D GetCursor( eMouseCursorType type )
@@ -57,6 +58,7 @@ namespace Mononoke
 
             Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
             mCarSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
+            mTerrain = new TextureHolder(graphics, "data/textures/terrain/", brokenTexture);
         }
         public static Texture2D GetIconByName( string str )
         { 
@@ -73,6 +75,10 @@ namespace Mononoke
         public static Texture2D GetPlayerSprite()
         { 
             return mCarSprites.GetTextureByName("soldier");
+        }
+        public static Texture2D GetTerrainTileByName(string str)
+        {
+            return mTerrain.GetTextureByName(str);
         }
         static void SetSimpleSquare( GraphicsDeviceManager graphics )
         {
