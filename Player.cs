@@ -16,8 +16,9 @@ namespace Mononoke
         Car mCar;
         Camera2D mCamera;
         KeyboardState mPreviousKeyboardState;
-        Interaction mActiveInteraction;
+        public Interaction mActiveInteraction;
         Collidable mCameraFocus;
+        public bool Enabled = true; // disabled means can only do interaction input which will reenable the player
         public Player(Vector2 pos, Overworld overworld, Camera2D camera) 
             : base( pos, false,TextureAssetManager.GetPlayerSprite(), 1, Vector2.Zero )
         {
@@ -53,52 +54,62 @@ namespace Mononoke
         {
             mCamera.Position = -mCameraFocus.mPosition + new Vector2(960, 540);
             KeyboardState state = Keyboard.GetState();
-            // We make it possible to rotate the player body
-            if ( mCar == null)
+            if (state.IsKeyUp(Keys.E) && mPreviousKeyboardState.IsKeyDown(Keys.E))
             {
-                HandleWalkInput(state);
+                if (mActiveInteraction != null)
+                {
+                    mActiveInteraction();
+                }
             }
-            else
-            {
-               //mPosition = mCar.Position;
-                if (state.IsKeyDown(Keys.E))
+            // We make it possible to rotate the player body
+            if (Enabled)
+            { 
+                if ( mCar == null)
                 {
-                    mCar = null;
-                    return;
-                }
-                if (state.IsKeyDown(Keys.D))
-                {
-                    mCar.SetSteer(-1.0f);
-                }
-                else if (state.IsKeyDown(Keys.A))
-                {
-                    mCar.SetSteer(1.0f);
+                    HandleWalkInput(state);
                 }
                 else
                 {
-                    mCar.SetSteer(0.0f);
-                }
+                   //mPosition = mCar.Position;
+                    if (state.IsKeyDown(Keys.E))
+                    {
+                        mCar = null;
+                        return;
+                    }
+                    if (state.IsKeyDown(Keys.D))
+                    {
+                        mCar.SetSteer(-1.0f);
+                    }
+                    else if (state.IsKeyDown(Keys.A))
+                    {
+                        mCar.SetSteer(1.0f);
+                    }
+                    else
+                    {
+                        mCar.SetSteer(0.0f);
+                    }
 
-                if (state.IsKeyDown(Keys.W))
-                {
-                    mCar.SetGas(1.0f);
-                }
-                else
-                {
-                    mCar.SetGas(0f);
-                }
+                    if (state.IsKeyDown(Keys.W))
+                    {
+                        mCar.SetGas(1.0f);
+                    }
+                    else
+                    {
+                        mCar.SetGas(0f);
+                    }
 
-                if (state.IsKeyDown(Keys.S))
-                {
-                    mCar.SetBrake(1.0f);
+                    if (state.IsKeyDown(Keys.S))
+                    {
+                        mCar.SetBrake(1.0f);
+                    }
+                    else
+                    {
+                        mCar.SetBrake(0f);
+                    }
                 }
-                else
-                {
-                    mCar.SetBrake(0f);
-                }
+                base.Update(gameTime);
             }
             mPreviousKeyboardState = state;
-            base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -125,13 +136,7 @@ namespace Mononoke
             {
                 resultantVelocity += new Vector2(0, 1);
             }
-            if (state.IsKeyUp(Keys.E) && mPreviousKeyboardState.IsKeyDown(Keys.E))
-            {
-                if (mActiveInteraction != null)
-                {
-                    mActiveInteraction();
-                }
-            }
+            
             //AddFdorce(resultantVelocity);
             //mVelocity += resultantVelocity * 3f;
             mVelocity = resultantVelocity * 3f ;

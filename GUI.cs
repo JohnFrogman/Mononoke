@@ -51,11 +51,18 @@ namespace Mononoke
             mainPanel.AddChild(headerPanel);
 
 
-            mInventoryGrid = new Grid();
+            //mInventoryGrid = new Grid();
+            mInventoryGrid = new Grid
+            {
+                ShowGridLines = true,
+                ColumnSpacing = 150,
+                RowSpacing = 150,
+            };
             mInventoryGrid.Padding = new Thickness(5);
             mInventoryGrid.Background = new SolidBrush(Color.Black);
             mInventoryGrid.Width = 500;
             mInventoryGrid.Height = 500;
+            mInventoryGrid.Enabled = false;
             mInventoryGrid.Visible = false;
             mainPanel.AddChild(mInventoryGrid);
                 //Image icon = new Image();
@@ -94,24 +101,34 @@ namespace Mononoke
         public void ShowInventory(Inventory inv)
         { 
             mInventoryGrid.Enabled = true;
-            for (int i = 0; i < mInventoryGrid.Width; i++)
+            mInventoryGrid.Visible = true;
+            for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
             {
-                for (int j = 0; j < mInventoryGrid.Height; j++)
+                for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
                 {
-                    Panel inventoryBackground = new Panel();
-                    aV.Background = new SolidBrush(Color.Gray);
-                    aV.Width = 150;
-                    aV.Height = 50;
-                    Image portrait = new Image();
-                    portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-                    portrait.HorizontalAlignment = HorizontalAlignment.Left;
-                    portrait.VerticalAlignment = VerticalAlignment.Center;
-                    portrait.PaddingLeft = 6;
-                    Image img = new Image();
-                    img.
-                    mInventoryGrid.AddChild()
+                    Panel itemSlot = new Panel();
+                    itemSlot.Background = new SolidBrush(Color.Gray);
+                    itemSlot.Width = 80;
+                    itemSlot.Height = 80;
+                    //mInventoryGrid.GridRow = j;
+                    //mInventoryGrid.GridColumn = i;
+                    itemSlot.GridColumn = i;
+                    itemSlot.GridRow = j;
+
+                    //Image portrait = new Image();
+                    //portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
+                    //portrait.HorizontalAlignment = HorizontalAlignment.Left;
+                    //portrait.VerticalAlignment = VerticalAlignment.Center;
+                    //portrait.PaddingLeft = 6;
+                    mInventoryGrid.Widgets.Add(itemSlot);
                 }
             }
+        }
+        public void HideInventory()
+        {
+            mInventoryGrid.Enabled = false;
+            mInventoryGrid.Visible = false;
+            mInventoryGrid.Widgets.Clear();
         }
     }
 }

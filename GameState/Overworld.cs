@@ -15,30 +15,20 @@ namespace Mononoke
     class Overworld : IGameState
     {
         private string mSaveSlotName = "";
-        private OverworldController mController;
         private GUI mGui;
         private Camera2D mCamera;
-        private GraphicsDeviceManager mGraphics;
         private Player mPlayer;
-        private List<Collidable> mCollidables = new();
         private Car mCar;
         private TerrainManager mTerrainManager;
-        List<Collidable> Triggers = new();
         public Overworld(Camera2D camera, GraphicsDeviceManager _graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
             mCamera = camera;
-            mGraphics = _graphics;
-            mController = new OverworldController(this, camera, _graphics, game);
             mCar = new Car(this, new Vector2(150f, 150f), TextureAssetManager.GetCarSpriteByName("car_big"), this);
             mPlayer = new Player(new Vector2(300f,300f), this, mCamera);
             mGui = new GUI(desktop, mCar);
             mTerrainManager = new TerrainManager(mCamera);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
-        }      
-        public void RegisterInteractable(Collidable i)
-        { 
-            //mInteractables.Add(i);
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
         {
@@ -58,8 +48,14 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
-            mGui.ShowInventory(car.Boot);
-            //mPlayer.EnterCar(car);
+            mGui.ShowInventory(car.mBoot);
+            mPlayer.mActiveInteraction = () => { CloseBoot(); };
+            mPlayer.Enabled = false;
+        }
+        public void CloseBoot()
+        { 
+            mGui.HideInventory();
+            mPlayer.Enabled = true;
         }
         void IGameState.Update(GameTime gameTime)
         {

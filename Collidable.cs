@@ -24,7 +24,7 @@ namespace Mononoke
         protected Vector2 mVelocity; // units should be metres per second.
         protected float mAngularVelocity; // Radians per second
 
-        Vector2 mCurrentForce;
+        protected Vector2 mCurrentForce;
         float mNewRotation;
 
         float mBounce = 0.5f;

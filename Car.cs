@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input; 
+using System;
 
 namespace Mononoke
 {
@@ -17,17 +18,19 @@ namespace Mononoke
         float mSteeringPos = 0f;
         float mGas = 0f;
         float mBrake = 0f;
+        int mWheelBase = 45;
 
         Collidable mDoors;
         Collidable mBootInteractionArea;
 
-        Inventory mBoot;
+        public Inventory mBoot;
         public Car(Overworld ow, Vector2 pos, Texture2D sprite, Overworld overworld)
             : base(pos, false, sprite, 700, Vector2.Zero)
         {
             mStatic = true;
             mDoors = new Collidable( Vector2.UnitY * sprite.Height * -0.15f, true, null, 1, new Vector2(100f,30f),true, () => { overworld.EnterCar(this);}, this);
             mBootInteractionArea = new Collidable( Vector2.UnitY * sprite.Height * 0.3f, true, null, 1, new Vector2(80f, sprite.Height * 0.5f), true, () => { overworld.OpenBoot(this); }, this);
+            mBoot = new Inventory(10,10);
         }
         public Vector2 ExitPos()
         {
@@ -37,7 +40,31 @@ namespace Mononoke
         {
             mDoors.Update(gameTime);
             mBootInteractionArea.Update(gameTime);
-            Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            Vector2 frontWheel = mWheelBase * Forward();
+            Vector2 backWheel = -mWheelBase * Forward();
+            backWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * Forward();
+            frontWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * Forward().RotateRadians(mSteeringPos);
+            mRotation = (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
+            backWheel += mPosition;
+            frontWheel += mPosition;
+            mPosition = (frontWheel + backWheel) / 2f;
+
+            CollisionManager.Collidies(this);
+            mVelocity *= mDrag;
+            mCurrentForce = Vector2.Zero;
+
+            //Vector2 rear_wheel = mPosition - mPosition.X * mWheelBase;
+            //Vector2 front_wheel = position + mPosition.X * mWheelBase;
+            //rear_wheel += velocity * delta
+            //front_wheel += velocity.rotated(steer_angle) * delta
+            //var new_heading = (front_wheel - rear_wheel).normalized()
+            //velocity = new_heading * velocity.length()
+            //rotation = new_heading.angle()
+
+            //Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+
             AddForce(Forward() * mGas * 10000f);
             //HandleControls();
             base.Update(gameTime);
