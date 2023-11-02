@@ -18,7 +18,7 @@ namespace Mononoke
         float mSteeringPos = 0f;
         float mGas = 0f;
         float mBrake = 0f;
-        int mWheelBase = 45;
+        int mWheelBase = 5;
 
         Collidable mDoors;
         Collidable mBootInteractionArea;
@@ -40,33 +40,20 @@ namespace Mononoke
         {
             mDoors.Update(gameTime);
             mBootInteractionArea.Update(gameTime);
-
-            Vector2 frontWheel = mWheelBase * Forward();
-            Vector2 backWheel = -mWheelBase * Forward();
-            backWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * Forward();
-            frontWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * Forward().RotateRadians(mSteeringPos);
+            //https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
+            Vector2 frontWheel = mPosition + mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            Vector2 backWheel = mPosition - mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            backWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            frontWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation + mSteeringPos), (float)Math.Sin(mRotation + mSteeringPos));
+            mPosition = (frontWheel + backWheel) / 2;
             mRotation = (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
-            backWheel += mPosition;
-            frontWheel += mPosition;
-            mPosition = (frontWheel + backWheel) / 2f;
 
             CollisionManager.Collidies(this);
             mVelocity *= mDrag;
             mCurrentForce = Vector2.Zero;
 
-            //Vector2 rear_wheel = mPosition - mPosition.X * mWheelBase;
-            //Vector2 front_wheel = position + mPosition.X * mWheelBase;
-            //rear_wheel += velocity * delta
-            //front_wheel += velocity.rotated(steer_angle) * delta
-            //var new_heading = (front_wheel - rear_wheel).normalized()
-            //velocity = new_heading * velocity.length()
-            //rotation = new_heading.angle()
-
-            //Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds);
-
-
-            AddForce(Forward() * mGas * 10000f);
             //HandleControls();
+            AddForce(Forward() * mGas * 10000f);
             base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch) 

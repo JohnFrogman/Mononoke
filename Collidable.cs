@@ -147,6 +147,8 @@ namespace Mononoke
             v[3] = v[3].RotateRadians(mRotation) + mPosition;
             return v;
         }
+        // https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+        // https://dyn4j.org/2010/01/sat/
         public bool Intersects(Collidable other)
         {
             List<Vector2> v1 = Vertices();

@@ -28,6 +28,7 @@ namespace Mononoke
             mPlayer = new Player(new Vector2(300f,300f), this, mCamera);
             mGui = new GUI(desktop, mCar);
             mTerrainManager = new TerrainManager(mCamera);
+            mPlayer.EnterCar(mCar);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
         }
         void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
