@@ -1,0 +1,27 @@
+{ "frames": {
+   "Sprite-0004 0.": {
+    "frame": { "x": 0, "y": 0, "w": 20, "h": 17 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 20, "h": 17 },
+    "sourceSize": { "w": 20, "h": 17 },
+    "duration": 150
+   },
+   "Sprite-0004 1.": {
+    "frame": { "x": 20, "y": 0, "w": 20, "h": 17 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 20, "h": 17 },
+    "sourceSize": { "w": 20, "h": 17 },
+    "duration": 150
+   },
+   "Sprite-0004 2.": {
+    "frame": { "x": 40, "y": 0, "w": 20, "h": 17 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 20, "h": 17 },
+    "sourceSize": { "w": 20, "h": 17 },
+    "duration": 150
+   },
+   "Sprite-0004 3.": {
+    "frame": { "x": 60, "y": 0, "w": 20, "h": 17 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 20, "h": 17 },
+    "sourceSize": { "w": 20, "h": 17 },
+    "duration": 150
+   }
+ }
+ }

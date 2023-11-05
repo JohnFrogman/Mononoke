@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Microsoft.VisualBasic;
+using System;
 
 namespace Mononoke
 {
@@ -14,7 +15,7 @@ namespace Mononoke
         Texture2D mColliderSprite;
 
         public Vector2 mPosition;
-        protected float mRotation;
+        public float mRotation;
         Vector2 mOrigin;
         public bool mStatic;
         Collidable mParent;
@@ -25,7 +26,7 @@ namespace Mononoke
         protected float mAngularVelocity; // Radians per second
 
         protected Vector2 mCurrentForce;
-        float mNewRotation;
+        protected float mNewRotation;
 
         float mBounce = 0.5f;
         public bool Active = true;
@@ -79,6 +80,14 @@ namespace Mononoke
                     mPosition = newPos;
                     mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
                     mRotation += mNewRotation;
+                    if (mRotation > 2f*Math.PI )
+                    {
+                        mRotation -= 2f*(float)Math.PI;
+                    }
+                    if (mRotation <= 2f*(float)Math.PI)
+                    {
+                        mRotation += 2f * (float)Math.PI;
+                    }
                 }
                 else
                 {
@@ -96,6 +105,18 @@ namespace Mononoke
         public Vector2 Forward()
         {
             return -Vector2.UnitY.RotateRadians(mRotation);
+        }
+        public Vector2 Back()
+        {
+            return Vector2.UnitY.RotateRadians(mRotation);
+        }
+        public Vector2 Left()
+        {
+            return Vector2.UnitX.RotateRadians(mRotation);
+        }
+        public Vector2 Right()
+        {
+            return Vector2.UnitX.RotateRadians(mRotation);
         }
         public void AddForce(Vector2 force)
         {

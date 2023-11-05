@@ -18,7 +18,8 @@ namespace Mononoke
         float mSteeringPos = 0f;
         float mGas = 0f;
         float mBrake = 0f;
-        int mWheelBase = 5;
+        int mWheelBase = 45;
+        float mHorizontalDamping = 0.6f;
 
         Collidable mDoors;
         Collidable mBootInteractionArea;
@@ -40,21 +41,34 @@ namespace Mononoke
         {
             mDoors.Update(gameTime);
             mBootInteractionArea.Update(gameTime);
-            //https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
-            Vector2 frontWheel = mPosition + mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            Vector2 backWheel = mPosition - mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            backWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            frontWheel += mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation + mSteeringPos), (float)Math.Sin(mRotation + mSteeringPos));
-            mPosition = (frontWheel + backWheel) / 2;
-            mRotation = (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
-
-            CollisionManager.Collidies(this);
-            mVelocity *= mDrag;
-            mCurrentForce = Vector2.Zero;
-
-            //HandleControls();
+            
+            // We add force to the forward vector, which is considered the forward of the wheels/car, even though this is unrealistic
+            float factor = 1- (float)Math.Pow(Math.E, -0.3*Speed());
+            Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds * factor);
+            // Stepping on the gas
             AddForce(Forward() * mGas * 10000f);
+            // To stop drift we can apply a very strong damping to and horizontal movement, this is kind of realistic,
+            // because in real life wheels only rotate on one axis and any movement orthogonal to that axis going to
+            // experience very high friction, (which if overcome would be a skid). Can add a ceiling to the damping to 
+            // allow drift
+            HorizontalDamping();
+
+            ApplyBrakes(gameTime);
+
+
+            //mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
+            //https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
+            //Vector2 frontWheel = mPosition + mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            //Vector2 backWheel = mPosition - mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            //backWheel += mVelocity * PIXELS_PER_METRE * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
+            //frontWheel += mVelocity * PIXELS_PER_METRE * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation + mSteeringPos), (float)Math.Sin(mRotation + mSteeringPos));
+            //mPosition = (frontWheel + backWheel) / 2;
+            //mRotation = (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
+            //CollisionManager.Collidies(this);
+            //mVelocity *= mDrag;
+
             base.Update(gameTime);
+            //HandleControls();
         }
         public override void Draw(SpriteBatch spriteBatch) 
         {
@@ -93,39 +107,56 @@ namespace Mononoke
         {
             return mVelocity.Magnitude();
         }
-        void HandleControls()
+        void HorizontalDamping()
         {
-            KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Keys.D))
-            {
-                SetSteer(-1.0f);
-            }
-            else if (state.IsKeyDown(Keys.A))
-            {
-                SetSteer(1.0f);
-            }
-            else
-            {
-                SetSteer(0.0f);
-            }
-
-            if (state.IsKeyDown(Keys.W))
-            {
-                SetGas(1.0f);
-            }
-            else
-            {
-                SetGas(0f);
-            }
-
-            if (state.IsKeyDown(Keys.S))
-            {
-                SetBrake(1.0f);
-            }
-            else
-            {
-                SetBrake(0f);
-            }
+            Vector2 fV = Forward() * Vector2.Dot(Forward(), mVelocity);
+            Vector2 rV = Right() * Vector2.Dot(Right(), mVelocity);
+            mVelocity = fV + rV * mHorizontalDamping; 
         }
+        void ApplyBrakes(GameTime gameTime )
+        {
+            Vector2 brakingDeceleration = (float)gameTime.ElapsedGameTime.TotalSeconds * Back() * mBrake * 10f; // Friction from the brake is roughly Brake Pedal Pos * Mass * Gravity, so just don't include mass term to get deceleration from A = f/m
+            Vector2 fV = Forward() * Vector2.Dot(Forward(), mVelocity);
+            Vector2 rV = Right() * Vector2.Dot(Right(), mVelocity);
+            if (brakingDeceleration.Magnitude() > fV.Magnitude())
+                mVelocity = rV;
+            else
+                mVelocity += brakingDeceleration;
+        }
+        //void HandleControls()
+        //{
+        //    KeyboardState state = Keyboard.GetState();
+        //    if (state.IsKeyDown(Keys.D))
+        //    {
+        //        SetSteer(-1.0f);
+        //    }
+        //    else if (state.IsKeyDown(Keys.A))
+        //    {
+        //        SetSteer(1.0f);
+        //    }
+        //    else
+        //    {
+        //        SetSteer(0.0f);
+        //    }
+
+        //    if (state.IsKeyDown(Keys.W))
+        //    {
+        //        SetGas(1.0f);
+        //    }
+        //    else
+        //    {
+        //        SetGas(0f);
+        //    }
+
+        //    if (state.IsKeyDown(Keys.S))
+        //    {
+        //        SetBrake(1.0f);
+        //    }
+        //    else
+        //    {
+        //        SetBrake(0f);
+        //    }
+        //}
+
     }
 }

@@ -68,5 +68,10 @@ namespace Mononoke
         {
             return new Vector2(-v.Y, v.X);
         }
+        public static float AngleBetween(this Vector2 a, Vector2 b)
+        {
+            // a · b = | a || b | cosθ
+            return (float)Math.Acos(Vector2.Dot(a,b) / (a.Magnitude() * b.Magnitude()));
+        }
     }
 }
