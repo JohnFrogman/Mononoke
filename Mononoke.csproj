@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
@@ -11,6 +11,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="data\textures\icons\sphere.png" />
+    <None Remove="data\textures\units\player_grab.json" />
+    <None Remove="data\textures\units\player_idle.json" />
     <None Remove="Icon.bmp" />
     <None Remove="Icon.ico" />
   </ItemGroup>
@@ -32,13 +34,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="data\json\**" />
     <Compile Remove="data\NewFolder\**" />
+    <Content Remove="data\json\**" />
     <Content Remove="data\NewFolder\**" />
+    <EmbeddedResource Remove="data\json\**" />
     <EmbeddedResource Remove="data\NewFolder\**" />
+    <None Remove="data\json\**" />
     <None Remove="data\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="data\json\" />
     <Folder Include="car\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

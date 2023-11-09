@@ -5,7 +5,7 @@ using System;
 
 namespace Mononoke
 {
-    internal class Car : Collidable
+    internal class Car : RigidBody
     {
         //float mFuel;
 
@@ -21,17 +21,19 @@ namespace Mononoke
         int mWheelBase = 45;
         float mHorizontalDamping = 0.6f;
 
-        Collidable mDoors;
-        Collidable mBootInteractionArea;
+        RigidBody mDoors;
+        RigidBody mBootInteractionArea;
+        Texture2D mSprite;
 
         public Inventory mBoot;
         public Car(Overworld ow, Vector2 pos, Texture2D sprite, Overworld overworld)
-            : base(pos, false, sprite, 700, Vector2.Zero)
+            : base(pos, false, 700, new Vector2(sprite.Width, sprite.Height))
         {
             mStatic = true;
-            mDoors = new Collidable( Vector2.UnitY * sprite.Height * -0.15f, true, null, 1, new Vector2(100f,30f),true, () => { overworld.EnterCar(this);}, this);
-            mBootInteractionArea = new Collidable( Vector2.UnitY * sprite.Height * 0.3f, true, null, 1, new Vector2(80f, sprite.Height * 0.5f), true, () => { overworld.OpenBoot(this); }, this);
+            mDoors = new RigidBody( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, () => { overworld.EnterCar(this);}, this);
+            mBootInteractionArea = new RigidBody( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, () => { overworld.OpenBoot(this); }, this);
             mBoot = new Inventory(10,10);
+            mSprite = sprite;
         }
         public Vector2 ExitPos()
         {
@@ -74,7 +76,8 @@ namespace Mononoke
         {
             mDoors.Draw(spriteBatch);
             mBootInteractionArea.Draw(spriteBatch);
-            base.Draw(spriteBatch);
+            //base.Draw(spriteBatch);
+            spriteBatch.Draw(mSprite, mPosition, null, Color.White, mRotation, Centre(), 1f, SpriteEffects.None, 0f);
         }
         public void SetGas(float gas)
         {

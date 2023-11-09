@@ -9,11 +9,11 @@ namespace Mononoke
 {
     internal static class CollisionManager
     {
-        static List<Collidable> collidableList = new();
-        public static bool Collidies(Collidable c)
+        static List<RigidBody> collidableList = new();
+        public static bool Collidies(RigidBody c)
         {
             bool ret = false;
-            foreach ( Collidable collidable in collidableList)
+            foreach ( RigidBody collidable in collidableList)
             {
                 if (!collidable.Active)
                     continue;
@@ -43,7 +43,7 @@ namespace Mononoke
             //    }
             //} 
         }
-        public static void RegisterCollidable(Collidable collidable)
+        public static void RegisterCollidable(RigidBody collidable)
         {
             collidableList.Add(collidable); 
         }

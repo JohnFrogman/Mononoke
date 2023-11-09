@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Reflection.Metadata.Ecma335;
+using System.Reflection.Metadata;
 
 namespace Mononoke
 {
@@ -72,6 +73,12 @@ namespace Mononoke
         {
             // a · b = | a || b | cosθ
             return (float)Math.Acos(Vector2.Dot(a,b) / (a.Magnitude() * b.Magnitude()));
+        }
+        public static float ClockwiseAngleBetween(this Vector2 a, Vector2 b)
+        {
+            float dot = Vector2.Dot(a,b); //Dot product between [x1, y1] and [x2, y2]
+            float det = a.X * b.Y - a.Y * b.X;      // Determinant
+            return (float)Math.Atan2(det, dot);  //# atan2(y, x) or atan2(sin, cos)
         }
     }
 }

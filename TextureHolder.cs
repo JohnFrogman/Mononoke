@@ -22,7 +22,7 @@ namespace Mononoke
             string[] files = Directory.GetFiles( directory );
             foreach (string f in files)
             {
-                if ( ".png" == Path.GetExtension(f) )
+                if ( ".png" == Path.GetExtension(f) || ".jpg" == Path.GetExtension(f))
                 { 
                     Textures.Add( f.Substring( directory.Length , f.Length - directory.Length - 4 ) , Texture2D.FromFile(graphics.GraphicsDevice, f) );
                 }

@@ -10,21 +10,34 @@ using Microsoft.VisualBasic;
 
 namespace Mononoke
 {
-    internal class Player : Collidable
+    enum ePlayerAnimationState
+    { 
+        Idle,
+        Walking,
+        OpenDoor
+    }
+    internal class Player : RigidBody
     {
         Overworld mOverworld;
         Car mCar;
         Camera2D mCamera;
         KeyboardState mPreviousKeyboardState;
         public Interaction mActiveInteraction;
-        Collidable mCameraFocus;
+        RigidBody mCameraFocus;
+        Animator mAnimator;
+        const float mWalkSpeed = 2.5f;
         public bool Enabled = true; // disabled means can only do interaction input which will reenable the player
-        public Player(Vector2 pos, Overworld overworld, Camera2D camera) 
-            : base( pos, false,TextureAssetManager.GetPlayerSprite(), 1, Vector2.Zero )
+        public Player(Vector2 pos, Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics) 
+            : base( pos, false, 1, new Vector2(20, 17) )
         {
             mCameraFocus = this;
             mCamera = camera;
             mOverworld = overworld;
+            mAnimator = new Animator();
+            mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
+            mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_idle.json", graphics));
+            mAnimator.AddAnimation((int)ePlayerAnimationState.OpenDoor, new Animation(this, "data/textures/units/player_grab.json", graphics, (int)ePlayerAnimationState.Idle));
+            //mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
         }
         public Rectangle Rectangle()
         {
@@ -36,7 +49,6 @@ namespace Mononoke
             car.mStatic = false;
             mCar = car;
             Active = false;
-            mActiveInteraction = () => { ExitCar(car); };
             mDrag = 0f;
             //foreach (Fixture f in mBody.FixtureList)
             //  f.CollidesWith = Category.None;
@@ -52,60 +64,39 @@ namespace Mononoke
         }
         public override void Update(GameTime gameTime)
         {
+            mAnimator.Update(gameTime);
             mCamera.Position = -mCameraFocus.mPosition + new Vector2(960, 540);
             KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyUp(Keys.E) && mPreviousKeyboardState.IsKeyDown(Keys.E))
+            bool animationSet = false;
+            if (mAnimator.GetCurrentState() != (int)ePlayerAnimationState.OpenDoor)
             {
-                if (mActiveInteraction != null)
-                {
-                    mActiveInteraction();
-                }
+                mAnimator.SetCurrentState((int)ePlayerAnimationState.Idle);
             }
-            // We make it possible to rotate the player body
             if (Enabled)
-            { 
+            {
+                if (state.IsKeyUp(Keys.E) && mPreviousKeyboardState.IsKeyDown(Keys.E))
+                {
+                    if (mCar == null)
+                    { 
+                        mAnimator.SetCurrentState((int)ePlayerAnimationState.OpenDoor);
+                        if (mActiveInteraction != null)
+                        {
+                            mActiveInteraction();
+                        }
+                    }
+                    else
+                    {
+                        ExitCar(mCar);
+                    }
+                }
+                mActiveInteraction = null;
                 if ( mCar == null)
                 {
                     HandleWalkInput(state);
                 }
                 else
                 {
-                   //mPosition = mCar.Position;
-                    if (state.IsKeyDown(Keys.E))
-                    {
-                        mCar = null;
-                        return;
-                    }
-                    if (state.IsKeyDown(Keys.D))
-                    {
-                        mCar.SetSteer(-1.0f);
-                    }
-                    else if (state.IsKeyDown(Keys.A))
-                    {
-                        mCar.SetSteer(1.0f);
-                    }
-                    else
-                    {
-                        mCar.SetSteer(0.0f);
-                    }
-
-                    if (state.IsKeyDown(Keys.W))
-                    {
-                        mCar.SetGas(1.0f);
-                    }
-                    else
-                    {
-                        mCar.SetGas(0f);
-                    }
-
-                    if (state.IsKeyDown(Keys.S))
-                    {
-                        mCar.SetBrake(1.0f);
-                    }
-                    else
-                    {
-                        mCar.SetBrake(0f);
-                    }
+                    HandleCarInput(state);
                 }
                 base.Update(gameTime);
             }
@@ -114,12 +105,16 @@ namespace Mononoke
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (mCar == null)
+            {
+                mAnimator.Draw(spriteBatch);
                 base.Draw(spriteBatch);
-
+            }
         }
+        // -Vector2.UnitY.RotateRadians(mRotation);
         void HandleWalkInput(KeyboardState state)
         {
             Vector2 resultantVelocity = Vector2.Zero;
+
             if (state.IsKeyDown(Keys.D) )//&& mPreviousKeyboardState.IsKeyDown(Keys.A))
             {
                 resultantVelocity += new Vector2(1,0);
@@ -136,12 +131,54 @@ namespace Mononoke
             {
                 resultantVelocity += new Vector2(0, 1);
             }
-            
-            //AddFdorce(resultantVelocity);
-            //mVelocity += resultantVelocity * 3f;
-            mVelocity = resultantVelocity * 3f ;
+            if (Vector2.Zero != resultantVelocity)
+            {
+                resultantVelocity.Normalize();
+                mAnimator.SetCurrentState((int)ePlayerAnimationState.Walking);
+                mVelocity = resultantVelocity * mWalkSpeed;
+                mRotation = -mVelocity.ClockwiseAngleBetween(Vector2.UnitY);
+            }
+            else
+            {
+                mVelocity = Vector2.Zero;
+            }
+                //AddFdorce(resultantVelocity);
+                //mVelocity += resultantVelocity * 3f;
         }
-        public override void OnCollide(Collidable other)
+        void HandleCarInput(KeyboardState state)
+        {
+            if (state.IsKeyDown(Keys.D))
+            {
+                mCar.SetSteer(-1.0f);
+            }
+            else if (state.IsKeyDown(Keys.A))
+            {
+                mCar.SetSteer(1.0f);
+            }
+            else
+            {
+                mCar.SetSteer(0.0f);
+            }
+
+            if (state.IsKeyDown(Keys.W))
+            {
+                mCar.SetGas(1.0f);
+            }
+            else
+            {
+                mCar.SetGas(0f);
+            }
+
+            if (state.IsKeyDown(Keys.S))
+            {
+                mCar.SetBrake(1.0f);
+            }
+            else
+            {
+                mCar.SetBrake(0f);
+            }
+        }
+        public override void OnCollide(RigidBody other)
         { 
             if (other.IsTrigger)
             {
