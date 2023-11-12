@@ -10,24 +10,19 @@ namespace Mononoke
     internal static class CollisionManager
     {
         static List<RigidBody> collidableList = new();
-        public static bool Collidies(RigidBody c)
+        public static List<RigidBody> Collidies(RigidBody c)
         {
-            bool ret = false;
+            List<RigidBody> result = new();
             foreach ( RigidBody collidable in collidableList)
             {
-                if (!collidable.Active)
+                if (!collidable.Active || collidable == c.mParent || collidable == c) // Cant collide with inactive, itself or it's parent
                     continue;
-                if (collidable != c && collidable.Intersects(c))
+                if (collidable.Intersects(c))
                 {
-                    c.OnCollide(collidable);
-                    collidable.OnCollide(c);
-                    if (!collidable.IsTrigger)
-                    {
-                        ret = true;
-                    }
+                    result.Add(collidable);
                 }
             }
-            return ret;
+            return result;
         }
         public static void CheckCollisions()
         {

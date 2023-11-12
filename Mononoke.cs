@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
 using Myra;
 using Myra.Graphics2D.UI;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Mononoke
 {
@@ -11,7 +12,7 @@ namespace Mononoke
     {
         public const int RENDER_WIDTH = 1920;
         public const int RENDER_HEIGHT = 1080;
-        public const bool SHOW_COLLIDERS = true;
+        public const bool SHOW_COLLIDERS = false;
         public const string SAVE_PATH = "data/save/";
         //        public const int DRAW_DISTANCE = 2;
 
@@ -50,6 +51,7 @@ namespace Mononoke
             Camera = new Camera2D( _graphics );
 
             TextureAssetManager.Initialise( _graphics );
+            SoundAssetManager.Initialise();
             //CurrentState = new MainMenu( _graphics, this);
             CurrentState = new Overworld(Camera, _graphics, this, mDesktop);
             //NewGame();

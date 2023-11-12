@@ -6,13 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Mononoke
 {
-    public enum eMouseCursorType
-    {
-        Default
-        ,Move
-        ,IllegalMove
-        ,SelectUnit
-    }
+    //public enum eMouseCursorType
+    //{
+    //    Default
+    //    ,Move
+    //    ,IllegalMove
+    //    ,SelectUnit
+    //}
     public static class TextureAssetManager
     {
         private static TextureHolder Icons;
@@ -20,28 +20,28 @@ namespace Mononoke
         private static TextureHolder mTerrain;
         private static Texture2D simpleSpuare;
         private static MouseCursorHolder Cursors;
-        public static Texture2D GetCursor( eMouseCursorType type )
-        {
-            switch (type)
-            {
-                case eMouseCursorType.Move :
-                {
-                    return Cursors.MoveCursor;
-                }
-                case eMouseCursorType.IllegalMove:
-                {
-                    return Cursors.IllegalMoveCursor;
-                }
-                case eMouseCursorType.SelectUnit:
-                {
-                    return Cursors.SelectCursor;
-                }
-                default :
-                {
-                    return Cursors.DefaultCursor;
-                }
-            }
-        }
+        //public static Texture2D GetCursor( eMouseCursorType type )
+        //{
+        //    switch (type)
+        //    {
+        //        case eMouseCursorType.Move :
+        //        {
+        //            return Cursors.MoveCursor;
+        //        }
+        //        case eMouseCursorType.IllegalMove:
+        //        {
+        //            return Cursors.IllegalMoveCursor;
+        //        }
+        //        case eMouseCursorType.SelectUnit:
+        //        {
+        //            return Cursors.SelectCursor;
+        //        }
+        //        default :
+        //        {
+        //            return Cursors.DefaultCursor;
+        //        }
+        //    }
+        //}
         
         public static void Initialise( GraphicsDeviceManager graphics )
         {

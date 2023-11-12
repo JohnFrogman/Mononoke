@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.VisualBasic;
+using System.Net.Sockets;
 
 namespace Mononoke
 {
@@ -18,21 +19,19 @@ namespace Mononoke
     }
     internal class Player : RigidBody
     {
-        Overworld mOverworld;
-        Car mCar;
         Camera2D mCamera;
-        KeyboardState mPreviousKeyboardState;
         public Interaction mActiveInteraction;
         RigidBody mCameraFocus;
         Animator mAnimator;
         const float mWalkSpeed = 2.5f;
-        public bool Enabled = true; // disabled means can only do interaction input which will reenable the player
+        public bool InCar = false;
+        public bool Locked = false; // ignores controls
+        float mInteractTimer = 0f;
         public Player(Vector2 pos, Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics) 
             : base( pos, false, 1, new Vector2(20, 17) )
         {
             mCameraFocus = this;
             mCamera = camera;
-            mOverworld = overworld;
             mAnimator = new Animator();
             mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
             mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_idle.json", graphics));
@@ -45,149 +44,79 @@ namespace Mononoke
         }
         public void EnterCar(Car car)
         {
+            InCar = true;
             mCameraFocus = car;
             car.mStatic = false;
-            mCar = car;
             Active = false;
             mDrag = 0f;
-            //foreach (Fixture f in mBody.FixtureList)
-            //  f.CollidesWith = Category.None;
         }
         public void ExitCar(Car car)
         {
+            InCar = false;
             mCameraFocus = this;
             car.mStatic = true;
             car.Stop();
             mPosition = car.ExitPos();
             Active = true;
-            mCar = null;
         }
         public override void Update(GameTime gameTime)
         {
             mAnimator.Update(gameTime);
             mCamera.Position = -mCameraFocus.mPosition + new Vector2(960, 540);
-            KeyboardState state = Keyboard.GetState();
-            bool animationSet = false;
-            if (mAnimator.GetCurrentState() != (int)ePlayerAnimationState.OpenDoor)
+            if (mActiveInteraction != null && Locked && mActiveInteraction.Duration > 0f)
             {
-                mAnimator.SetCurrentState((int)ePlayerAnimationState.Idle);
+                mInteractTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (mInteractTimer > mActiveInteraction.Duration)
+                { 
+                    Locked = false;
+                    mActiveInteraction.Use(); 
+                }
             }
-            if (Enabled)
-            {
-                if (state.IsKeyUp(Keys.E) && mPreviousKeyboardState.IsKeyDown(Keys.E))
-                {
-                    if (mCar == null)
-                    { 
-                        mAnimator.SetCurrentState((int)ePlayerAnimationState.OpenDoor);
-                        if (mActiveInteraction != null)
-                        {
-                            mActiveInteraction();
-                        }
-                    }
-                    else
-                    {
-                        ExitCar(mCar);
-                    }
-                }
-                mActiveInteraction = null;
-                if ( mCar == null)
-                {
-                    HandleWalkInput(state);
-                }
-                else
-                {
-                    HandleCarInput(state);
-                }
-                base.Update(gameTime);
-            }
-            mPreviousKeyboardState = state;
+            base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (mCar == null)
+            if (!InCar)
             {
                 mAnimator.Draw(spriteBatch);
                 base.Draw(spriteBatch);
             }
         }
-        // -Vector2.UnitY.RotateRadians(mRotation);
-        void HandleWalkInput(KeyboardState state)
+        public void Interact()
         {
-            Vector2 resultantVelocity = Vector2.Zero;
-
-            if (state.IsKeyDown(Keys.D) )//&& mPreviousKeyboardState.IsKeyDown(Keys.A))
+            if (Locked)
+                return;
+            mAnimator.SetCurrentState((int)ePlayerAnimationState.OpenDoor);
+            if (mActiveInteraction != null)
             {
-                resultantVelocity += new Vector2(1,0);
+                mInteractTimer = 0f;
+                Locked = true;
             }
-            if (state.IsKeyDown(Keys.A) )//&& mPreviousKeyboardState.IsKeyDown(Keys.D))
+        }
+        public void SetWalkDirection(Vector2 dir)
+        {
+            if (Locked)
+                return;
+            if (Vector2.Zero != dir)
             {
-                resultantVelocity += new Vector2(-1, 0);
-            }
-            if (state.IsKeyDown(Keys.W) )//&& mPreviousKeyboardState.IsKeyDown(Keys.W))
-            {
-                resultantVelocity += new Vector2(0, -1);
-            }
-            if (state.IsKeyDown(Keys.S) )//&& mPreviousKeyboardState.IsKeyDown(Keys.S))
-            {
-                resultantVelocity += new Vector2(0, 1);
-            }
-            if (Vector2.Zero != resultantVelocity)
-            {
-                resultantVelocity.Normalize();
+                dir.Normalize();
                 mAnimator.SetCurrentState((int)ePlayerAnimationState.Walking);
-                mVelocity = resultantVelocity * mWalkSpeed;
+                mVelocity = dir * mWalkSpeed;
                 mRotation = -mVelocity.ClockwiseAngleBetween(Vector2.UnitY);
             }
             else
             {
+                mAnimator.SetCurrentState((int)ePlayerAnimationState.Idle);
                 mVelocity = Vector2.Zero;
             }
-                //AddFdorce(resultantVelocity);
-                //mVelocity += resultantVelocity * 3f;
         }
-        void HandleCarInput(KeyboardState state)
-        {
-            if (state.IsKeyDown(Keys.D))
-            {
-                mCar.SetSteer(-1.0f);
-            }
-            else if (state.IsKeyDown(Keys.A))
-            {
-                mCar.SetSteer(1.0f);
-            }
-            else
-            {
-                mCar.SetSteer(0.0f);
-            }
-
-            if (state.IsKeyDown(Keys.W))
-            {
-                mCar.SetGas(1.0f);
-            }
-            else
-            {
-                mCar.SetGas(0f);
-            }
-
-            if (state.IsKeyDown(Keys.S))
-            {
-                mCar.SetBrake(1.0f);
-            }
-            else
-            {
-                mCar.SetBrake(0f);
-            }
-        }
-        public override void OnCollide(RigidBody other)
+        public override void OnCollisionStart(RigidBody other)
         { 
             if (other.IsTrigger)
             {
                 mActiveInteraction = other.mInteraction;
             }
-            base.OnCollide(other);
-        }
-        void Interact()
-        { 
+            base.OnCollisionStart(other);
         }
     }
 }

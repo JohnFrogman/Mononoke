@@ -6,16 +6,25 @@ using System;
 
 namespace Mononoke
 {
-    public delegate void Interaction();
-    internal class RigidBody
+    public delegate void OnUse();
+    public class Interaction
+    {
+        public Interaction(OnUse use, float duration) 
+        { 
+            Duration = duration;
+            Use = use;
+        }
+        public float Duration = -1.0f;
+        public OnUse Use;
+    }
+    public class RigidBody
     {
         Texture2D mColliderSprite;
 
         public Vector2 mPosition;
         public float mRotation;
         Vector2 mOrigin;
-        public bool mStatic;
-        RigidBody mParent;
+        public RigidBody mParent;
         protected Vector2 mSize; 
 
         protected float mMass;
@@ -27,7 +36,8 @@ namespace Mononoke
         protected float mNewRotation;
 
         float mBounce = 0.5f;
-        public bool Active = true;
+        public bool Active = true; // Inactive, not doing anyhting, doesnt collide, doesnt move, doesnt interact
+        public bool mStatic = false; // Static objects collide but will not move themselves.
         public bool IsTrigger = false; // Collides but does not cause any physics interactions on collision.
         bool mTriggerActive;
         public float mDrag = 0.99f;
@@ -35,6 +45,17 @@ namespace Mononoke
         List<Vector2> mVertices = new();
 
         public Interaction mInteraction;
+        List<RigidBody> PreviousOthers = new();
+        //public RigidBody(RigidBody body)
+        //{
+        //    mPosition = body.mPosition; 
+        //    mRotation = body.mRotation;
+        //    mOrigin = body.mOrigin;
+        //    mParent = body.mParent;
+        //    mVelocity = body.mVelocity;
+        //    mAngularVelocity = body.mAngularVelocity;
+        
+        //}
 
         public RigidBody(Vector2 pos, bool isStatic, float mass, Vector2 size, bool isTrigger = false, Interaction interaction = null, RigidBody parent = null)
         {
@@ -59,46 +80,55 @@ namespace Mononoke
         }
         public virtual void Update(GameTime gameTime)
         {
-            mTriggerActive = false;
+            // if inactive leave.
+            if (!Active)
+                return;
             if (mParent != null)
             { 
                 mPosition = mOrigin.RotateRadians(mParent.mRotation) + mParent.mPosition;
                 mRotation = mParent.mRotation;
             }
-
-            if (!Active)
-                return;
-            if (!mStatic)
-            { 
-                    
-                Vector2 newPos = mPosition + PIXELS_PER_METRE * mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (!CollisionManager.Collidies(this))
-                { 
-                    mPosition = newPos;
-                    mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
-                    mRotation += mNewRotation;
-                    if (mRotation > 2f*Math.PI )
-                    {
-                        mRotation -= 2f*(float)Math.PI;
-                    }
-                    if (mRotation <= 2f*(float)Math.PI)
-                    {
-                        mRotation += 2f * (float)Math.PI;
-                    }
-                }
-                else
+            //RigidBody futureSelf = new RigidBody(this); // Right now we're stepping into things and correcting, really we should predict collisions and stop them happening
+            List<RigidBody> others = CollisionManager.Collidies(this);
+            foreach (RigidBody previousOther in PreviousOthers)
+            {
+                // If previous others has a member not in the new others then collision has ended
+                if (!others.Contains(previousOther))
                 {
-                    //mTriggerActive = true;
-                    //mVelocity = Vector2.Zero;
+                    OnCollisionEnd(previousOther);
                 }
-
-                mVelocity *= mDrag;
-                //Friction();
-                //AirResistance();
-                mNewRotation = 0;
-                mCurrentForce = Vector2.Zero;
             }
+            foreach (RigidBody other in others)
+            {
+                // If there was a previous rigid body and we're now hitting a different one
+                if (!PreviousOthers.Contains(other))
+                {
+                    OnCollisionStart(other);
+                }
+                OnCollision(other); // Fires every frame we're hitting
+            }
+            PreviousOthers = others;
+            DoStep(gameTime);
+        }
+        void DoStep(GameTime gameTime)
+        {
+            Vector2 newPos = mPosition + PIXELS_PER_METRE * mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            mPosition = newPos;
+            mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
+            mRotation += mNewRotation;
+            if (mRotation > 2f * Math.PI)
+            {
+                mRotation -= 2f * (float)Math.PI;
+            }
+            if (mRotation <= 2f * (float)Math.PI)
+            {
+                mRotation += 2f * (float)Math.PI;
+            }
+            mVelocity *= mDrag;
+            //Friction();
+            //AirResistance();
+            mNewRotation = 0;
+            mCurrentForce = Vector2.Zero;
         }
         public Vector2 Forward()
         {
@@ -142,7 +172,7 @@ namespace Mononoke
                 return;
             if (Mononoke.SHOW_COLLIDERS)
             { 
-                //spriteBatch.Draw(mColliderSprite, mPosition, null, mTriggerActive ? new Color(new Vector4(255, 0, 255, 125)) : new Color( new Vector4(0, 255, 255, 125)), mRotation, /*mSize*0.5f*/new Vector2(0.5f,0.5f), mSize, SpriteEffects.None, 0f);
+                spriteBatch.Draw(mColliderSprite, mPosition, null, mTriggerActive ? new Color(new Vector4(255, 0, 255, 125)) : new Color( new Vector4(0, 255, 255, 125)), mRotation, /*mSize*0.5f*/new Vector2(0.5f,0.5f), mSize, SpriteEffects.None, 0f);
             }
             //if (mSprite != null)
             //{ 
@@ -224,23 +254,39 @@ namespace Mononoke
             }
             return true;
         }
-        public virtual void OnCollide(RigidBody other)
+        
+        public virtual void OnCollisionStart(RigidBody other)
         {
             if (IsTrigger && other is Player) 
             {
                 mTriggerActive = true;
                 return;
+            }            
+        }
+        void PushOut(RigidBody other)
+        {
+            Vector2 dir = mPosition - other.mPosition;
+            if (dir == Vector2.Zero)
+                dir = Vector2.UnitX; // if we land directly in the middle then we could get stuck
+            dir.Normalize();
+            mPosition += dir;
+            mVelocity = -mVelocity * mBounce;
+            //AddForce( dir * mMass );
+        }
+        public virtual void OnCollision(RigidBody other)
+        {
+            // If it's not static and we're hitting something that isnt a trigger push the collider away/out of the other one
+            if (!mStatic && !other.IsTrigger)
+            { 
+                PushOut(other);
             }
-            if (other.IsTrigger)
-                return;
-            // If it's not static push the collider away/out of the other one
-            if (!mStatic)
+        }
+        public virtual void OnCollisionEnd(RigidBody other)
+        {
+            if (IsTrigger && other is Player)
             {
-                Vector2 dir = mPosition - other.mPosition;
-                dir.Normalize();
-                mPosition += dir;
-                mVelocity = -mVelocity * mBounce;
-                //AddForce( dir * mMass );
+                mTriggerActive = false;
+                return;
             }
         }
         protected void Rotate(float rotation)

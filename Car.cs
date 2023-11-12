@@ -18,20 +18,21 @@ namespace Mononoke
         float mSteeringPos = 0f;
         float mGas = 0f;
         float mBrake = 0f;
-        int mWheelBase = 45;
         float mHorizontalDamping = 0.6f;
 
         RigidBody mDoors;
         RigidBody mBootInteractionArea;
         Texture2D mSprite;
 
+        bool mRadioOn = false;
+
         public Inventory mBoot;
         public Car(Overworld ow, Vector2 pos, Texture2D sprite, Overworld overworld)
             : base(pos, false, 700, new Vector2(sprite.Width, sprite.Height))
         {
             mStatic = true;
-            mDoors = new RigidBody( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, () => { overworld.EnterCar(this);}, this);
-            mBootInteractionArea = new RigidBody( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, () => { overworld.OpenBoot(this); }, this);
+            mDoors = new RigidBody( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, new Interaction(() => { overworld.EnterCar(this);}, 0.6f), this);
+            mBootInteractionArea = new RigidBody( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, new Interaction(() => { overworld.OpenBoot(this); }, 0.6f), this);
             mBoot = new Inventory(10,10);
             mSprite = sprite;
         }
@@ -115,6 +116,12 @@ namespace Mononoke
             Vector2 fV = Forward() * Vector2.Dot(Forward(), mVelocity);
             Vector2 rV = Right() * Vector2.Dot(Right(), mVelocity);
             mVelocity = fV + rV * mHorizontalDamping; 
+        }
+
+        public void ToggleRadio()
+        { 
+            mRadioOn = !mRadioOn;
+            SoundAssetManager.SetPaused(mRadioOn);
         }
         void ApplyBrakes(GameTime gameTime )
         {

@@ -20,6 +20,8 @@ namespace Mononoke
         private Player mPlayer;
         private Car mCar;
         private TerrainManager mTerrainManager;
+        private InputManager mInputManager;
+        private OverworldController mController;
         public Overworld(Camera2D camera, GraphicsDeviceManager graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
@@ -28,6 +30,9 @@ namespace Mononoke
             mPlayer = new Player(new Vector2(50f,50f), this, mCamera, graphics);
             mGui = new GUI(desktop, mCar);
             mTerrainManager = new TerrainManager(mCamera);
+            mInputManager = new InputManager();
+            mController = new OverworldController(mInputManager, this, mPlayer, mCar);
+            SoundAssetManager.PlaySongsByName(new List<string>{"polygondwanaland", "deserted dunes welcome weary feet"});
             //mPlayer.EnterCar(mCar);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
         }
@@ -48,21 +53,38 @@ namespace Mononoke
         public void OpenBoot(Car car)
         {
             mGui.ShowInventory(car.mBoot);
-            mPlayer.mActiveInteraction = () => { CloseBoot(); };
-            mPlayer.Enabled = false;
+            mPlayer.mActiveInteraction = new Interaction( CloseBoot, 1f);
+        }
+        public void ShowPlayerInventory()
+        {
+            //mGui.ShowInventory(car.mBoot);
+            //mPlayer.mActiveInteraction = () => { CloseBoot(); };
+            //mPlayer.Enabled = false;
         }
         public void CloseBoot()
         { 
             mGui.HideInventory();
-            mPlayer.Enabled = true;
         }
         void IGameState.Update(GameTime gameTime)
         {
-            MouseState mstate = Mouse.GetState();
+            mInputManager.Update(gameTime);
+            mController.Update(gameTime);
             mCar.Update(gameTime);
             mPlayer.Update(gameTime);
             mGui.Update(gameTime);
             mTerrainManager.Update(gameTime);
+            float ListeningDistance;
+            if (mPlayer.InCar)
+            {
+                ListeningDistance = 1f;
+            }
+            else
+            { 
+                ListeningDistance = (mPlayer.mPosition - mCar.mPosition).Magnitude() / RigidBody.PIXELS_PER_METRE;
+            }
+            float attentuation = 3f * (float)Math.Pow(0.5f, ListeningDistance);
+            SoundAssetManager.SetMusicVolume(attentuation);
+            
             float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //We update the world
         }

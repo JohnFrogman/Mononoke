@@ -118,5 +118,14 @@ namespace Mononoke
         {
             spriteBatch.Draw(mSpriteSheet, Parent.mPosition, new Rectangle(CurrentFrame.x, CurrentFrame.y, CurrentFrame.width, CurrentFrame.height), Color.White, Parent.mRotation, Origin, 1f, SpriteEffects.None, 0f);
         }
+        public float GetTotalLength()
+        {
+            float total = 0f;
+            foreach (AnimationFrame frame in Frames)
+            {
+                total += frame.Duration;
+            }
+            return total;
+        }
     }
 }

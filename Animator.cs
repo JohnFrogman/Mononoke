@@ -43,5 +43,9 @@ namespace Mononoke
         {
             return CurrentState;
         }
+        public float GetAnimationLength(int index)
+        {
+            return AnimationStates[index].GetTotalLength();
+        }
     }
 }
