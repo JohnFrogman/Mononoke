@@ -22,7 +22,9 @@ namespace Mononoke
         Texture2D mColliderSprite;
 
         public Vector2 mPosition;
+        private Vector2 mPreviousPosition;
         public float mRotation;
+        private float mPreviousRotation;
         Vector2 mOrigin;
         public RigidBody mParent;
         protected Vector2 mSize; 
@@ -83,11 +85,7 @@ namespace Mononoke
             // if inactive leave.
             if (!Active)
                 return;
-            if (mParent != null)
-            { 
-                mPosition = mOrigin.RotateRadians(mParent.mRotation) + mParent.mPosition;
-                mRotation = mParent.mRotation;
-            }
+            DoStep(gameTime);
             //RigidBody futureSelf = new RigidBody(this); // Right now we're stepping into things and correcting, really we should predict collisions and stop them happening
             List<RigidBody> others = CollisionManager.Collidies(this);
             foreach (RigidBody previousOther in PreviousOthers)
@@ -105,13 +103,19 @@ namespace Mononoke
                 {
                     OnCollisionStart(other);
                 }
-                OnCollision(other); // Fires every frame we're hitting
+                //OnCollision(other); // Fires every frame we're hitting
             }
             PreviousOthers = others;
-            DoStep(gameTime);
         }
         void DoStep(GameTime gameTime)
         {
+            mPreviousPosition = mPosition;
+            mPreviousRotation = mRotation;
+            if (mParent != null)
+            {
+                mPosition = mOrigin.RotateRadians(mParent.mRotation) + mParent.mPosition;
+                mRotation = mParent.mRotation;
+            }
             Vector2 newPos = mPosition + PIXELS_PER_METRE * mVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
             mPosition = newPos;
             mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;

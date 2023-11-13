@@ -77,7 +77,7 @@ namespace Mononoke
             if (songQueue.Count > 0)
             {
                 currentSong = 0;
-                MediaPlayer.Play(songQueue[currentSong]);
+                //MediaPlayer.Play(songQueue[currentSong]);
             }
             else 
                 Paused = true;
@@ -88,7 +88,7 @@ namespace Mononoke
         }
         public static void Initialise()
         {
-            MediaPlayer.Volume = 0.01f;
+            MediaPlayer.Volume = 0.01f * MusicVolume;
             string musicDir = "data/music/";
             string sfxDir = "data/sfx/";
             if (!Directory.Exists(musicDir))

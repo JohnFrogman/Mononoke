@@ -22,6 +22,7 @@ namespace Mononoke
         private TerrainManager mTerrainManager;
         private InputManager mInputManager;
         private OverworldController mController;
+        private List<RigidBody> mBodies = new();
         public Overworld(Camera2D camera, GraphicsDeviceManager graphics, Mononoke game, Desktop desktop)
         {
             mSaveSlotName = "Cimmeria";
@@ -35,16 +36,17 @@ namespace Mononoke
             SoundAssetManager.PlaySongsByName(new List<string>{"polygondwanaland", "deserted dunes welcome weary feet"});
             //mPlayer.EnterCar(mCar);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
+            mBodies.Add(new RigidBody(new Vector2(-200,0), false, 300, new Vector2(100,500)));
         }
-        void IGameState.Draw(SpriteBatch _spriteBatch, GraphicsDeviceManager _graphics)
+        void IGameState.Draw(SpriteBatch spriteBatch, GraphicsDeviceManager _graphics)
         {
-            mTerrainManager.Draw(_spriteBatch);
-            //foreach (Collidable collidable in mCollidables)
-            //{
-            //    collidable.Draw(_spriteBatch);
-            //}
-            mCar.Draw(_spriteBatch);
-            mPlayer.Draw(_spriteBatch);
+            mTerrainManager.Draw(spriteBatch);
+            foreach (RigidBody b in mBodies)
+            {
+                b.Draw(spriteBatch);
+            }
+            mCar.Draw(spriteBatch);
+            mPlayer.Draw(spriteBatch);
         }
         public void EnterCar(Car car)
         { 
@@ -85,8 +87,11 @@ namespace Mononoke
             float attentuation = 3f * (float)Math.Pow(0.5f, ListeningDistance);
             SoundAssetManager.SetMusicVolume(attentuation);
             
+            foreach (RigidBody b in mBodies)
+            {
+                b.Update(gameTime);
+            }
             float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //We update the world
         }
 
         // Need to save out units, maps, Actors, Provinces and the player
