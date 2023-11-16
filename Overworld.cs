@@ -54,7 +54,7 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
-            mGui.ShowInventory(car.mBoot);
+            mGui.ShowInventory(car.mBoot, car.mPosition);
             mPlayer.mActiveInteraction = new Interaction( CloseBoot, 1f);
         }
         public void ShowPlayerInventory()

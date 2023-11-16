@@ -25,15 +25,15 @@ namespace Mononoke
         Label mTimeLabel;
         Car mCar;
         Label mSpeedLabel;
-        Grid mInventoryGrid;
         Vector2 spacing = new Vector2(60, 0);
+        Panel mMainPanel;
         public GUI(Desktop desktop, Car car)
         {
             mCar = car;
             desktop.Widgets.Clear();
-            Panel mainPanel = new Panel();
-            mainPanel.Background = new SolidBrush(Color.Transparent);
-            desktop.Root = mainPanel;
+            mMainPanel = new Panel();
+            mMainPanel.Background = new SolidBrush(Color.Transparent);
+            desktop.Root = mMainPanel;
 
             HorizontalStackPanel headerPanel = new HorizontalStackPanel();
             headerPanel.Spacing = 10;
@@ -48,32 +48,8 @@ namespace Mononoke
             mSpeedLabel.Text = "";
             headerPanel.AddChild(mSpeedLabel);
 
-            mainPanel.AddChild(headerPanel);
-
-
-            //mInventoryGrid = new Grid();
-            mInventoryGrid = new Grid
-            {
-                ShowGridLines = true,
-                ColumnSpacing = 150,
-                RowSpacing = 150,
-            };
-            mInventoryGrid.Padding = new Thickness(5);
-            mInventoryGrid.Background = new SolidBrush(Color.Black);
-            mInventoryGrid.Width = 500;
-            mInventoryGrid.Height = 500;
-            mInventoryGrid.Enabled = false;
-            mInventoryGrid.Visible = false;
-            mainPanel.AddChild(mInventoryGrid);
-                //Image icon = new Image();
-                //icon.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-                //icon.HorizontalAlignment = HorizontalAlignment.Left;
-                //icon.VerticalAlignment = VerticalAlignment.Top;
-                //Myra.Graphics2D.Thickness t = icon.Padding;
-                //t.Left = 6;
-                //icon.Padding = t;
-
-            }
+            mMainPanel.AddChild(headerPanel);
+        }
         // 0 = 01/01/1114
         // t = days since 01/01/1114
         // 360 days in a year
@@ -98,10 +74,20 @@ namespace Mononoke
         {
             mSpeedLabel.Text = mCar.Speed() + " m/s";
         }
-        public void ShowInventory(Inventory inv)
-        { 
-            mInventoryGrid.Enabled = true;
-            mInventoryGrid.Visible = true;
+        Grid BuildInventoryGrid(Inventory inv)
+        {
+            Grid inventoryGrid = new Grid
+            {
+                ShowGridLines = true,
+                ColumnSpacing = 150,
+                RowSpacing = 150,
+            };
+            inventoryGrid.Padding = new Thickness(5);
+            inventoryGrid.Background = new SolidBrush(Color.Black);
+            inventoryGrid.Width = 500;
+            inventoryGrid.Height = 500;
+            inventoryGrid.Enabled = true;
+            inventoryGrid.Visible = true;
             for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
             {
                 for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
@@ -120,15 +106,45 @@ namespace Mononoke
                     //portrait.HorizontalAlignment = HorizontalAlignment.Left;
                     //portrait.VerticalAlignment = VerticalAlignment.Center;
                     //portrait.PaddingLeft = 6;
-                    mInventoryGrid.Widgets.Add(itemSlot);
+                    inventoryGrid.Widgets.Add(itemSlot);
                 }
             }
+            return inventoryGrid;
+        }
+        public void ShowInventory(Inventory inv, Vector2 pos)
+        { 
+            Grid inventoryGrid = BuildInventoryGrid(inv);
+            //inventoryGrid.pos
+            inventoryGrid.Enabled = true;
+            inventoryGrid.Visible = true;
+            for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
+            {
+                for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
+                {
+                    Panel itemSlot = new Panel();
+                    itemSlot.Background = new SolidBrush(Color.Gray);
+                    itemSlot.Width = 80;
+                    itemSlot.Height = 80;
+                    //mInventoryGrid.GridRow = j;
+                    //mInventoryGrid.GridColumn = i;
+                    itemSlot.GridColumn = i;
+                    itemSlot.GridRow = j;
+
+                    //Image portrait = new Image();
+                    //portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
+                    //portrait.HorizontalAlignment = HorizontalAlignment.Left;
+                    //portrait.VerticalAlignment = VerticalAlignment.Center;
+                    //portrait.PaddingLeft = 6;
+                    inventoryGrid.Widgets.Add(itemSlot);
+                }
+            }
+            mMainPanel.AddChild(inventoryGrid);
         }
         public void HideInventory()
         {
-            mInventoryGrid.Enabled = false;
-            mInventoryGrid.Visible = false;
-            mInventoryGrid.Widgets.Clear();
+            //inventoryGrid.Enabled = false;
+            //inventoryGrid.Visible = false;
+            //inventoryGrid.Widgets.Clear();
         }
     }
 }
