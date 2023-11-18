@@ -27,6 +27,7 @@ namespace Mononoke
         public bool InCar = false;
         public bool Locked = false; // ignores controls
         float mInteractTimer = 0f;
+        public Inventory mInventory;
         public Player(Vector2 pos, Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics) 
             : base( pos, false, 1, new Vector2(20, 17) )
         {
@@ -36,6 +37,7 @@ namespace Mononoke
             mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
             mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_idle.json", graphics));
             mAnimator.AddAnimation((int)ePlayerAnimationState.OpenDoor, new Animation(this, "data/textures/units/player_grab.json", graphics, (int)ePlayerAnimationState.Idle));
+            mInventory = new Inventory(5,5);
             //mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
         }
         public Rectangle Rectangle()

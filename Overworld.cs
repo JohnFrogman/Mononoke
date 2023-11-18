@@ -32,7 +32,7 @@ namespace Mononoke
             mGui = new GUI(desktop, mCar);
             mTerrainManager = new TerrainManager(mCamera);
             mInputManager = new InputManager();
-            mController = new OverworldController(mInputManager, this, mPlayer, mCar);
+            mController = new OverworldController(mInputManager, this, mPlayer, mCar, mGui.mInventoryManager );
             SoundAssetManager.PlaySongsByName(new List<string>{"polygondwanaland", "deserted dunes welcome weary feet"});
             //mPlayer.EnterCar(mCar);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
@@ -54,7 +54,8 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
-            mGui.ShowInventory(car.mBoot, car.mPosition);
+            mGui.mInventoryManager.ToggleInventory(car.mBoot, car.mPosition.ToPoint());
+            //mGui.ShowInventory(car.mBoot, car.mPosition);
             mPlayer.mActiveInteraction = new Interaction( CloseBoot, 1f);
         }
         public void ShowPlayerInventory()
@@ -65,10 +66,11 @@ namespace Mononoke
         }
         public void CloseBoot()
         { 
-            mGui.HideInventory();
+            //mGui.();
         }
         void IGameState.Update(GameTime gameTime)
         {
+            SoundAssetManager.Update(gameTime);
             mInputManager.Update(gameTime);
             mController.Update(gameTime);
             mCar.Update(gameTime);

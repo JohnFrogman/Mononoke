@@ -21,13 +21,15 @@ namespace Mononoke
         InputManager mInputManager;
         //bool SavePressed; 
         Overworld mOverworld;
+        InventoryManager mInventoryManager;
         //Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics, Mononoke game
-        public OverworldController(InputManager inputManager, Overworld overworld, Player player, Car car) 
+        public OverworldController(InputManager inputManager, Overworld overworld, Player player, Car car, InventoryManager inventoryManager) 
         {
             mPlayer = player;
             mCar = car;
             mInputManager = inputManager;
             mOverworld = overworld;
+            mInventoryManager = inventoryManager;
         }
         public void Update( GameTime gameTime)
         {
@@ -42,6 +44,7 @@ namespace Mononoke
             { 
                 WalkInput();
             }
+            InventoryInput();
         }
         void WalkInput()
         {
@@ -113,6 +116,53 @@ namespace Mononoke
             if (mInputManager.ButtonReleased(eInputType.Radio))
             {
                 mCar.ToggleRadio();
+            }
+        }
+
+        //SwitchInventoryForward, SwitchInventoryBack, InventoryLeft, InventoryRight, InventoryUp, InventoryDown, OpenPlayerInventory
+        void InventoryInput()
+        {
+            if (mInputManager.ButtonReleased(eInputType.OpenPlayerInventory))
+            {
+                mInventoryManager.ToggleInventory(mPlayer.mInventory, new Point(Mononoke.RENDER_WIDTH/2, Mononoke.RENDER_HEIGHT/2));
+            }
+
+            if (!mInventoryManager.Active) return;
+            if (mInputManager.ButtonReleased(eInputType.SwitchInventoryForward))
+            {
+                mInventoryManager.SwitchInventory(true);
+            }
+            else if (mInputManager.ButtonReleased(eInputType.SwitchInventoryBack))
+            {
+                mInventoryManager.SwitchInventory(false);
+            }
+
+            Vector2Int inventoryMove = Vector2Int.Zero;
+            if (mInputManager.ButtonReleased(eInputType.InventoryUp))
+            {
+                inventoryMove += Vector2Int.Up;
+            }
+            else if (mInputManager.ButtonReleased(eInputType.InventoryDown))
+            {
+                inventoryMove += Vector2Int.Down;
+            }
+
+            if (mInputManager.ButtonReleased(eInputType.InventoryLeft))
+            {
+                inventoryMove += Vector2Int.Left;
+            }
+            else if (mInputManager.ButtonReleased(eInputType.InventoryRight))
+            {
+                inventoryMove += Vector2Int.Right;
+            }
+            if (inventoryMove!= Vector2Int.Zero)
+            { 
+                mInventoryManager.InventoryMove(inventoryMove);
+            }
+
+            if (mInputManager.ButtonReleased(eInputType.InventorySelect))
+            {
+                mInventoryManager.OnInventorySelect();
             }
         }
     }

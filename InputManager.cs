@@ -13,7 +13,9 @@ namespace Mononoke
     {
         Up, Down, Left, Right,
         Interact,
-        Accelerate, Brake, TurnLeft, TurnRight, Radio
+        Accelerate, Brake, TurnLeft, TurnRight, Radio,
+        SwitchInventoryForward, SwitchInventoryBack, InventoryLeft, InventoryRight, InventoryUp, InventoryDown, OpenPlayerInventory, InventorySelect
+
     }
     internal class InputManager
     {
@@ -78,6 +80,15 @@ namespace Mononoke
             mKeyboardBindings.Add(eInputType.TurnLeft, Keys.A);
             mKeyboardBindings.Add(eInputType.TurnRight, Keys.D);
             mKeyboardBindings.Add(eInputType.Radio, Keys.R);
+
+            mKeyboardBindings.Add(eInputType.SwitchInventoryForward, Keys.O);
+            mKeyboardBindings.Add(eInputType.SwitchInventoryBack, Keys.U);
+            mKeyboardBindings.Add(eInputType.InventoryUp, Keys.K);
+            mKeyboardBindings.Add(eInputType.InventoryDown, Keys.I);
+            mKeyboardBindings.Add(eInputType.InventoryLeft, Keys.J);
+            mKeyboardBindings.Add(eInputType.InventoryRight, Keys.L);
+            mKeyboardBindings.Add(eInputType.OpenPlayerInventory, Keys.B);
+            mKeyboardBindings.Add(eInputType.InventorySelect, Keys.Space);
         }
     }
 }

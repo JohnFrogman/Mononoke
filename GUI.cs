@@ -27,6 +27,8 @@ namespace Mononoke
         Label mSpeedLabel;
         Vector2 spacing = new Vector2(60, 0);
         Panel mMainPanel;
+        public InventoryManager mInventoryManager;
+
         public GUI(Desktop desktop, Car car)
         {
             mCar = car;
@@ -49,6 +51,7 @@ namespace Mononoke
             headerPanel.AddChild(mSpeedLabel);
 
             mMainPanel.AddChild(headerPanel);
+            mInventoryManager = new (desktop);
         }
         // 0 = 01/01/1114
         // t = days since 01/01/1114
@@ -73,78 +76,8 @@ namespace Mononoke
         public void Update(GameTime gameTime)
         {
             mSpeedLabel.Text = mCar.Speed() + " m/s";
+            //mInventoryManager.upda(gameTime);
         }
-        Grid BuildInventoryGrid(Inventory inv)
-        {
-            Grid inventoryGrid = new Grid
-            {
-                ShowGridLines = true,
-                ColumnSpacing = 150,
-                RowSpacing = 150,
-            };
-            inventoryGrid.Padding = new Thickness(5);
-            inventoryGrid.Background = new SolidBrush(Color.Black);
-            inventoryGrid.Width = 500;
-            inventoryGrid.Height = 500;
-            inventoryGrid.Enabled = true;
-            inventoryGrid.Visible = true;
-            for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
-            {
-                for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
-                {
-                    Panel itemSlot = new Panel();
-                    itemSlot.Background = new SolidBrush(Color.Gray);
-                    itemSlot.Width = 80;
-                    itemSlot.Height = 80;
-                    //mInventoryGrid.GridRow = j;
-                    //mInventoryGrid.GridColumn = i;
-                    itemSlot.GridColumn = i;
-                    itemSlot.GridRow = j;
-
-                    //Image portrait = new Image();
-                    //portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-                    //portrait.HorizontalAlignment = HorizontalAlignment.Left;
-                    //portrait.VerticalAlignment = VerticalAlignment.Center;
-                    //portrait.PaddingLeft = 6;
-                    inventoryGrid.Widgets.Add(itemSlot);
-                }
-            }
-            return inventoryGrid;
-        }
-        public void ShowInventory(Inventory inv, Vector2 pos)
-        { 
-            Grid inventoryGrid = BuildInventoryGrid(inv);
-            //inventoryGrid.pos
-            inventoryGrid.Enabled = true;
-            inventoryGrid.Visible = true;
-            for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
-            {
-                for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
-                {
-                    Panel itemSlot = new Panel();
-                    itemSlot.Background = new SolidBrush(Color.Gray);
-                    itemSlot.Width = 80;
-                    itemSlot.Height = 80;
-                    //mInventoryGrid.GridRow = j;
-                    //mInventoryGrid.GridColumn = i;
-                    itemSlot.GridColumn = i;
-                    itemSlot.GridRow = j;
-
-                    //Image portrait = new Image();
-                    //portrait.Renderable = new TextureRegion(TextureAssetManager.GetIconByName("petrichor"));
-                    //portrait.HorizontalAlignment = HorizontalAlignment.Left;
-                    //portrait.VerticalAlignment = VerticalAlignment.Center;
-                    //portrait.PaddingLeft = 6;
-                    inventoryGrid.Widgets.Add(itemSlot);
-                }
-            }
-            mMainPanel.AddChild(inventoryGrid);
-        }
-        public void HideInventory()
-        {
-            //inventoryGrid.Enabled = false;
-            //inventoryGrid.Visible = false;
-            //inventoryGrid.Widgets.Clear();
-        }
+        
     }
 }

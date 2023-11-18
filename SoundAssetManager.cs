@@ -47,6 +47,7 @@ namespace Mononoke
             Timer += gameTime.ElapsedGameTime;
             if (Timer > songQueue[0].Duration)
             {
+                Timer = new TimeSpan();
                 currentSong++;
                 if (currentSong >= songQueue.Count)
                 {
@@ -77,7 +78,7 @@ namespace Mononoke
             if (songQueue.Count > 0)
             {
                 currentSong = 0;
-                //MediaPlayer.Play(songQueue[currentSong]);
+                MediaPlayer.Play(songQueue[currentSong]);
             }
             else 
                 Paused = true;
