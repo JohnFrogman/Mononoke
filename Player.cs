@@ -37,7 +37,8 @@ namespace Mononoke
             mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
             mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_idle.json", graphics));
             mAnimator.AddAnimation((int)ePlayerAnimationState.OpenDoor, new Animation(this, "data/textures/units/player_grab.json", graphics, (int)ePlayerAnimationState.Idle));
-            mInventory = new Inventory(5,5);
+            mInventory = new Inventory("Backpack",5,5);
+            mInventory.ItemMap[2, 3] = new InventoryItem("Test Item", new List<Vector2Int> { Vector2Int.Zero });
             //mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
         }
         public Rectangle Rectangle()

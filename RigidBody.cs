@@ -48,16 +48,6 @@ namespace Mononoke
 
         public Interaction mInteraction;
         List<RigidBody> PreviousOthers = new();
-        //public RigidBody(RigidBody body)
-        //{
-        //    mPosition = body.mPosition; 
-        //    mRotation = body.mRotation;
-        //    mOrigin = body.mOrigin;
-        //    mParent = body.mParent;
-        //    mVelocity = body.mVelocity;
-        //    mAngularVelocity = body.mAngularVelocity;
-        
-        //}
 
         public RigidBody(Vector2 pos, bool isStatic, float mass, Vector2 size, bool isTrigger = false, Interaction interaction = null, RigidBody parent = null)
         {
@@ -103,7 +93,7 @@ namespace Mononoke
                 {
                     OnCollisionStart(other);
                 }
-                //OnCollision(other); // Fires every frame we're hitting
+                OnCollision(other); // Fires every frame we're hitting
             }
             PreviousOthers = others;
         }
@@ -265,7 +255,7 @@ namespace Mononoke
             {
                 mTriggerActive = true;
                 return;
-            }            
+            }      
         }
         void PushOut(RigidBody other)
         {

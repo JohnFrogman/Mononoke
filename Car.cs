@@ -33,7 +33,7 @@ namespace Mononoke
             mStatic = true;
             mDoors = new RigidBody( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, new Interaction(() => { overworld.EnterCar(this);}, 0.6f), this);
             mBootInteractionArea = new RigidBody( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, new Interaction(() => { overworld.OpenBoot(this); }, 0.6f), this);
-            mBoot = new Inventory(10,10);
+            mBoot = new Inventory("Boot", 10,10);
             mSprite = sprite;
         }
         public Vector2 ExitPos()

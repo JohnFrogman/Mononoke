@@ -10,8 +10,9 @@ namespace Mononoke
     {
         public string Name;
         public InventoryItem[,] ItemMap; 
-        public Inventory(int width, int height) 
+        public Inventory(string name, int width, int height) 
         {
+            Name = name;  
             ItemMap = new InventoryItem[width, height];
         }
         public void AddItem(InventoryItem item, Vector2Int pos)
