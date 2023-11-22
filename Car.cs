@@ -40,11 +40,8 @@ namespace Mononoke
         {
             return mPosition + new Vector2(50f, mSprite.Height * -0.15f).RotateRadians(mRotation);
         }
-        public override void Update(GameTime gameTime)
+        public override void DoStep(GameTime gameTime)
         {
-            mDoors.Update(gameTime);
-            mBootInteractionArea.Update(gameTime);
-            
             // We add force to the forward vector, which is considered the forward of the wheels/car, even though this is unrealistic
             float factor = 1- (float)Math.Pow(Math.E, -0.3*Speed());
             Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds * factor);
@@ -70,7 +67,7 @@ namespace Mononoke
             //CollisionManager.Collidies(this);
             //mVelocity *= mDrag;
 
-            base.Update(gameTime);
+            base.DoStep(gameTime);
             //HandleControls();
         }
         public override void Draw(SpriteBatch spriteBatch) 

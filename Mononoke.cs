@@ -12,7 +12,7 @@ namespace Mononoke
     {
         public const int RENDER_WIDTH = 1920;
         public const int RENDER_HEIGHT = 1080;
-        public const bool SHOW_COLLIDERS = false;
+        public const bool SHOW_COLLIDERS = true;
         public const string SAVE_PATH = "data/save/";
         //        public const int DRAW_DISTANCE = 2;
 

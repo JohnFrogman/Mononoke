@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Microsoft.VisualBasic;
 using System;
+using System.Diagnostics;
 
 namespace Mononoke
 {
@@ -68,16 +69,10 @@ namespace Mononoke
             mPosition = pos;
             mOrigin = pos;
             mParent = parent;
-            CollisionManager.RegisterCollidable(this);
+            PhysicsManager.RegisterBody(this);
         }
-        public virtual void Update(GameTime gameTime)
+        public virtual void Collision(List<RigidBody> others)
         {
-            // if inactive leave.
-            if (!Active)
-                return;
-            DoStep(gameTime);
-            //RigidBody futureSelf = new RigidBody(this); // Right now we're stepping into things and correcting, really we should predict collisions and stop them happening
-            List<RigidBody> others = CollisionManager.Collidies(this);
             foreach (RigidBody previousOther in PreviousOthers)
             {
                 // If previous others has a member not in the new others then collision has ended
@@ -97,8 +92,15 @@ namespace Mononoke
             }
             PreviousOthers = others;
         }
-        void DoStep(GameTime gameTime)
+        // Only call from child or Physics manager, once per frame!!!
+        public virtual void DoStep(GameTime gameTime)
         {
+            if (this is Player)
+            {
+                Debug.WriteLine("Position: " + mPosition.ToString());
+                Debug.WriteLine("Previous Position: " + mPreviousPosition.ToString());
+                Debug.WriteLine("------");
+            }
             mPreviousPosition = mPosition;
             mPreviousRotation = mRotation;
             if (mParent != null)
@@ -123,6 +125,11 @@ namespace Mononoke
             //AirResistance();
             mNewRotation = 0;
             mCurrentForce = Vector2.Zero;
+        }
+        void UndoStep()
+        {
+            mPosition = mPreviousPosition;
+            mRotation = mPreviousRotation;
         }
         public Vector2 Forward()
         {
@@ -256,6 +263,10 @@ namespace Mononoke
                 mTriggerActive = true;
                 return;
             }      
+            if (!IsTrigger && !other.IsTrigger)
+            { 
+                UndoStep();
+            }
         }
         void PushOut(RigidBody other)
         {

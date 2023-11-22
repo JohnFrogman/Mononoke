@@ -78,7 +78,7 @@ namespace Mononoke
             if (songQueue.Count > 0)
             {
                 currentSong = 0;
-                MediaPlayer.Play(songQueue[currentSong]);
+                //MediaPlayer.Play(songQueue[currentSong]);
             }
             else 
                 Paused = true;

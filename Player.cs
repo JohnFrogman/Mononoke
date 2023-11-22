@@ -62,7 +62,7 @@ namespace Mononoke
             mPosition = car.ExitPos();
             Active = true;
         }
-        public override void Update(GameTime gameTime)
+        public override void DoStep(GameTime gameTime)
         {
             mAnimator.Update(gameTime);
             mCamera.Position = -mCameraFocus.mPosition + new Vector2(960, 540);
@@ -75,7 +75,7 @@ namespace Mononoke
                     mActiveInteraction.Use(); 
                 }
             }
-            base.Update(gameTime);
+            base.DoStep(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {

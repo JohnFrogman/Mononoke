@@ -163,6 +163,10 @@ namespace Mononoke
             }
             if (mHeldItem != null)
             {
+                // Need to check if it fits, then if there are any items in the slot.
+                // If no items in place then just place it
+                // If there's a single item where the held item would be placed then swap with it
+                // If more than one it can't be placed
                 if (CanPlace(mActiveInventory, mHeldItem, HighlightPos))
                 {
 

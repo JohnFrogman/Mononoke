@@ -73,8 +73,8 @@ namespace Mononoke
             SoundAssetManager.Update(gameTime);
             mInputManager.Update(gameTime);
             mController.Update(gameTime);
-            mCar.Update(gameTime);
-            mPlayer.Update(gameTime);
+            //mCar.Update(gameTime);
+            //mPlayer.Update(gameTime);
             mGui.Update(gameTime);
             mTerrainManager.Update(gameTime);
             float ListeningDistance;
@@ -89,10 +89,7 @@ namespace Mononoke
             float attentuation = 3f * (float)Math.Pow(0.5f, ListeningDistance);
             SoundAssetManager.SetMusicVolume(attentuation);
             
-            foreach (RigidBody b in mBodies)
-            {
-                b.Update(gameTime);
-            }
+            PhysicsManager.DoStep(gameTime);
             float totalSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
 
