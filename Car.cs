@@ -2,10 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input; 
 using System;
+using System.Collections.Generic;
 
 namespace Mononoke
 {
-    internal class Car : RigidBody
+    internal class Car
     {
         //float mFuel;
 
@@ -20,6 +21,7 @@ namespace Mononoke
         float mBrake = 0f;
         float mHorizontalDamping = 0.6f;
 
+        public RigidBody mBody;
         RigidBody mDoors;
         RigidBody mBootInteractionArea;
         Texture2D mSprite;
@@ -28,54 +30,52 @@ namespace Mononoke
 
         public Inventory mBoot;
         public Car(Overworld ow, Vector2 pos, Texture2D sprite, Overworld overworld)
-            : base(pos, false, 700, new Vector2(sprite.Width, sprite.Height))
         {
-            mStatic = true;
-            mDoors = new RigidBody( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, new Interaction(() => { overworld.EnterCar(this);}, 0.6f), this);
-            mBootInteractionArea = new RigidBody( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, new Interaction(() => { overworld.OpenBoot(this); }, 0.6f), this);
+            List<Vector2> vertices = new List<Vector2>()
+            {
+                 new Vector2(-30, 53)
+                ,new Vector2(-18, 64)
+                ,new Vector2(18, 64)
+                ,new Vector2(30, 53)
+
+                ,new Vector2(30, -53)
+                ,new Vector2(18, -64)
+                ,new Vector2(-18, -64)
+                ,new Vector2(-30, -53)
+            };
+            mBody = RigidBody.BuildPolygon(pos, true, 700, vertices, new Vector2(sprite.Width, sprite.Height) / 2);
+            //mBody = RigidBody.BuildRectangle(pos, true, 700, new Vector2(60,128));
+            mDoors = RigidBody.BuildRectangle( Vector2.UnitY * sprite.Height * -0.15f, true, 1, new Vector2(100f,30f),true, new Interaction(() => { overworld.EnterCar(this);}, 0.6f), mBody);
+            mBootInteractionArea = RigidBody.BuildRectangle( Vector2.UnitY * sprite.Height * 0.3f, true, 1, new Vector2(80f, sprite.Height * 0.5f), true, new Interaction(() => { overworld.OpenBoot(this); }, 0.6f), mBody);
             mBoot = new Inventory("Boot", 10,10);
             mSprite = sprite;
         }
         public Vector2 ExitPos()
         {
-            return mPosition + new Vector2(50f, mSprite.Height * -0.15f).RotateRadians(mRotation);
+            return mBody.mPosition + new Vector2(50f, mSprite.Height * -0.15f).RotateRadians(mBody.mRotation);
         }
-        public override void DoStep(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             // We add force to the forward vector, which is considered the forward of the wheels/car, even though this is unrealistic
             float factor = 1- (float)Math.Pow(Math.E, -0.3*Speed());
-            Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds * factor);
+            mBody.Rotate(-3f * mSteeringPos * (float)gameTime.ElapsedGameTime.TotalSeconds * factor);
             // Stepping on the gas
-            AddForce(Forward() * mGas * 10000f);
+            mBody.AddForce(mBody.Forward() * mGas * 10000f);
             // To stop drift we can apply a very strong damping to and horizontal movement, this is kind of realistic,
             // because in real life wheels only rotate on one axis and any movement orthogonal to that axis going to
             // experience very high friction, (which if overcome would be a skid). Can add a ceiling to the damping to 
             // allow drift
             HorizontalDamping();
-
             ApplyBrakes(gameTime);
-
-
-            //mVelocity += (float)gameTime.ElapsedGameTime.TotalSeconds * mCurrentForce / mMass;
-            //https://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
-            //Vector2 frontWheel = mPosition + mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            //Vector2 backWheel = mPosition - mWheelBase * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            //backWheel += mVelocity * PIXELS_PER_METRE * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation), (float)Math.Sin(mRotation));
-            //frontWheel += mVelocity * PIXELS_PER_METRE * (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2((float)Math.Cos(mRotation + mSteeringPos), (float)Math.Sin(mRotation + mSteeringPos));
-            //mPosition = (frontWheel + backWheel) / 2;
-            //mRotation = (float)Math.Atan2(frontWheel.Y - backWheel.Y, frontWheel.X - backWheel.X);
-            //CollisionManager.Collidies(this);
-            //mVelocity *= mDrag;
-
-            base.DoStep(gameTime);
-            //HandleControls();
         }
-        public override void Draw(SpriteBatch spriteBatch) 
+        public void Draw(SpriteBatch spriteBatch) 
         {
             mDoors.Draw(spriteBatch);
             mBootInteractionArea.Draw(spriteBatch);
             //base.Draw(spriteBatch);
-            spriteBatch.Draw(mSprite, mPosition, null, Color.White, mRotation, Centre(), 1f, SpriteEffects.None, 0f);
+            mBody.Draw(spriteBatch);
+            spriteBatch.Draw(mSprite, mBody.mPosition, null, Color.White, mBody.mRotation, mBody.mCentre, 1f, SpriteEffects.None, 0f);
+            //mBody.DrawVertices(spriteBatch);
         }
         public void SetGas(float gas)
         {
@@ -106,13 +106,13 @@ namespace Mononoke
         }
         public float Speed()
         {
-            return mVelocity.Magnitude();
+            return mBody.mVelocity.Magnitude();
         }
         void HorizontalDamping()
         {
-            Vector2 fV = Forward() * Vector2.Dot(Forward(), mVelocity);
-            Vector2 rV = Right() * Vector2.Dot(Right(), mVelocity);
-            mVelocity = fV + rV * mHorizontalDamping; 
+            Vector2 fV = mBody.Forward() * Vector2.Dot(mBody.Forward(), mBody.mVelocity);
+            Vector2 rV = mBody.Right() * Vector2.Dot(mBody.Right(), mBody.mVelocity);
+            mBody.mVelocity = fV + rV * mHorizontalDamping; 
         }
 
         public void ToggleRadio()
@@ -122,13 +122,13 @@ namespace Mononoke
         }
         void ApplyBrakes(GameTime gameTime )
         {
-            Vector2 brakingDeceleration = (float)gameTime.ElapsedGameTime.TotalSeconds * Back() * mBrake * 10f; // Friction from the brake is roughly Brake Pedal Pos * Mass * Gravity, so just don't include mass term to get deceleration from A = f/m
-            Vector2 fV = Forward() * Vector2.Dot(Forward(), mVelocity);
-            Vector2 rV = Right() * Vector2.Dot(Right(), mVelocity);
+            Vector2 brakingDeceleration = (float)gameTime.ElapsedGameTime.TotalSeconds * mBody.Back() * mBrake * 10f; // Friction from the brake is roughly Brake Pedal Pos * Mass * Gravity, so just don't include mass term to get deceleration from A = f/m
+            Vector2 fV = mBody.Forward() * Vector2.Dot(mBody.Forward(), mBody.mVelocity);
+            Vector2 rV = mBody.Right() * Vector2.Dot(mBody.Right(), mBody.mVelocity);
             if (brakingDeceleration.Magnitude() > fV.Magnitude())
-                mVelocity = rV;
+                mBody.mVelocity = rV;
             else
-                mVelocity += brakingDeceleration;
+                mBody.mVelocity += brakingDeceleration;
         }
         //void HandleControls()
         //{

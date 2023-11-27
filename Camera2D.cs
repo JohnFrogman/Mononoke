@@ -36,8 +36,9 @@ namespace Mononoke
             Matrix rotationMatrix = Matrix.CreateRotationZ(Rotation);
             //Matrix scaleMatrix = Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)); // No zoom for now
             Matrix originMatrix = Matrix.CreateTranslation(new Vector3(Origin.X, Origin.Y, 0));
+            Matrix scaleMatrix = Matrix.CreateScale( Mononoke.RENDER_SCALE );
 
-            return translationMatrix * rotationMatrix /** scaleMatrix*/ * originMatrix;
+            return translationMatrix * rotationMatrix * scaleMatrix * originMatrix;
         }
     }
 }

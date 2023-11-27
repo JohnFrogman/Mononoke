@@ -10,125 +10,56 @@ using Myra.Graphics2D.TextureAtlases;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Mononoke
-{
-    class ItemPanel
-    {
-        public Texture2D mImage;
-        public Panel mPanel;
-        public ItemPanel(/*Texture2D image,*/ Panel panel)
-        {
-            //mImage = image;
-            mPanel = panel;
-        }
-    }
+{    
     internal class InventoryManager
     {
         public bool Active = false;
         Desktop mDesktop;
-        List<Inventory> mActiveInventories = new();
-        Dictionary<Inventory, Dictionary<Vector2Int, Panel>> mInventoryGridMap = new();
+        Panel mMainPanel;
+        Dictionary<Inventory, InventoryGUI> mInventoryMap = new();
         Inventory mActiveInventory;
         Vector2Int HighlightPos = Vector2Int.Zero;
         InventoryItem mHeldItem = null;
-        const int ITEM_BOX_SIZE = 32;
-        readonly Color DEFAULT_ITEM_COL = Color.AntiqueWhite;
-        readonly Color HIGHLIGHTED_ITEM_COL = Color.Red;
-        public InventoryManager(Desktop desktop)
+        ItemPanel mHeldItemPanel;
+        public InventoryManager(Desktop desktop, Panel mainPanel)
         {
             mDesktop = desktop;
-        }
-        Grid BuildInventoryGrid(Inventory inv)
-        {
-            Dictionary<Vector2Int, Panel> map = new();
-            Grid inventoryGrid = new Grid
-            {
-                //ShowGridLines = true,
-                ColumnSpacing = 0,
-                RowSpacing = 0
-            };
-            inventoryGrid.Padding = new Thickness(0);
-            inventoryGrid.Margin = new Thickness(0);
-            inventoryGrid.Background = new SolidBrush(Color.Transparent);
-            inventoryGrid.Width = inv.ItemMap.GetLength(0) * ITEM_BOX_SIZE;
-            inventoryGrid.Height = inv.ItemMap.GetLength(1) * ITEM_BOX_SIZE;
-            inventoryGrid.Enabled = true;
-            inventoryGrid.Visible = true;
-            for (int i = 0; i < inv.ItemMap.GetLength(0); i++)
-            {
-                for (int j = 0; j < inv.ItemMap.GetLength(1); j++)
-                {
-                    Panel slot = new Panel();
-                    slot.Background = new SolidBrush(DEFAULT_ITEM_COL);
-                    slot.Width = ITEM_BOX_SIZE;
-                    slot.Height = ITEM_BOX_SIZE;
-                    Image icon = new Image();
-                    if (inv.ItemMap[i, j] != null)
-                    {
-                        Texture2D tex = TextureAssetManager.GetIconByName("petrichor");
-                        icon.Renderable = new TextureRegion(tex);
-                        //portrait.Scale = new Vector2(ITEM_BOX_SIZE / tex.Width, ITEM_BOX_SIZE / tex.Height);
-                        icon.HorizontalAlignment = HorizontalAlignment.Center;
-                        icon.VerticalAlignment = VerticalAlignment.Center;
-                    }
-                    slot.AddChild(icon);
-                    slot.GridRow = j;
-                    slot.GridColumn = i;
-                    map.Add(new Vector2Int(i, j), slot);
-                    inventoryGrid.AddChild(slot);
-                }
-            }
-            mInventoryGridMap.Add(inv, map);
-            return inventoryGrid;
+            mMainPanel = mainPanel;
         }
         public void ToggleInventory(Inventory inv, Point pos) // pos where it appears on on the screen, nothing to do with the item slot map
         {
-            if (mActiveInventories.Contains(inv))
+            if (mInventoryMap.ContainsKey(inv))
             {
-                mInventoryGridMap[inv].First().Value.Parent.RemoveFromParent();
-                mActiveInventories.Remove(inv);
-                mInventoryGridMap.Remove(inv);
+                mInventoryMap[inv].Delete();
+                mInventoryMap.Remove(inv);
+                //mDesktop.HideContextMenu();
                 SwitchInventory(true);
-                Active = mActiveInventories.Count > 0;
+                Active = mInventoryMap.Count > 0;
                 return;
             }
-            mActiveInventories.Add(inv);
-            Grid inventoryGrid = BuildInventoryGrid(inv);
-            if (mActiveInventories.Count == 1)
+            mInventoryMap.Add(inv, new InventoryGUI(inv, mMainPanel, mDesktop));
+            if (mInventoryMap.Count == 1)
             {
                 mActiveInventory = inv;
                 HighlightPos = Vector2Int.Zero;
-                mInventoryGridMap[mActiveInventory][HighlightPos].Background = new SolidBrush(HIGHLIGHTED_ITEM_COL);
+                mInventoryMap[inv].Highlight(HighlightPos);
             }
-            VerticalStackPanel container = new VerticalStackPanel
-            {
-                Spacing = 4
-            };
-            Label title = new Label();
-            title.Text = inv.Name;
-            title.HorizontalAlignment = HorizontalAlignment.Center;
-            container.Background = new SolidBrush(Color.Gray);
-            container.AddChild(title);
-            container.AddChild(inventoryGrid);
-            mDesktop.ShowContextMenu(container, pos);
+            //mDesktop.ShowContextMenu(mInventoryMap[inv].Container, pos);
+
             Active = true;
         }
-        //void ItemClick(InventoryItem item)
-        //{
-        //    int i;
-        //    i = 0;
-        //    i++;
-        //}
         public void SwitchInventory(bool forward)
         {
-            if (mActiveInventories.Count < 2) return;
-            int index = (forward ? 1 : -1) + mActiveInventories.IndexOf(mActiveInventory);
-            if (index < 0)
-                index = mActiveInventories.Count - 1;
-            if (index >= mActiveInventories.Count)
-                index = 0;
-            mActiveInventory = mActiveInventories[index];
+            //if (mInventoryMap.Count < 2) return;
+            //int index = (forward ? 1 : -1) + mInventoryMap.IndexOf(mActiveInventory);
+            //if (index < 0)
+            //    index = mInventoryMap.Count - 1;
+            //if (index >= mInventoryMap.Count)
+            //    index = 0;
+            //mActiveInventory = mInventoryMap[index];
 
         }
         public void HideInventory()
@@ -139,7 +70,7 @@ namespace Mononoke
         }
         public void InventoryMove(Vector2Int v)
         {
-            mInventoryGridMap[mActiveInventory][HighlightPos].Background = new SolidBrush(DEFAULT_ITEM_COL);
+            mInventoryMap[mActiveInventory].Unhighlight(HighlightPos);
             HighlightPos += v;
             if (HighlightPos.X < 0)
                 HighlightPos.X = mActiveInventory.ItemMap.GetLength(0) - 1;
@@ -151,15 +82,16 @@ namespace Mononoke
             if (HighlightPos.Y >= mActiveInventory.ItemMap.GetLength(1))
                 HighlightPos.Y = 0;
 
-            mInventoryGridMap[mActiveInventory][HighlightPos].Background = new SolidBrush(HIGHLIGHTED_ITEM_COL);
-            //.GridRow(HighlightPos.X, HighlightPos.Y)
+            mInventoryMap[mActiveInventory].Highlight(HighlightPos);
         }
         public void OnInventorySelect()
         {
             InventoryItem highlightedItem = mActiveInventory.ItemMap[HighlightPos.X, HighlightPos.Y];
             if (mHeldItem == null)
             {
+                mInventoryMap[mActiveInventory].GrabItem(HighlightPos);
                 mHeldItem = highlightedItem;
+                mHeldItemPanel = new ItemPanel(0,0, mHeldItem);
             }
             if (mHeldItem != null)
             {
@@ -169,8 +101,14 @@ namespace Mononoke
                 // If more than one it can't be placed
                 if (CanPlace(mActiveInventory, mHeldItem, HighlightPos))
                 {
-
+                    mActiveInventory.ItemMap[HighlightPos.X, HighlightPos.Y] = mHeldItem;
+                    mHeldItem = null;
                 }
+                //if (CanSwap(mActiveInventory, mHeldItem, HighlightPos))
+                //{
+                //    InventoryItem i = mHeldItem;
+
+                //}
             }
 
         }

@@ -20,7 +20,7 @@ namespace Mononoke
         static TimeSpan Timer;
         static List<Song> songQueue = new();
         static int currentSong = 0;
-        static bool Paused = false;
+        static bool Paused = true;
         static float MusicVolume = 0.01f;
         public static void SetVolume(float f)
         { 
@@ -65,7 +65,6 @@ namespace Mononoke
         }
         public static void PlaySongsByName(List<string> names)
         {
-            Paused = false;
             songQueue.Clear();
             Timer = TimeSpan.Zero;
             foreach (string name in names)
@@ -78,7 +77,7 @@ namespace Mononoke
             if (songQueue.Count > 0)
             {
                 currentSong = 0;
-                //MediaPlayer.Play(songQueue[currentSong]);
+                MediaPlayer.Play(songQueue[currentSong]);
             }
             else 
                 Paused = true;

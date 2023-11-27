@@ -17,11 +17,12 @@ namespace Mononoke
         Walking,
         OpenDoor
     }
-    internal class Player : RigidBody
+    internal class Player
     {
         Camera2D mCamera;
         public Interaction mActiveInteraction;
         RigidBody mCameraFocus;
+        public RigidBody mBody;
         Animator mAnimator;
         const float mWalkSpeed = 2.5f;
         public bool InCar = false;
@@ -29,43 +30,58 @@ namespace Mononoke
         float mInteractTimer = 0f;
         public Inventory mInventory;
         public Player(Vector2 pos, Overworld overworld, Camera2D camera, GraphicsDeviceManager graphics) 
-            : base( pos, false, 1, new Vector2(20, 17) )
         {
-            mCameraFocus = this;
+            List<Vector2> vertices = new List<Vector2>()
+            {
+                new Vector2(10, 1)
+                ,new Vector2(10, -3)
+                ,new Vector2(8, -5)
+                ,new Vector2(4, -6)
+                ,new Vector2(-4, -6)
+                ,new Vector2(-8, -5)
+                ,new Vector2(-10, -3)
+                ,new Vector2(-10, 1)
+                ,new Vector2(-3, 7)
+                ,new Vector2(3, 7)
+            };
+            mBody = RigidBody.BuildPolygon(pos, false, 700, vertices, new Vector2(20, 17) / 2);
+            //mBody = RigidBody.BuildRectangle(pos, false, 1, new Vector2(20,17));
+            mBody.ActivatesTriggers = true;
+            mCameraFocus = mBody;
             mCamera = camera;
             mAnimator = new Animator();
-            mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
-            mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_idle.json", graphics));
-            mAnimator.AddAnimation((int)ePlayerAnimationState.OpenDoor, new Animation(this, "data/textures/units/player_grab.json", graphics, (int)ePlayerAnimationState.Idle));
+            mAnimator.AddAnimation((int)ePlayerAnimationState.Walking, new Animation(mBody, "data/textures/units/player_walk_cycle.json", graphics));
+            mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(mBody, "data/textures/units/player_idle.json", graphics));
+            mAnimator.AddAnimation((int)ePlayerAnimationState.OpenDoor, new Animation(mBody, "data/textures/units/player_grab.json", graphics, (int)ePlayerAnimationState.Idle));
             mInventory = new Inventory("Backpack",5,5);
             mInventory.ItemMap[2, 3] = new InventoryItem("Test Item", new List<Vector2Int> { Vector2Int.Zero });
             //mAnimator.AddAnimation((int)ePlayerAnimationState.Idle, new Animation(this, "data/textures/units/player_walk_cycle.json", graphics));
         }
         public Rectangle Rectangle()
         {
-            return new Rectangle((mPosition - mSize/2f).ToPoint(), mSize.ToPoint());
+            return new Rectangle((mBody.mPosition - mBody.mSize /2f).ToPoint(), mBody.mSize.ToPoint());
         }
         public void EnterCar(Car car)
         {
             InCar = true;
-            mCameraFocus = car;
-            car.mStatic = false;
-            Active = false;
-            mDrag = 0f;
+            mCameraFocus = car.mBody;
+            car.mBody.mStatic = false;
+            mBody.Active = false;
+            mBody.mDrag = 0f;
         }
         public void ExitCar(Car car)
         {
             InCar = false;
-            mCameraFocus = this;
-            car.mStatic = true;
-            car.Stop();
-            mPosition = car.ExitPos();
-            Active = true;
+            mCameraFocus = mBody;
+            car.mBody.mStatic = true;
+            car.mBody.Stop();
+            mBody.mPosition = car.ExitPos();
+            mBody.Active = true;
         }
-        public override void DoStep(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             mAnimator.Update(gameTime);
-            mCamera.Position = -mCameraFocus.mPosition + new Vector2(960, 540);
+            mCamera.Position = -mCameraFocus.mPosition + new Vector2(480, 270);
             if (mActiveInteraction != null && Locked && mActiveInteraction.Duration > 0f)
             {
                 mInteractTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -75,14 +91,13 @@ namespace Mononoke
                     mActiveInteraction.Use(); 
                 }
             }
-            base.DoStep(gameTime);
         }
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             if (!InCar)
             {
                 mAnimator.Draw(spriteBatch);
-                base.Draw(spriteBatch);
+                mBody.Draw(spriteBatch);
             }
         }
         public void Interact()
@@ -104,22 +119,21 @@ namespace Mononoke
             {
                 dir.Normalize();
                 mAnimator.SetCurrentState((int)ePlayerAnimationState.Walking);
-                mVelocity = dir * mWalkSpeed;
-                mRotation = -mVelocity.ClockwiseAngleBetween(Vector2.UnitY);
+                mBody.mVelocity = dir * mWalkSpeed;
+                mBody.mRotation = -mBody.mVelocity.ClockwiseAngleBetween(Vector2.UnitY);
             }
             else
             {
                 mAnimator.SetCurrentState((int)ePlayerAnimationState.Idle);
-                mVelocity = Vector2.Zero;
+                mBody.mVelocity = Vector2.Zero;
             }
         }
-        public override void OnCollisionStart(RigidBody other)
-        { 
+        public void OnCollisionStart(RigidBody other)
+        {
             if (other.IsTrigger)
             {
                 mActiveInteraction = other.mInteraction;
             }
-            base.OnCollisionStart(other);
         }
     }
 }

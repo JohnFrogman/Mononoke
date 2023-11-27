@@ -33,6 +33,6 @@ namespace Mononoke
         public static bool operator ==(Vector2Int a, Vector2Int b)
         {
             return a.X == b.X && a.Y == b.Y;
-        }
+        }        
     }
 }

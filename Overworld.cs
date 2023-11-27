@@ -17,7 +17,7 @@ namespace Mononoke
         private string mSaveSlotName = "";
         private GUI mGui;
         private Camera2D mCamera;
-        private Player mPlayer;
+        public static Player mPlayer;
         private Car mCar;
         private TerrainManager mTerrainManager;
         private InputManager mInputManager;
@@ -34,9 +34,10 @@ namespace Mononoke
             mInputManager = new InputManager();
             mController = new OverworldController(mInputManager, this, mPlayer, mCar, mGui.mInventoryManager );
             SoundAssetManager.PlaySongsByName(new List<string>{"polygondwanaland", "deserted dunes welcome weary feet"});
+            SoundAssetManager.SetPaused(true);
             //mPlayer.EnterCar(mCar);
             //mCollidables.Add(new Collidable(new Vector2(0, 0), true, TextureAssetManager.GetPlayerSprite(), 100, Vector2.Zero));
-            mBodies.Add(new RigidBody(new Vector2(-200,0), false, 300, new Vector2(100,500)));
+            mBodies.Add(RigidBody.BuildRectangle(new Vector2(-200,0), false, 300, new Vector2(100,500)));
         }
         void IGameState.Draw(SpriteBatch spriteBatch, GraphicsDeviceManager _graphics)
         {
@@ -54,7 +55,7 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
-            mGui.mInventoryManager.ToggleInventory(car.mBoot, car.mPosition.ToPoint());
+            mGui.mInventoryManager.ToggleInventory(car.mBoot, car.mBody.mPosition.ToPoint());
             //mGui.ShowInventory(car.mBoot, car.mPosition);
             mPlayer.mActiveInteraction = new Interaction( CloseBoot, 1f);
         }
@@ -73,10 +74,10 @@ namespace Mononoke
             SoundAssetManager.Update(gameTime);
             mInputManager.Update(gameTime);
             mController.Update(gameTime);
-            //mCar.Update(gameTime);
-            //mPlayer.Update(gameTime);
             mGui.Update(gameTime);
             mTerrainManager.Update(gameTime);
+            mPlayer.Update(gameTime);
+            mCar.Update(gameTime);
             float ListeningDistance;
             if (mPlayer.InCar)
             {
@@ -84,7 +85,7 @@ namespace Mononoke
             }
             else
             { 
-                ListeningDistance = (mPlayer.mPosition - mCar.mPosition).Magnitude() / RigidBody.PIXELS_PER_METRE;
+                ListeningDistance = (mPlayer.mBody.mPosition - mCar.mBody.mPosition).Magnitude() / RigidBody.PIXELS_PER_METRE;
             }
             float attentuation = 3f * (float)Math.Pow(0.5f, ListeningDistance);
             SoundAssetManager.SetMusicVolume(attentuation);

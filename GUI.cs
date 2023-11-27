@@ -51,7 +51,7 @@ namespace Mononoke
             headerPanel.AddChild(mSpeedLabel);
 
             mMainPanel.AddChild(headerPanel);
-            mInventoryManager = new (desktop);
+            mInventoryManager = new (desktop, mMainPanel);
         }
         // 0 = 01/01/1114
         // t = days since 01/01/1114
