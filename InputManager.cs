@@ -89,6 +89,29 @@ namespace Mononoke
             mKeyboardBindings.Add(eInputType.InventoryRight, Keys.L);
             mKeyboardBindings.Add(eInputType.OpenPlayerInventory, Keys.B);
             mKeyboardBindings.Add(eInputType.InventorySelect, Keys.Space);
+
+            //mGamepadBindings.Clear();
+            //mGamepadBindings.Add(eInputType.Up, Keys.W);
+            //mGamepadBindings.Add(eInputType.Down, Keys.S);
+            //mGamepadBindings.Add(eInputType.Left, Keys.A);
+            //mGamepadBindings.Add(eInputType.Right, Keys.D);
+             
+            //mGamepadBindings.Add(eInputType.Interact, Keys.E);
+
+            //mGamepadBindings.Add(eInputType.Accelerate, Keys.W);
+            //mGamepadBindings.Add(eInputType.Brake, Keys.S);
+            //mGamepadBindings.Add(eInputType.TurnLeft, Keys.A);
+            //mGamepadBindings.Add(eInputType.TurnRight, Keys.D);
+            //mGamepadBindings.Add(eInputType.Radio, Keys.R);
+
+            //mGamepadBindings.Add(eInputType.SwitchInventoryForward, Keys.O);
+            //mGamepadBindings.Add(eInputType.SwitchInventoryBack, Keys.U);
+            //mGamepadBindings.Add(eInputType.InventoryUp, Keys.K);
+            //mGamepadBindings.Add(eInputType.InventoryDown, Keys.I);
+            //mGamepadBindings.Add(eInputType.InventoryLeft, Keys.J);
+            //mGamepadBindings.Add(eInputType.InventoryRight, Keys.L);
+            //mGamepadBindings.Add(eInputType.OpenPlayerInventory, Keys.B);
+            //mGamepadBindings.Add(eInputType.InventorySelect, Keys.Space);
         }
     }
 }

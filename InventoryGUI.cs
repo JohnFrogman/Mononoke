@@ -12,6 +12,18 @@ using Microsoft.Xna.Framework;
 
 namespace Mononoke
 {
+    class HeldItemPanel
+    {
+        List<ItemPanel> Panels = new();
+        public HeldItemPanel(InventoryItem item, Vector2Int pos) 
+        { 
+        }
+        public void SetPos(Vector2Int pos, Inventory inventory)
+        {
+
+        }
+
+    }
     class ItemPanel
     {
         public Panel mPanel;

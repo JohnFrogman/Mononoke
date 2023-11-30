@@ -82,6 +82,7 @@ namespace Mononoke
             if (HighlightPos.Y >= mActiveInventory.ItemMap.GetLength(1))
                 HighlightPos.Y = 0;
 
+            mHeldItemPanel.SetPosition(HighlightPos);
             mInventoryMap[mActiveInventory].Highlight(HighlightPos);
         }
         public void OnInventorySelect()
@@ -91,7 +92,7 @@ namespace Mononoke
             {
                 mInventoryMap[mActiveInventory].GrabItem(HighlightPos);
                 mHeldItem = highlightedItem;
-                mHeldItemPanel = new ItemPanel(0,0, mHeldItem);
+                ShowHeldItemPanel();                
             }
             if (mHeldItem != null)
             {
@@ -123,6 +124,10 @@ namespace Mononoke
                     return false;
             }
             return true;
+        }
+        void ShowHeldItemPanel()
+        {
+            mHeldItemPanel = new ItemPanel(0, 0, mHeldItem);
         }
     }
 }
