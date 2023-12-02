@@ -5,10 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Myra.Graphics2D.UI;
-using Myra.Graphics2D.Brushes;
-using Myra.Graphics2D.TextureAtlases;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace Mononoke
 {
@@ -55,18 +51,15 @@ namespace Mononoke
         }
         public void OpenBoot(Car car)
         {
-            mGui.mInventoryManager.ToggleInventory(car.mBoot, car.mBody.mPosition.ToPoint());
+            Point p = car.mBody.mPosition.ToPoint();
+            Vector2Int screenPos = new Vector2Int(p.X % Mononoke.RENDER_WIDTH, p.Y % Mononoke.RENDER_HEIGHT);
+            mGui.mInventoryManager.ToggleInventory(car.mBoot, screenPos);
             //mGui.ShowInventory(car.mBoot, car.mPosition);
             mPlayer.mActiveInteraction = new Interaction( CloseBoot, 1f);
         }
-        public void ShowPlayerInventory()
-        {
-            //mGui.ShowInventory(car.mBoot);
-            //mPlayer.mActiveInteraction = () => { CloseBoot(); };
-            //mPlayer.Enabled = false;
-        }
         public void CloseBoot()
-        { 
+        {
+            mGui.mInventoryManager.ToggleInventory(mCar.mBoot, Vector2Int.Zero);
             //mGui.();
         }
         void IGameState.Update(GameTime gameTime)

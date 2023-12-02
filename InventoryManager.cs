@@ -23,13 +23,13 @@ namespace Mononoke
         Inventory mActiveInventory;
         Vector2Int HighlightPos = Vector2Int.Zero;
         InventoryItem mHeldItem = null;
-        ItemPanel mHeldItemPanel;
+        HeldItemPanel mHeldItemPanel;
         public InventoryManager(Desktop desktop, Panel mainPanel)
         {
             mDesktop = desktop;
             mMainPanel = mainPanel;
         }
-        public void ToggleInventory(Inventory inv, Point pos) // pos where it appears on on the screen, nothing to do with the item slot map
+        public void ToggleInventory(Inventory inv, Vector2Int pos) // pos where it appears on on the screen, nothing to do with the item slot map
         {
             if (mInventoryMap.ContainsKey(inv))
             {
@@ -40,33 +40,30 @@ namespace Mononoke
                 Active = mInventoryMap.Count > 0;
                 return;
             }
-            mInventoryMap.Add(inv, new InventoryGUI(inv, mMainPanel, mDesktop));
+            mInventoryMap.Add(inv, new InventoryGUI(inv, mMainPanel, mDesktop, pos));
             if (mInventoryMap.Count == 1)
             {
                 mActiveInventory = inv;
                 HighlightPos = Vector2Int.Zero;
                 mInventoryMap[inv].Highlight(HighlightPos);
             }
-            //mDesktop.ShowContextMenu(mInventoryMap[inv].Container, pos);
-
             Active = true;
         }
         public void SwitchInventory(bool forward)
         {
-            //if (mInventoryMap.Count < 2) return;
-            //int index = (forward ? 1 : -1) + mInventoryMap.IndexOf(mActiveInventory);
-            //if (index < 0)
-            //    index = mInventoryMap.Count - 1;
-            //if (index >= mInventoryMap.Count)
-            //    index = 0;
-            //mActiveInventory = mInventoryMap[index];
+            if (mInventoryMap.Count < 2) return;
 
-        }
-        public void HideInventory()
-        {
-            //inventoryGrid.Enabled = false;
-            //inventoryGrid.Visible = false;
-            //inventoryGrid.Widgets.Clear();
+            mInventoryMap[mActiveInventory].Unhighlight(HighlightPos);
+            HighlightPos = Vector2Int.Zero;
+            int index = (forward ? 1 : -1) + mInventoryMap.Keys.ToList().IndexOf(mActiveInventory);
+            if (index < 0)
+                index = mInventoryMap.Count - 1;
+            if (index >= mInventoryMap.Count)
+                index = 0;
+            mActiveInventory = mInventoryMap.Keys.ToList()[index];
+            mInventoryMap[mActiveInventory].Highlight(HighlightPos);
+            if (mHeldItem != null)
+                mHeldItemPanel.SetPos(mInventoryMap[mActiveInventory].ScreenPos, HighlightPos,mActiveInventory);
         }
         public void InventoryMove(Vector2Int v)
         {
@@ -82,34 +79,28 @@ namespace Mononoke
             if (HighlightPos.Y >= mActiveInventory.ItemMap.GetLength(1))
                 HighlightPos.Y = 0;
 
-            mHeldItemPanel.SetPosition(HighlightPos);
+            if (mHeldItemPanel != null) { 
+                mHeldItemPanel.SetPos(mInventoryMap[mActiveInventory].ScreenPos, HighlightPos, mActiveInventory);
+            }
             mInventoryMap[mActiveInventory].Highlight(HighlightPos);
         }
         public void OnInventorySelect()
         {
             InventoryItem highlightedItem = mActiveInventory.ItemMap[HighlightPos.X, HighlightPos.Y];
-            if (mHeldItem == null)
+            if (mHeldItem == null && highlightedItem != null)
             {
                 mInventoryMap[mActiveInventory].GrabItem(HighlightPos);
-                mHeldItem = highlightedItem;
+                mHeldItem = new InventoryItem(highlightedItem);
+                mActiveInventory.ItemMap[HighlightPos.X, HighlightPos.Y] = null;
                 ShowHeldItemPanel();                
             }
-            if (mHeldItem != null)
+            else if (mHeldItem != null && highlightedItem == null)
             {
-                // Need to check if it fits, then if there are any items in the slot.
-                // If no items in place then just place it
-                // If there's a single item where the held item would be placed then swap with it
-                // If more than one it can't be placed
-                if (CanPlace(mActiveInventory, mHeldItem, HighlightPos))
-                {
-                    mActiveInventory.ItemMap[HighlightPos.X, HighlightPos.Y] = mHeldItem;
-                    mHeldItem = null;
-                }
-                //if (CanSwap(mActiveInventory, mHeldItem, HighlightPos))
-                //{
-                //    InventoryItem i = mHeldItem;
-
-                //}
+                mActiveInventory.AddItem(mHeldItem, HighlightPos);
+                mInventoryMap[mActiveInventory].PlaceItem(HighlightPos, mHeldItem);
+                mHeldItem = null;
+                mHeldItemPanel.Delete();
+                mHeldItemPanel = null;
             }
 
         }
@@ -127,7 +118,7 @@ namespace Mononoke
         }
         void ShowHeldItemPanel()
         {
-            mHeldItemPanel = new ItemPanel(0, 0, mHeldItem);
+            mHeldItemPanel = new HeldItemPanel(mMainPanel, mHeldItem, HighlightPos, mInventoryMap[mActiveInventory].ScreenPos, mActiveInventory);
         }
     }
 }

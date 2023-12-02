@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,11 @@ namespace Mononoke
         public static bool operator ==(Vector2Int a, Vector2Int b)
         {
             return a.X == b.X && a.Y == b.Y;
-        }        
+        }     
+        
+        //public static overide bool Equals(Vector2Int a, Vector2Int b)
+        //{
+        //    return a.X == b.X && a.Y == b.Y;
+        //}
     }
 }

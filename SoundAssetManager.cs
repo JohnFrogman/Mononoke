@@ -88,6 +88,7 @@ namespace Mononoke
         }
         public static void Initialise()
         {
+            return;
             MediaPlayer.Volume = 0.01f * MusicVolume;
             string musicDir = "data/music/";
             string sfxDir = "data/sfx/";
@@ -108,6 +109,8 @@ namespace Mononoke
                     Songs.Add(name, Song.FromUri(name, new Uri(Path.GetFullPath(f))));
                 }
             }
+
+
             //files = Directory.GetFiles(sfxDir);
             //foreach (string f in files)
             //{

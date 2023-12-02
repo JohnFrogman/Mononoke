@@ -124,7 +124,7 @@ namespace Mononoke
         {
             if (mInputManager.ButtonReleased(eInputType.OpenPlayerInventory))
             {
-                mInventoryManager.ToggleInventory(mPlayer.mInventory, new Point(Mononoke.RENDER_WIDTH/2, Mononoke.RENDER_HEIGHT/2));
+                mInventoryManager.ToggleInventory(mPlayer.mInventory, new Vector2Int(Mononoke.RENDER_WIDTH/2, Mononoke.RENDER_HEIGHT/2));
             }
 
             if (!mInventoryManager.Active) return;

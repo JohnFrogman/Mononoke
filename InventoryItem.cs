@@ -16,5 +16,10 @@ namespace Mononoke
             Occupies = occupies;
             if (!Occupies.Contains(Vector2Int.Zero) || Occupies.Count == 0) { Occupies.Add(Vector2Int.Zero); }
         }
+        public InventoryItem(InventoryItem item)
+        {
+            Name = item.Name;   
+            Occupies = new List<Vector2Int>(item.Occupies);
+        }
     }
 }

@@ -15,12 +15,25 @@ namespace Mononoke
     class HeldItemPanel
     {
         List<ItemPanel> Panels = new();
-        public HeldItemPanel(InventoryItem item, Vector2Int pos) 
+        Grid mGrid;
+        static Vector2Int OFFSET = new Vector2Int(2, 22);
+        public HeldItemPanel(Panel mainPanel, InventoryItem item, Vector2Int pos, Vector2Int inventoryPos, Inventory inventory) 
         { 
+            mGrid = new Grid();
+            ItemPanel p = new ItemPanel(0,0,item);
+            mGrid.AddChild(p.mPanel);
+            p.mPanel.Background = new SolidBrush(Color.Transparent);
+            SetPos(inventoryPos, pos, inventory);
+            mainPanel.AddChild(mGrid);
         }
-        public void SetPos(Vector2Int pos, Inventory inventory)
+        public void SetPos(Vector2Int inventoryPos, Vector2Int pos, Inventory inventory)
         {
-
+            mGrid.Left = inventoryPos.X + (pos.X * InventoryGUI.ITEM_BOX_SIZE) + OFFSET.X;
+            mGrid.Top =  inventoryPos.Y + (pos.Y * InventoryGUI.ITEM_BOX_SIZE) + OFFSET.Y;
+        }
+        public void Delete()
+        {
+            mGrid.RemoveFromParent();
         }
 
     }
@@ -30,22 +43,22 @@ namespace Mononoke
         public Image mImage;
         public ItemPanel(int i, int j, InventoryItem item)
         {
-            Panel panel = new Panel();
-            panel.Background = new SolidBrush(InventoryGUI.DEFAULT_ITEM_COL);
-            panel.Width = InventoryGUI.ITEM_BOX_SIZE;
-            panel.Height = InventoryGUI.ITEM_BOX_SIZE;
-            Image image = new Image();
+            mPanel = new Panel();
+            mPanel.Background = new SolidBrush(InventoryGUI.DEFAULT_ITEM_COL);
+            mPanel.Width = InventoryGUI.ITEM_BOX_SIZE;
+            mPanel.Height = InventoryGUI.ITEM_BOX_SIZE;
+            mImage = new Image();
             if (item != null)
             {
                 Texture2D tex = TextureAssetManager.GetIconByName("petrichor");
-                image.Renderable = new TextureRegion(tex);
+                mImage.Renderable = new TextureRegion(tex);
                 //portrait.Scale = new Vector2(ITEM_BOX_SIZE / tex.Width, ITEM_BOX_SIZE / tex.Height);
-                image.HorizontalAlignment = HorizontalAlignment.Center;
-                image.VerticalAlignment = VerticalAlignment.Center;
+                mImage.HorizontalAlignment = HorizontalAlignment.Center;
+                mImage.VerticalAlignment = VerticalAlignment.Center;
             }
-            panel.AddChild(image);
-            panel.GridRow = j;
-            panel.GridColumn = i;
+            mPanel.AddChild(mImage);
+            mPanel.GridRow = j;
+            mPanel.GridColumn = i;
         }
     }
     class InventoryGUI
@@ -56,8 +69,13 @@ namespace Mononoke
         public static readonly Color HIGHLIGHTED_ITEM_COL = Color.Red;
         public VerticalStackPanel Container;
         Dictionary<Vector2Int, ItemPanel> mInventoryGridMap = new();
-        public InventoryGUI(Inventory inv, Panel mainPanel, Desktop desktop)
+        public Vector2Int ScreenPos;
+        Panel mMainPanel;
+        HeldItemPanel mHeldItemPanel;
+        public InventoryGUI(Inventory inv, Panel mainPanel, Desktop desktop, Vector2Int pos)
         {
+            ScreenPos = pos;
+            mMainPanel = mainPanel;
             Grid inventoryGrid = new Grid
             {
                 //ShowGridLines = true,
@@ -91,8 +109,8 @@ namespace Mononoke
             Container.Background = new SolidBrush(Color.Gray);
             Container.AddChild(title);
             Container.AddChild(inventoryGrid);
-            Container.Left = 200;
-            Container.Top = 200;
+            Container.Left = pos.X;
+            Container.Top = pos.Y;
             Container.Width = inventoryGrid.Width;
             Container.Height = inventoryGrid.Height + title.Height + 3;
             mainPanel.AddChild(Container);
@@ -114,6 +132,12 @@ namespace Mononoke
         {
             //mInventoryGridMap[pos].mImage = new Image();
             mInventoryGridMap[pos].mImage.Renderable = null;
+        }
+        public void PlaceItem(Vector2Int pos, InventoryItem item)
+        {
+            //mInventoryGridMap[pos].mImage = new Image();
+            Texture2D tex = TextureAssetManager.GetIconByName("petrichor");
+            mInventoryGridMap[pos].mImage.Renderable = new TextureRegion(tex); ;
         }
     }
 }
