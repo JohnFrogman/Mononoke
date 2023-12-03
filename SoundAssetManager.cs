@@ -89,36 +89,36 @@ namespace Mononoke
         public static void Initialise()
         {
             return;
-            MediaPlayer.Volume = 0.01f * MusicVolume;
-            string musicDir = "data/music/";
-            string sfxDir = "data/sfx/";
-            if (!Directory.Exists(musicDir))
-            {
-                throw new Exception("Music directory does not exist! " + musicDir);
-            }
-            //if (!Directory.Exists(sfxDir))
+            //MediaPlayer.Volume = 0.01f * MusicVolume;
+            //string musicDir = "data/music/";
+            ////string sfxDir = "data/sfx/";
+            //if (!Directory.Exists(musicDir))
             //{
-            //    throw new Exception("SFX directory does not exist! " + sfxDir);
-            //}   
-            string[] files = Directory.GetFiles(musicDir);
-            foreach (string f in files)
-            {
-                if (".wav" == Path.GetExtension(f) || ".ogg" == Path.GetExtension(f))
-                {
-                    string name = f.Substring(musicDir.Length, f.Length - musicDir.Length - 4).ToLower();
-                    Songs.Add(name, Song.FromUri(name, new Uri(Path.GetFullPath(f))));
-                }
-            }
-
-
-            //files = Directory.GetFiles(sfxDir);
+            //    throw new Exception("Music directory does not exist! " + musicDir);
+            //}
+            ////if (!Directory.Exists(sfxDir))
+            ////{
+            ////    throw new Exception("SFX directory does not exist! " + sfxDir);
+            ////}   
+            //string[] files = Directory.GetFiles(musicDir);
             //foreach (string f in files)
             //{
             //    if (".wav" == Path.GetExtension(f) || ".ogg" == Path.GetExtension(f))
             //    {
-            //        SoundEffects.Add(f.Substring(sfxDir.Length, f.Length - sfxDir.Length - 4).ToLower(), SoundEffect.FromFile(f));
+            //        string name = f.Substring(musicDir.Length, f.Length - musicDir.Length - 4).ToLower();
+            //        Songs.Add(name, Song.FromUri(name, new Uri(Path.GetFullPath(f))));
             //    }
             //}
+
+
+            ////files = Directory.GetFiles(sfxDir);
+            ////foreach (string f in files)
+            ////{
+            ////    if (".wav" == Path.GetExtension(f) || ".ogg" == Path.GetExtension(f))
+            ////    {
+            ////        SoundEffects.Add(f.Substring(sfxDir.Length, f.Length - sfxDir.Length - 4).ToLower(), SoundEffect.FromFile(f));
+            ////    }
+            ////}
         }
     }
 }

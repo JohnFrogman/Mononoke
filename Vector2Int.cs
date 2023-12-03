@@ -9,11 +9,11 @@ namespace Mononoke
 {
     internal struct Vector2Int
     {
-        public Vector2Int(int x, int y)   
+        public Vector2Int(int x, int y)
         {
             X = x;
             Y = y;
-        } 
+        }
         public int X;
         public int Y;
         public static Vector2Int Zero = new Vector2Int(0, 0);
@@ -29,16 +29,19 @@ namespace Mononoke
         }
         public static bool operator !=(Vector2Int a, Vector2Int b)
         {
-            return !(a==b);
+            return !(a == b);
         }
         public static bool operator ==(Vector2Int a, Vector2Int b)
         {
             return a.X == b.X && a.Y == b.Y;
-        }     
-        
-        //public static overide bool Equals(Vector2Int a, Vector2Int b)
-        //{
-        //    return a.X == b.X && a.Y == b.Y;
-        //}
+        }
+        public override bool Equals(Object b)
+        {
+            return this == (Vector2Int)b;
+        }
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ (Y.GetHashCode() << 2);
+        }
     }
 }

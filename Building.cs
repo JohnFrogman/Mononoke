@@ -11,7 +11,7 @@ namespace Mononoke
     class WallGeometry
     { 
         List<Vector2Int> Vertices;
-        int Thickness;
+        //int Thickness;
         public WallGeometry() { }
         public List<RigidBody> toRigidBodies()
         {

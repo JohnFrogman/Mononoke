@@ -15,7 +15,6 @@ namespace Mononoke
     }
     class OverworldController
     {
-        float PressTime = 0f;
         Player mPlayer;
         Car mCar;
         InputManager mInputManager;

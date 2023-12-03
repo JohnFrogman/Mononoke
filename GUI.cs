@@ -12,12 +12,6 @@ using Myra.Graphics2D;
 
 namespace Mononoke
 {
-    struct GUIData { 
-        DateTime mDateTime;
-        int mHunger;
-        int mFuel;
-        int mEnergy;
-    }
     class GUI
     {
         //uint UnitPerStamina = 1;

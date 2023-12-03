@@ -63,19 +63,15 @@ namespace Mononoke
     }
     class InventoryGUI
     {
-        public Texture2D mImage;
         public const int ITEM_BOX_SIZE = 32;
         public static readonly Color DEFAULT_ITEM_COL = Color.AntiqueWhite;
         public static readonly Color HIGHLIGHTED_ITEM_COL = Color.Red;
         public VerticalStackPanel Container;
         Dictionary<Vector2Int, ItemPanel> mInventoryGridMap = new();
         public Vector2Int ScreenPos;
-        Panel mMainPanel;
-        HeldItemPanel mHeldItemPanel;
         public InventoryGUI(Inventory inv, Panel mainPanel, Desktop desktop, Vector2Int pos)
         {
             ScreenPos = pos;
-            mMainPanel = mainPanel;
             Grid inventoryGrid = new Grid
             {
                 //ShowGridLines = true,

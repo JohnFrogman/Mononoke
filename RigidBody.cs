@@ -54,8 +54,6 @@ namespace Mononoke
 
         public Interaction mInteraction;
         List<RigidBody> PreviousOthers = new();
-        private bool v1;
-        private int v2;
         public bool ActivatesTriggers = false;
 
         public static RigidBody BuildRectangle(Vector2 pos, bool isStatic, float mass, Vector2 size, bool isTrigger = false, Interaction interaction = null, RigidBody parent = null)
@@ -220,12 +218,12 @@ namespace Mononoke
         public Vector2 Centre()
         {
             return mSize * 0.5f;
-            Vector2 result = Vector2.Zero;
-            foreach (Vector2 v in mVertices)
-            {
-                result += v;
-            }
-            return result / mVertices.Count;
+            //Vector2 result = Vector2.Zero;
+            //foreach (Vector2 v in mVertices)
+            //{
+            //    result += v;
+            //}
+            //return result / mVertices.Count;
         }
         public List<Vector2> Vertices()
         {
