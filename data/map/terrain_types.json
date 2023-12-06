@@ -1,0 +1,22 @@
+{
+	"Grass" : 
+	{
+		"colour" : "87b65e"
+		"floor_texture" : "grassland"
+	}
+	,"Forest" : 
+	{
+		"colour" : "418a00"
+		"floor_texture" : "autumn_leaves"
+		,"doodads" : [ 
+			{
+				"name" : "pine_tree",
+				"threshold" : 0.25
+			}
+		]
+	}
+	,"Shrub" : 
+	{
+		"colour" : "78b840"
+	}
+}

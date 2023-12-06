@@ -18,31 +18,9 @@ namespace Mononoke
         private static TextureHolder Icons;
         private static TextureHolder mCarSprites;
         private static TextureHolder mTerrain;
+        private static TextureHolder mDoodads;
         private static Texture2D simpleSpuare;
-        private static MouseCursorHolder Cursors;
-        //public static Texture2D GetCursor( eMouseCursorType type )
-        //{
-        //    switch (type)
-        //    {
-        //        case eMouseCursorType.Move :
-        //        {
-        //            return Cursors.MoveCursor;
-        //        }
-        //        case eMouseCursorType.IllegalMove:
-        //        {
-        //            return Cursors.IllegalMoveCursor;
-        //        }
-        //        case eMouseCursorType.SelectUnit:
-        //        {
-        //            return Cursors.SelectCursor;
-        //        }
-        //        default :
-        //        {
-        //            return Cursors.DefaultCursor;
-        //        }
-        //    }
-        //}
-        
+
         public static void Initialise( GraphicsDeviceManager graphics )
         {
             Texture2D brokenTexture = new Texture2D(graphics.GraphicsDevice, 1,1);
@@ -54,11 +32,10 @@ namespace Mononoke
             brokenTexture.SetData(pixels);
             SetSimpleSquare( graphics );
 
-            Cursors = new MouseCursorHolder( graphics, brokenTexture );
-
             Icons = new TextureHolder( graphics, "data/textures/icons/", brokenTexture );
             mCarSprites = new TextureHolder(graphics, "data/textures/units/", brokenTexture );
             mTerrain = new TextureHolder(graphics, "data/textures/terrain/", brokenTexture);
+            mDoodads = new TextureHolder(graphics, "data/textures/doodads/", brokenTexture);
         }
         public static Texture2D GetIconByName( string str )
         { 
@@ -79,6 +56,10 @@ namespace Mononoke
         public static Texture2D GetTerrainTileByName(string str)
         {
             return mTerrain.GetTextureByName(str);
+        }
+        public static Texture2D GetDoodadByname(string str)
+        {
+            return mDoodads.GetTextureByName(str);
         }
         static void SetSimpleSquare( GraphicsDeviceManager graphics )
         {

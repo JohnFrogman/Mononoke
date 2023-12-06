@@ -6,9 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text.Json;
 
 namespace Mononoke
 {
+    class TileTypeData
+    {
+        List<DoodadTemplate> Doodads;
+        Texture2D FloorTexture;
+    }
     internal class TerrainManager
     {
         Camera2D mCamera;
@@ -20,8 +27,10 @@ namespace Mononoke
         int XCoord = 0;
         int YCoord = 0;
         Vector2 Offset;
+        //eTerrainTileType[,] TileTypeMap;
         public TerrainManager(Camera2D camera) 
         {
+            LoadTerrainTypes();
             mCamera = camera;
             //mTileGrid = new Texture2D[1,1];
             Texture2D tex = TextureAssetManager.GetTerrainTileByName("sand_tile_big");
@@ -37,6 +46,11 @@ namespace Mononoke
                     mTileGrid[i, j] = new TerrainTile(tex, CoordsToTerrainPos(i,j), new Vector2(tex.Width/2f, tex.Height/2f));
                 }
             }
+        }
+        void LoadTerrainTypes()
+        {
+            JsonDocument json = JsonDocument.Parse(File.ReadAllText("data/map/terrain_types.json"));
+            json.Deserialize(List<>)
         }
         Vector2 CoordsToTerrainPos(int x, int y)
         {

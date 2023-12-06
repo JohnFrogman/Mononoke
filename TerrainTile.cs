@@ -23,5 +23,8 @@ namespace Mononoke
         {
             spriteBatch.Draw(mTexture, mPosition, null, Color.White, 0f, mCentre, 1f, SpriteEffects.None, 0f);
         }
+        public void Initialise()
+        { 
+        }
     }
 }
