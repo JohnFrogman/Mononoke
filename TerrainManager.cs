@@ -8,13 +8,34 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
+using System.Xml.Linq;
+using System.Text.Json.Nodes;
 
 namespace Mononoke
 {
+    class DoodadData
+    {
+        public readonly DoodadTemplate Template;
+        public readonly float Threshold;
+        public DoodadData(DoodadTemplate t, float theshold)
+        {
+            Template = t;
+            Threshold = theshold;
+        }
+    }
     class TileTypeData
     {
-        List<DoodadTemplate> Doodads;
-        Texture2D FloorTexture;
+        public readonly string Name;
+        public readonly List<DoodadData> Doodads;
+        public readonly Texture2D FloorTexture;
+        public readonly Color Colour;
+        public TileTypeData(string name, List<DoodadData> doodadTemplates, Texture2D floorTexture, Color colour)
+        {
+            Name = name;
+            Doodads = doodadTemplates; 
+            FloorTexture = floorTexture;
+            Colour = colour;
+        }
     }
     internal class TerrainManager
     {
@@ -27,6 +48,8 @@ namespace Mononoke
         int XCoord = 0;
         int YCoord = 0;
         Vector2 Offset;
+        Dictionary<Color, TileTypeData> TerrainTypeColourMap = new();
+        Dictionary<string, TileTypeData> TerrainTypeNameMap = new();
         //eTerrainTileType[,] TileTypeMap;
         public TerrainManager(Camera2D camera) 
         {
@@ -50,7 +73,25 @@ namespace Mononoke
         void LoadTerrainTypes()
         {
             JsonDocument json = JsonDocument.Parse(File.ReadAllText("data/map/terrain_types.json"));
-            json.Deserialize(List<>)
+            var types = json.RootElement.EnumerateObject();
+
+            foreach (var e in types)
+            {
+                string name = e.Name;
+                List<DoodadData> doodads = new List<DoodadData>();
+                var doodadElements = e.Value.GetProperty("doodads").EnumerateArray();
+                foreach (var d in doodadElements)
+                {
+                    doodads.Add(new DoodadData(DoodadAssetManager.GetDoodadTemplate(d.GetProperty("name").ToString()), (float)d.GetProperty("threshold").GetDouble()));
+                }
+                TileTypeData tt = new TileTypeData(
+                    name,
+                    doodads,
+                    TextureAssetManager.GetTerrainTileByName(e.Value.GetProperty("floor_texture").GetString()),
+                    e.Value.GetProperty("colour").GetColor());
+                TerrainTypeColourMap.Add(tt.Colour, tt);
+                TerrainTypeNameMap.Add(tt.Name, tt);
+            }
         }
         Vector2 CoordsToTerrainPos(int x, int y)
         {

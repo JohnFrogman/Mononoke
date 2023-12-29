@@ -10,11 +10,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Mononoke
 {
-    internal class DoodadAssetManager
+    static class DoodadAssetManager
     {
         static Dictionary<string, DoodadTemplate> Doodads = new();
 
-        public DoodadTemplate GetDoodadTemplate(string name)
+        public static DoodadTemplate GetDoodadTemplate(string name)
         { 
             if (!Doodads.ContainsKey(name))
             {
@@ -22,9 +22,9 @@ namespace Mononoke
             }
             return Doodads[name];
         }
-        void LoadDoodad(string name)
+        static void LoadDoodad(string name)
         {
-            Doodads.Add(name, DoodadTemplate.fromJson(JsonDocument.Parse(File.ReadAllText("data/doodads/" + name)).RootElement));
+            Doodads.Add(name, DoodadTemplate.fromJson(JsonDocument.Parse(File.ReadAllText("data/doodads/" + name + ".json")).RootElement));
         }
     }
 }

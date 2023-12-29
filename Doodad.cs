@@ -20,7 +20,7 @@ namespace Mononoke
         {
             DoodadTemplate result = new();
             result.Sprite = TextureAssetManager.GetDoodadByname(e.GetProperty("sprite_name").ToString());
-            result.ColliderVertices = JsonSerializer.Deserialize<List<Vector2>>(e.GetProperty("vertices"));
+            result.ColliderVertices = JsonSerializer.Deserialize<List<Vector2>>(e.GetProperty("collider_vertices"));
             result.Static = e.GetProperty("static").GetBoolean();
             result.Mass = e.GetProperty("mass").GetInt32();
             result.Trigger = e.GetProperty("trigger").GetBoolean();

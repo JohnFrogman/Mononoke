@@ -2,12 +2,13 @@
 	"Grass" : 
 	{
 		"colour" : "87b65e"
-		"floor_texture" : "grassland"
+		,"floor_texture" : "grassland"
+		,"doodads" : []
 	}
 	,"Forest" : 
 	{
 		"colour" : "418a00"
-		"floor_texture" : "autumn_leaves"
+		,"floor_texture" : "autumn_leaves"
 		,"doodads" : [ 
 			{
 				"name" : "pine_tree",
@@ -18,5 +19,7 @@
 	,"Shrub" : 
 	{
 		"colour" : "78b840"
+		,"floor_texture" : "autumn_leaves"
+		,"doodads" : []
 	}
 }

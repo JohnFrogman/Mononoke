@@ -2,7 +2,7 @@
 	"sprite_name": "pine_tree",
 	"static" : true,
 	"mass" : 100,
-	"trigger" : false;
+	"trigger" : false,
 	"collider_vertices": [
 		{
 			"X": -11,
