@@ -42,9 +42,9 @@ namespace Mononoke
 
             mSpeedLabel = new Label();
             mSpeedLabel.Text = "";
-            headerPanel.AddChild(mSpeedLabel);
+            headerPanel.Widgets.Add(mSpeedLabel);
 
-            mMainPanel.AddChild(headerPanel);
+            mMainPanel.Widgets.Add(headerPanel);
             mInventoryManager = new (desktop, mMainPanel);
         }
         // 0 = 01/01/1114

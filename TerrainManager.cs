@@ -48,6 +48,7 @@ namespace Mononoke
         int XCoord = 0;
         int YCoord = 0;
         Vector2 Offset;
+        TileTypeData[,] mTypeMap;
         Dictionary<Color, TileTypeData> TerrainTypeColourMap = new();
         Dictionary<string, TileTypeData> TerrainTypeNameMap = new();
         //eTerrainTileType[,] TileTypeMap;
@@ -92,6 +93,12 @@ namespace Mononoke
                 TerrainTypeColourMap.Add(tt.Colour, tt);
                 TerrainTypeNameMap.Add(tt.Name, tt);
             }
+        }
+        void BuildTile(Vector2Int coord)
+        {
+            TileTypeData tt = mTypeMap[coord.X, coord.Y];
+            
+
         }
         Vector2 CoordsToTerrainPos(int x, int y)
         {
